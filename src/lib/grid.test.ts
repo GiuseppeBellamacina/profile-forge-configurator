@@ -16,7 +16,7 @@ describe("grid packing", () => {
   it("matches the renderer exactly", () => {
     const mine = pack(items, heightOf);
     expect(mine.map(({ id, x, y, w, h }) => ({ id, x, y, w, h }))).toEqual(boxes.map(({ id, x, y, w, h }) => ({ id, x, y, w, h })));
-    expect(height).toBe(Math.max(...boxes.map((b) => b.y + b.h)) + 28);
+    expect(height).toBe(Math.max(...boxes.map((b) => b.y + b.h)) + 54);
   });
 
   it("dropping a widget near a spot puts it there", () => {
@@ -49,5 +49,13 @@ describe("grid packing", () => {
     expect(heightFor(200, 100, 100 + 340)).toBe(380); // steps above 200: 280 (3 rows), 380 (4 rows)...
     expect(heightFor(200, 100, 100 + 60)).toBeUndefined();
     expect(heightSteps(120).map((x) => x.height).slice(0, 3)).toEqual([180, 280, 380]);
+  });
+
+  it("without a header everything sits 30px lower, like the renderer", () => {
+    const noHeader = items.filter((i) => i.id !== "header");
+    const k3 = normalize({ grid: gridOf(noHeader), about: ["Hello there"] });
+    const r3 = sectionBoxes(summarize(demoProfile(), k3), { k: k3 }).boxes;
+    expect(r3[0].y).toBe(30);
+    expect(pack(noHeader, (id) => r3.find((b) => b.id === id)?.minH).map(({ id, x, y }) => ({ id, x, y }))).toEqual(r3.map(({ id, x, y }) => ({ id, x, y })));
   });
 });
