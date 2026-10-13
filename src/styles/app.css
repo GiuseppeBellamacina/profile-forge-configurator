@@ -264,3 +264,7 @@ input[type="text"], input[type="number"], input[type="search"], input[type="pass
 svg.ic { flex: none; vertical-align: -3px; }
 .btn svg.ic { vertical-align: 0; }
 .grip svg.ic { vertical-align: -4px; }
+
+/* native dropdown lists: transparent selects made the popup fall back to white */
+select { background-color: var(--surface); }
+option, optgroup { background: var(--surface); color: var(--text); }
