@@ -1,0 +1,9 @@
+name = "profile-forge-oauth"
+main = "index.js"
+compatibility_date = "2024-11-01"
+
+[vars]
+# Origins of the page(s) allowed to start a sign-in and receive the token (no trailing slash).
+ALLOWED_ORIGINS = "https://giuseppebellamacina.github.io,http://localhost:8080"
+# Your OAuth App's client id (public). The secret is set with: wrangler secret put GITHUB_CLIENT_SECRET
+GITHUB_CLIENT_ID = "REPLACE_WITH_CLIENT_ID"

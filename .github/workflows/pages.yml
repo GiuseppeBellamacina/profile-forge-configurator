@@ -1,0 +1,53 @@
+name: Deploy configurator
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      core_ref:
+        description: profile-forge branch or tag to build against
+        default: main
+  # Fired by profile-forge when its renderer changes (optional): gh api repos/<owner>/profile-forge-configurator/dispatches -f event_type=core-updated
+  repository_dispatch:
+    types: [core-updated]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: GiuseppeBellamacina/profile-forge
+          ref: ${{ inputs.core_ref || 'main' }}
+          path: core
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm test
+      - run: node scripts/build-site.js
+        env:
+          CORE_DIR: core
+      - name: Point the page at the OAuth backend (optional)
+        env:
+          AUTH_URL: ${{ vars.AUTH_URL }}
+        run: echo "export const AUTH_URL = \"${AUTH_URL%/}\";" > _site/config.js
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

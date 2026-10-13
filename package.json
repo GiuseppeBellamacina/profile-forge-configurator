@@ -1,0 +1,15 @@
+{
+  "name": "profile-forge-configurator",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Web configurator for profile-forge: live preview, then publish config.json, workflow and assets to your profile repo.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-site.js",
+    "serve": "node scripts/build-site.js --serve",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": { "node": ">=20" },
+  "license": "MIT",
+  "repository": "github:GiuseppeBellamacina/profile-forge-configurator"
+}
