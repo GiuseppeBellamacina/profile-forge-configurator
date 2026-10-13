@@ -22,7 +22,7 @@ export const ICONS: Record<string, string> = icons.ICONS;
 export const BRANDS: Record<string, string> = icons.BRANDS;
 
 export const render: (data: Raw, opts: Raw) => string = renderer.render;
-export type Box = { id: string; x: number; y: number; w: number; h: number };
+export type Box = { id: string; x: number; y: number; w: number; h: number; minH: number };
 /** Where each section lands on the card, in card pixels (the card is 1000 wide). */
 export const sectionBoxes: (data: Raw, opts: Raw) => { height: number; boxes: Box[] } = renderer.sectionBoxes;
 export const summarize: (profile: Raw, k: Raw) => Raw = stats.summarize;
