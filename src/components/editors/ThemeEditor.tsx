@@ -150,6 +150,22 @@ export function ThemeGallery() {
   );
 }
 
+/** The "Advanced slots" switch (off unless the config already has custom slots) and, when on, the slot editor. */
+export function AdvancedSlots() {
+  const slots = themeSlots(useRaw());
+  const custom = Object.keys(slots).some((s) => s !== "dark" && s !== "light") || Object.keys(slots).length > 2;
+  const [on, setOn] = useState(custom);
+  return (
+    <div className="stack">
+      <label className="field inline" onClick={(e) => { e.preventDefault(); setOn(!on); }}>
+        <span className="field-label">Advanced slots <small>extra card files, e.g. for a portfolio site; GitHub only needs dark and light</small></span>
+        <button type="button" role="switch" aria-checked={on} aria-label="Advanced slots" className="toggle" />
+      </label>
+      {on && <ThemeSlots />}
+    </div>
+  );
+}
+
 /** Slots: the name decides the file (profile-forge-<slot>.svg), so the README never changes when a theme does. */
 export function ThemeSlots() {
   const raw = useRaw();
@@ -173,7 +189,7 @@ export function ThemeSlots() {
         </div>
       ))}
       <div className="row">
-        <button className="btn sm" onClick={() => edit((r) => { const s = themeSlots(r); r.themes = { ...s, [`slot${Object.keys(s).length + 1}`]: "dracula" }; })}>+ Add slot</button>
+        <button className="btn sm" onClick={() => edit((r) => { const s = themeSlots(r); r.themes = { ...s, [`slot${Object.keys(s).length + 1}`]: "dracula" }; })}><Icon n="plus" /> Add slot</button>
         <span className="hint">dark / light are the names GitHub’s README picture switch expects.</span>
       </div>
     </div>

@@ -9,7 +9,7 @@ import { ImportExport } from "../editors/ImportExport";
 import { LayoutEditor } from "../editors/LayoutEditor";
 import { PresetGallery } from "../editors/PresetGallery";
 import { PublishPanel } from "../editors/PublishPanel";
-import { ColorsEditor, CustomThemes, ThemeGallery, ThemeSlots } from "../editors/ThemeEditor";
+import { AdvancedSlots, ColorsEditor, CustomThemes, ThemeGallery } from "../editors/ThemeEditor";
 import { FieldList, FieldView } from "../ui/Fields";
 import { Icon } from "../ui/Icon";
 
@@ -49,7 +49,7 @@ export const LookStep = () => (
   <>
     <Section title="Themes" hint="Pick the slot you want to change, then click a theme. The slot names (dark / light) decide the file names, so your README never changes when you swap themes.">
       <ThemeGallery />
-      <Collapse title="Slots (advanced)"><ThemeSlots /></Collapse>
+      <AdvancedSlots />
     </Section>
     <Section title="Make it yours">
       <Collapse title="Color overrides"><ColorsEditor /></Collapse>
