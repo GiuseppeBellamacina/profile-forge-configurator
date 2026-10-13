@@ -1,9 +1,9 @@
 // Deterministic demo profile, same shape as fetchProfile() in src/github.js. Used until the user loads their own data.
-export function demoProfile() {
+export function demoProfile(): Record<string, any> {
   let seed = 42;
   const rnd = () => ((seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296);
   const today = new Date().toISOString().slice(0, 10);
-  const days = [];
+  const days: [string, number][] = [];
   for (let d = new Date("2016-03-01T00:00:00Z"); d.toISOString().slice(0, 10) <= today; d.setUTCDate(d.getUTCDate() + 1)) {
     const wd = d.getUTCDay();
     const busy = Math.sin(d.getTime() / 86_400_000 / 40) > -0.6;
@@ -11,7 +11,7 @@ export function demoProfile() {
     days.push([d.toISOString().slice(0, 10), n]);
   }
   days[days.length - 1][1] = 3;
-  const L = (name, color, size) => ({ name, color, size });
+  const L = (name: string, color: string, size: number) => ({ name, color, size });
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7aa2f7"/><stop offset="1" stop-color="#bb9af7"/></linearGradient></defs><rect width="200" height="200" fill="url(#g)"/><circle cx="100" cy="82" r="36" fill="#fff" fill-opacity=".9"/><path d="M30 200c6-48 40-68 70-68s64 20 70 68z" fill="#fff" fill-opacity=".9"/></svg>`;
   return {
     name: "Ada Demo", login: "ada-demo", avatar: `data:image/svg+xml;base64,${btoa(svg)}`,

@@ -1,3 +1,5 @@
-_site/
 node_modules/
+dist/
+public/core/
+_site/
 core/

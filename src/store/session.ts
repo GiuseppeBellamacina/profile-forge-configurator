@@ -1,0 +1,97 @@
+// GitHub sign-in (OAuth via the worker, or a personal access token) and the profile used by the preview.
+import { fetchProfile, normalize, type Raw } from "../core";
+import { demoProfile } from "../lib/demo";
+import { clone } from "../lib/path";
+import { api } from "../lib/publish";
+import { session as ss } from "../lib/storage";
+import { configStore } from "./config";
+import { createStore, useStore } from "./store";
+import { uiStore, type StepId } from "./ui";
+
+// Set at build time (VITE_AUTH_URL, from the AUTH_URL repository variable). Empty = personal access token only.
+export const AUTH_URL: string = ((import.meta.env.VITE_AUTH_URL as string | undefined) ?? "").replace(/\/$/, "");
+
+type Me = { login: string; avatar_url: string };
+type S = {
+  token: string; me: Me | null; via: "oauth" | "pat" | null; authError: string;
+  profile: Raw; source: string; loadMsg: string; loading: boolean; fetched: { login: string; priv: boolean } | null;
+};
+export const sessionStore = createStore<S>({
+  token: "", me: null, via: null, authError: "", profile: demoProfile(), source: "demo data", loadMsg: "", loading: false, fetched: null,
+});
+export const useSession = <T,>(select: (s: S) => T) => useStore(sessionStore, select);
+
+export async function setSession(token: string, via: "oauth" | "pat") {
+  const u = await api.user(token);
+  const me = { login: u.login as string, avatar_url: u.avatar_url as string };
+  sessionStore.set({ token, via, authError: "", me });
+  ss.set("pf:session", { token, via, me });
+  loadProfile(me.login).catch(() => {});
+}
+
+export function signIn(priv: boolean) {
+  const nonce = crypto.randomUUID().replace(/-/g, "");
+  ss.set("pf:nonce", nonce);
+  ss.set("pf:tab", uiStore.get().step);
+  const ret = encodeURIComponent(location.origin + location.pathname);
+  location.href = `${AUTH_URL}/auth/login?return=${ret}&state=${nonce}&scope=${priv ? "private" : "public"}`;
+}
+
+export async function signOut() {
+  const { via, token } = sessionStore.get();
+  if (via === "oauth" && AUTH_URL)
+    await fetch(`${AUTH_URL}/auth/logout`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) }).catch(() => {});
+  ss.set("pf:session", null);
+  sessionStore.set({ token: "", me: null, via: null, fetched: null, loadMsg: "", profile: demoProfile(), source: "demo data" });
+}
+
+export function useDemoData() {
+  sessionStore.set({ profile: demoProfile(), fetched: null, source: "demo data", loadMsg: "Back to demo data." });
+}
+
+/** Fetch a profile once; later edits reuse it. Cached per login (and private flag) in this tab. */
+export async function loadProfile(login: string, { force = false } = {}) {
+  const { token } = sessionStore.get();
+  if (!token) throw new Error("Sign in first.");
+  const raw = configStore.get().raw;
+  const priv = !!raw.includePrivate;
+  const key = `pf:profile:${login}:${priv}`;
+  const cached = !force && ss.get<Raw>(key);
+  if (cached) {
+    sessionStore.set({ profile: cached, fetched: { login, priv }, source: `@${login}`, loadMsg: `Showing @${login}.` });
+    return;
+  }
+  sessionStore.set({ loading: true, source: `loading @${login}…`, loadMsg: "Fetching your profile (a few seconds, only this once)…" });
+  try {
+    normalize(clone(raw)); // fail early on an invalid config
+    const p = await fetchProfile({ login, token, includePrivate: priv, tz: raw.timezone ?? "UTC", startingYear: null, extras: true });
+    ss.set(key, p);
+    sessionStore.set({ profile: p, fetched: { login, priv }, source: `@${login}`, loadMsg: `Showing @${login}.`, loading: false });
+  } catch (e: any) {
+    const f = sessionStore.get().fetched;
+    sessionStore.set({ source: f ? `@${f.login}` : "demo data", loadMsg: `Could not load @${login}: ${e.message}`, loading: false });
+    throw e;
+  }
+}
+
+/** Back from GitHub sign-in (token in the URL fragment), or a session kept in this tab. Returns true if the URL carried auth data. */
+export async function bootSession(): Promise<boolean> {
+  const hash = new URLSearchParams(location.hash.slice(1));
+  if (hash.has("pf_token") || hash.has("pf_error")) {
+    history.replaceState(null, "", location.pathname + location.search);
+    const saved = ss.get<StepId>("pf:tab");
+    if (saved) uiStore.set({ step: saved });
+    const ok = hash.get("state") && hash.get("state") === ss.get("pf:nonce");
+    ss.set("pf:nonce", null);
+    if (!ok) sessionStore.set({ authError: "The sign-in could not be verified. Please try again." });
+    else if (hash.has("pf_error")) sessionStore.set({ authError: `GitHub sign-in failed: ${hash.get("pf_error")}` });
+    else await setSession(hash.get("pf_token")!, "oauth").catch((e) => sessionStore.set({ authError: e.message }));
+    return true;
+  }
+  const s = ss.get<{ token: string; via: "oauth" | "pat"; me: Me }>("pf:session");
+  if (s?.token) {
+    sessionStore.set({ token: s.token, via: s.via, me: s.me });
+    loadProfile(s.me.login).catch(() => {});
+  }
+  return false;
+}

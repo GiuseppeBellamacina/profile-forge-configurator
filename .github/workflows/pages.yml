@@ -27,6 +27,10 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      CORE_DIR: core
+      # URL of the OAuth worker, baked into the page at build time (empty = personal access token sign-in only).
+      VITE_AUTH_URL: ${{ vars.AUTH_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
@@ -37,17 +41,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+      - run: npm ci
       - run: npm test
-      - run: node scripts/build-site.js
-        env:
-          CORE_DIR: core
-      - name: Point the page at the OAuth backend (optional)
-        env:
-          AUTH_URL: ${{ vars.AUTH_URL }}
-        run: echo "export const AUTH_URL = \"${AUTH_URL%/}\";" > _site/config.js
+      - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: dist
       - id: deployment
         uses: actions/deploy-pages@v4

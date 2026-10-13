@@ -5,11 +5,29 @@
   "description": "Web configurator for profile-forge: live preview, then publish config.json, workflow and assets to your profile repo.",
   "type": "module",
   "scripts": {
-    "build": "node scripts/build-site.js",
-    "serve": "node scripts/build-site.js --serve",
-    "test": "node --test test/*.test.js"
+    "build": "node scripts/sync-core.js && tsc --noEmit && vite build",
+    "test": "node --test test/*.test.js && vitest run",
+    "dev": "node scripts/sync-core.js && vite",
+    "preview": "vite preview",
+    "sync": "node scripts/sync-core.js",
+    "typecheck": "tsc --noEmit"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "license": "MIT",
-  "repository": "github:GiuseppeBellamacina/profile-forge-configurator"
+  "repository": "github:GiuseppeBellamacina/profile-forge-configurator",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21",
+    "vitest": "^2.1.9"
+  }
 }

@@ -4,16 +4,16 @@ const crcTable = Array.from({ length: 256 }, (_, n) => {
   for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
   return c >>> 0;
 });
-const crc32 = (b) => {
+const crc32 = (b: Uint8Array) => {
   let c = 0xffffffff;
   for (const x of b) c = crcTable[(c ^ x) & 0xff] ^ (c >>> 8);
   return (c ^ 0xffffffff) >>> 0;
 };
 
-export function zip(files) {
+export function zip(files: { path: string; bytes: Uint8Array }[]) {
   const enc = new TextEncoder();
-  const chunks = [];
-  const central = [];
+  const chunks: Uint8Array[] = [];
+  const central: Uint8Array[] = [];
   let offset = 0;
   for (const f of files) {
     const name = enc.encode(f.path);
@@ -47,5 +47,5 @@ export function zip(files) {
   end.setUint16(10, files.length, true);
   end.setUint32(12, size, true);
   end.setUint32(16, offset, true);
-  return new Blob([...chunks, ...central, new Uint8Array(end.buffer)], { type: "application/zip" });
+  return new Blob([...chunks, ...central, new Uint8Array(end.buffer)] as BlobPart[], { type: "application/zip" });
 }
