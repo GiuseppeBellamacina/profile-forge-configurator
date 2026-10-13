@@ -24,12 +24,13 @@ const cfg = {
   themes: { dark: "dracula", light: "gruvbox-light", print: "nord" },
   card: { radius: 41, hideBorder: true, background: { pattern: "grid" } },
   grid: [{ section: "header" }, { section: "stats", cols: 4, height: 280 }, { section: "streak", cols: 3 }],
-  header: { avatar: "rounded", rankIcon: "percentile", facts: ["stars", "followers"] },
+  header: { avatar: "rounded", rankIcon: "percentile", frame: "neon", rankStyle: "hexagon", rankThickness: 12, facts: ["stars", "followers"] },
+  trophies: { style: "gem", parts: ["title", "bar"], align: "left", padding: 30 },
   stats: { numberFormat: "short", lineHeight: 40, hide: ["issues"] },
   streak: { mode: "weekly", dateFormat: "j M[ Y]" },
   languages: { layout: "pie", count: 5 },
   heatmap: { weeks: 30, cell: "moon", mode: "snake", snakePath: "busy" },
-  colors: { icon_color: "ff0066", snakeColor: "ff8a3d" },
+  colors: { icon_color: "ff0066", snakeColor: "ff8a3d", frameColor: "00ff88", levelS: "ffaa00" },
 };
 
 try {
@@ -79,6 +80,13 @@ try {
   await ev(`(() => { const e = document.getElementById("ctl-heatmap.mode"); e.value = "0"; e.dispatchEvent(new Event("change", { bubbles: true })); })()`);
   await sleep(300);
   check("Details: snake options hide again for the plain grid", (await val("heatmap.snakePath")) === null && (await ev(`!document.getElementById("field-colors.snakeColor")`)));
+  check("Details: avatar frame", (await val("header.frame"))?.startsWith("neon"), await val("header.frame"));
+  const frameHex = await ev(`document.getElementById("field-colors.frameColor")?.querySelector("input[type=text]")?.value`);
+  check("Details: frame color", frameHex === "00ff88", frameHex);
+  check("Details: rank shape and thickness", (await val("header.rankStyle"))?.startsWith("hexagon") && (await val("header.rankThickness")) === "12", [await val("header.rankStyle"), await val("header.rankThickness")]);
+  check("Details: trophy style and padding", (await val("trophies.style"))?.startsWith("gem") && (await val("trophies.padding")) === "30", [await val("trophies.style"), await val("trophies.padding")]);
+  check("Details: trophy parts", (await pressed("trophies.parts")).join() === "title,bar", await pressed("trophies.parts"));
+  check("Details: the frame gallery is there", (await ev(`document.querySelectorAll(".fthumb-tile").length`)) >= 10);
   const facts = await pressed("header.facts");
   check("Details: header facts", facts.join() === "stars,followers", facts);
   check("Details: stats hide", (await pressed("stats.hide")).join() === "issues", await pressed("stats.hide"));

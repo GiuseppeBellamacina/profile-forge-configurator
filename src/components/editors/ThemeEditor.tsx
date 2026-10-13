@@ -42,7 +42,7 @@ function Swatch({ name, customs }: { name: string; customs: Record<string, unkno
 
 // Thumbnails render serially (one card per frame) so a 47-tile gallery never blocks typing or scrolling.
 let queue: Promise<unknown> = Promise.resolve();
-const later = <T,>(job: () => Promise<T>) => (queue = queue.then(() => new Promise((r) => setTimeout(r, 0))).then(job, job)) as Promise<T>;
+export const later = <T,>(job: () => Promise<T>) => (queue = queue.then(() => new Promise((r) => setTimeout(r, 0))).then(job, job)) as Promise<T>;
 
 /** The user's own card (their config, colors and profile) rendered with one theme, drawn when the tile scrolls into view. */
 function Thumb({ name, target, cache }: { name: string; target: string; cache: Map<string, string> }) {
@@ -196,7 +196,7 @@ export function ThemeSlots() {
   );
 }
 
-export function ColorWidget({ k, value, theme, onSet }: { k: string; value: string; theme: string; onSet: (v: string | undefined) => void }) {
+export function ColorWidget({ k, label, value, theme, onSet }: { k: string; label?: string; value: string; theme: string; onSet: (v: string | undefined) => void }) {
   // The text is kept locally while typing ("f", "ff", "fff"); only a valid or empty value reaches the store.
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft((d) => (d.replace("#", "") === value ? d : value)), [value]);
@@ -207,7 +207,7 @@ export function ColorWidget({ k, value, theme, onSet }: { k: string; value: stri
   } catch { /* unknown theme while editing */ }
   return (
     <div className="cf">
-      <span title={k}>{k}</span>
+      <span title={k}>{label ?? k}</span>
       <input type="color" aria-label={k} value={hex6(value || fallback)} onChange={(e) => onSet(e.target.value.slice(1))} />
       <input type="text" maxLength={9} value={draft} aria-label={`${k} hex`} placeholder={String(fallback).replace("#", "").slice(0, 8)} onChange={(e) => {
         setDraft(e.target.value);
@@ -222,7 +222,9 @@ export function ColorWidget({ k, value, theme, onSet }: { k: string; value: stri
 
 const colorNames = COLOR_NAMES.filter((k) => k !== "bg_gradient");
 // the snake colour is only offered while the heatmap is a snake
-const shownColors = (raw: Record<string, any>) => colorNames.filter((k) => k !== "snakeColor" || raw.heatmap?.mode === "snake");
+// the level colours have their own editor and the frame colour sits next to the frame option
+const OWN_EDITOR = new Set(["levelE", "levelD", "levelC", "levelB", "levelA", "levelS", "levelTop", "frameColor"]);
+const shownColors = (raw: Record<string, any>) => colorNames.filter((k) => !OWN_EDITOR.has(k) && (k !== "snakeColor" || raw.heatmap?.mode === "snake"));
 
 /** Color overrides for all slots, or for one slot only. */
 export function ColorsEditor() {
