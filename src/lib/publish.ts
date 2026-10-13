@@ -111,11 +111,11 @@ async function call(token: string, method: string, path: string, body?: unknown)
   if (!res.ok) {
     const scopes = res.headers.get("x-oauth-scopes");
     let hint = "";
-    if (res.status === 401) hint = "The token is invalid or expired.";
+    if (res.status === 401) hint = "Your GitHub session expired. Sign out and sign in again.";
     else if (res.status === 403 || res.status === 404)
       hint = /workflow/i.test(json.message ?? "") || (scopes !== null && !scopes.split(/,\s*/).includes("workflow"))
-        ? "Pushing a workflow file needs the `workflow` scope (classic token) or the Workflows: write permission (fine-grained token)."
-        : "Check that the token can write to this repository (classic: `repo` + `workflow`; fine-grained: Contents and Workflows write).";
+        ? "Pushing a workflow file needs the `workflow` permission. Sign out and sign in again, accepting every permission."
+        : "Check that you can write to this repository (private repos need the “private data” sign-in option).";
     throw new GitHubError(res.status, json.message ?? res.statusText, hint);
   }
   return json;

@@ -10,7 +10,8 @@ Design your card with a live preview, then publish everything to your profile re
 - **Presets gallery**, undo / redo (Ctrl Z / Ctrl Y), a search box for any option (Ctrl K), a dot and a reset button on every field that differs from the default.
 - **Share a configuration** as a link (`#c=…`, no server) or import / export `config.json`.
 - **One-click publish**: `config.json`, `.github/workflows/profile-forge.yml`, the icons under `assets/img/` and the card block in `README.md` go into your `<login>/<login>` repo in a single commit. It can create the repo, shows which files are new / changed, and starts the first workflow run.
-- **No token?** Download a `.zip` of everything, or open pre-filled “new file” pages on github.com.
+- **Sign in with GitHub, no token to paste.** The preview works without signing in (just type your login); signing in is only needed to commit.
+- **Prefer not to sign in?** Download a `.zip` of everything, or open pre-filled “new file” pages on github.com.
 
 ## Hosting (GitHub Pages)
 
@@ -33,26 +34,32 @@ Scopes: `public_repo` + `workflow` by default (enough for a public profile repo)
 
 ### Setting it up once
 
-1. Create an OAuth App: **GitHub → Settings → Developer settings → OAuth Apps → New**.
+1. Create an OAuth App: **GitHub → Settings → Developer settings → OAuth Apps → New OAuth App**, then **Generate a new client secret**.
    - Homepage URL: `https://<owner>.github.io/profile-forge-configurator/`
    - Authorization callback URL: `https://<your-worker>.workers.dev/auth/callback` (exactly: the worker builds `redirect_uri` from its own origin).
-2. Deploy the worker (needs a free Cloudflare account):
+2. Create a read-only token for the pre-login preview: **Settings → Developer settings → Personal access tokens → Fine-grained → Generate**, *Public repositories (read-only)*, no extra permissions.
+3. Deploy the worker (needs a free Cloudflare account):
 
    ```bash
    cd worker
    # edit wrangler.toml: GITHUB_CLIENT_ID and ALLOWED_ORIGINS (origins of your Pages site, and of local dev)
-   npx wrangler secret put GITHUB_CLIENT_SECRET
-   npx wrangler deploy
+   npx wrangler login
+   npx wrangler secret put GITHUB_CLIENT_SECRET    # the OAuth App secret
+   npx wrangler secret put GITHUB_PUBLIC_TOKEN     # the read-only token from step 2
+   npx wrangler deploy                              # prints https://profile-forge-oauth.<you>.workers.dev
    ```
-3. In **this** repo, **Settings → Secrets and variables → Actions → Variables**, add `AUTH_URL` = `https://<your-worker>.workers.dev`, then re-run the Pages workflow. The URL is baked into the page at build time (`VITE_AUTH_URL`).
+4. In **this** repo, **Settings → Secrets and variables → Actions → Variables**, add `AUTH_URL` = `https://<your-worker>.workers.dev`, then re-run the Pages workflow. The URL is baked into the page at build time (`VITE_AUTH_URL`).
 
-Without `AUTH_URL` the page falls back to a personal access token (classic: `repo` + `workflow`, or fine-grained with Contents and Workflows write). Either way the token lives in this tab's session storage only and is sent only to `api.github.com`.
+Without `AUTH_URL` the page can't sign in or preview a profile: it still works as a designer, with demo data and the zip download. There is no token field: users only ever sign in with GitHub, and the token lives in the tab's session storage and is sent only to `api.github.com`.
+
+> [!NOTE]
+> An OAuth App can't be limited to a single repository: `public_repo` / `repo` cover all of the user's repos. The app only ever writes to the repo the user picks in the Publish step. For per-repo permissions, switch to a GitHub App.
 
 `ALLOWED_ORIGINS` compares origins only (scheme + host + port), so it doesn't care about the `/profile-forge-configurator/` path. The dev server uses port **8080**, which is already in the list.
 
 ## Your real profile in the preview
 
-After signing in, your profile is fetched **once** (a few seconds) and cached for the tab; every edit re-renders from that data. The only option that fetches again is `includePrivate` (once per value). You can also preview any other public login. `streak.startingYear` is applied to the loaded data without a refetch.
+No sign-in needed: type any public GitHub login and the page fetches it **once** (a few seconds) through the worker's read-only proxy (`/api/graphql`, public data only, mutations refused) and caches it for the tab; every edit re-renders from that data. Sign in only to commit, or to include private contributions (`includePrivate` refetches once, with your own token). `streak.startingYear` is applied to the loaded data without a refetch.
 
 ## Development
 

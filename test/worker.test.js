@@ -53,6 +53,17 @@ test("callback reports a denied sign-in back to the page", async () => {
   assert.equal(new URLSearchParams(new URL(res.headers.get("Location")).hash.slice(1)).get("pf_error"), "access_denied");
 });
 
+test("graphql proxy injects the public token, only for allowed origins and never for mutations", async () => {
+  const e = { ...env, GITHUB_PUBLIC_TOKEN: "pub" };
+  const post = (origin, body) => worker.fetch(new Request("https://auth.example/api/graphql", { method: "POST", headers: { Origin: origin }, body: JSON.stringify(body) }), e);
+  let sent;
+  globalThis.fetch = async (u, init) => ((sent = init.headers.Authorization), Response.json({ data: {} }));
+  assert.equal((await post("https://me.github.io", { query: "query { viewer { login } }" })).status, 200);
+  assert.equal(sent, "bearer pub");
+  assert.equal((await post("https://evil.example", { query: "query { a }" })).status, 403);
+  assert.equal((await post("https://me.github.io", { query: "mutation { a }" })).status, 400);
+});
+
 test("logout revokes the grant only for allowed origins", async () => {
   globalThis.fetch = async (u, init) => (assert.match(u, /applications\/cid\/grant/), assert.match(init.headers.Authorization, /^Basic /), new Response(null, { status: 204 }));
   const ok = await call("/auth/logout", { method: "POST", headers: { Origin: "https://me.github.io", "Content-Type": "application/json" }, body: JSON.stringify({ token: "t" }) });

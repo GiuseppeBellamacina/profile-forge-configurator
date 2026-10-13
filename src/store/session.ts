@@ -1,4 +1,4 @@
-// GitHub sign-in (OAuth via the worker, or a personal access token) and the profile used by the preview.
+// GitHub sign-in (OAuth via the worker) and the profile used by the preview.
 import { fetchProfile, normalize, type Raw } from "../core";
 import { demoProfile } from "../lib/demo";
 import { clone } from "../lib/path";
@@ -8,12 +8,12 @@ import { configStore } from "./config";
 import { createStore, useStore } from "./store";
 import { uiStore, type StepId } from "./ui";
 
-// Set at build time (VITE_AUTH_URL, from the AUTH_URL repository variable). Empty = personal access token only.
+// Set at build time (VITE_AUTH_URL, from the AUTH_URL repository variable). Empty = no sign-in and no pre-login preview.
 export const AUTH_URL: string = ((import.meta.env.VITE_AUTH_URL as string | undefined) ?? "").replace(/\/$/, "");
 
 type Me = { login: string; avatar_url: string };
 type S = {
-  token: string; me: Me | null; via: "oauth" | "pat" | null; authError: string;
+  token: string; me: Me | null; via: "oauth" | null; authError: string;
   profile: Raw; source: string; loadMsg: string; loading: boolean; fetched: { login: string; priv: boolean } | null;
 };
 export const sessionStore = createStore<S>({
@@ -21,7 +21,7 @@ export const sessionStore = createStore<S>({
 });
 export const useSession = <T,>(select: (s: S) => T) => useStore(sessionStore, select);
 
-export async function setSession(token: string, via: "oauth" | "pat") {
+export async function setSession(token: string, via: "oauth") {
   const u = await api.user(token);
   const me = { login: u.login as string, avatar_url: u.avatar_url as string };
   sessionStore.set({ token, via, authError: "", me });
@@ -52,9 +52,9 @@ export function useDemoData() {
 /** Fetch a profile once; later edits reuse it. Cached per login (and private flag) in this tab. */
 export async function loadProfile(login: string, { force = false } = {}) {
   const { token } = sessionStore.get();
-  if (!token) throw new Error("Sign in first.");
+  if (!token && !AUTH_URL) throw new Error("Preview needs the sign-in backend, which isn’t configured on this site.");
   const raw = configStore.get().raw;
-  const priv = !!raw.includePrivate;
+  const priv = !!token && !!raw.includePrivate; // private data needs the user's own token
   const key = `pf:profile:${login}:${priv}`;
   const cached = !force && ss.get<Raw>(key);
   if (cached) {
@@ -64,7 +64,9 @@ export async function loadProfile(login: string, { force = false } = {}) {
   sessionStore.set({ loading: true, source: `loading @${login}…`, loadMsg: "Fetching your profile (a few seconds, only this once)…" });
   try {
     normalize(clone(raw)); // fail early on an invalid config
-    const p = await fetchProfile({ login, token, includePrivate: priv, tz: raw.timezone ?? "UTC", startingYear: null, extras: true });
+    // signed out: read-only public proxy on the worker
+    const via = token ? {} : { endpoint: `${AUTH_URL}/api/graphql` };
+    const p = await fetchProfile({ login, token: token || "anon", includePrivate: priv, tz: raw.timezone ?? "UTC", startingYear: null, extras: true, ...via });
     ss.set(key, p);
     sessionStore.set({ profile: p, fetched: { login, priv }, source: `@${login}`, loadMsg: `Showing @${login}.`, loading: false });
   } catch (e: any) {
@@ -88,7 +90,7 @@ export async function bootSession(): Promise<boolean> {
     else await setSession(hash.get("pf_token")!, "oauth").catch((e) => sessionStore.set({ authError: e.message }));
     return true;
   }
-  const s = ss.get<{ token: string; via: "oauth" | "pat"; me: Me }>("pf:session");
+  const s = ss.get<{ token: string; via: "oauth"; me: Me }>("pf:session");
   if (s?.token) {
     sessionStore.set({ token: s.token, via: s.via, me: s.me });
     loadProfile(s.me.login).catch(() => {});

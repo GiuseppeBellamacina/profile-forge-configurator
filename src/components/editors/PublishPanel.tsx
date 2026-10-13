@@ -98,7 +98,11 @@ export function PublishPanel() {
   const commit = async () => {
     setBusy(true);
     try {
-      const chosen = files.filter((f) => !off.has(f.path)) as { path: string; content: string | Uint8Array }[];
+      // merge into the latest README, not the one seen at "Check"
+      const latest = (await api.file(token, owner, repo, "README.md", branch))?.text ?? null;
+      const chosen = files
+        .map((f) => (f.readme ? { ...f, content: mergeReadme(latest, readmeBlock(raw)) } : f))
+        .filter((f) => !off.has(f.path)) as { path: string; content: string | Uint8Array }[];
       const c = await commitFiles(token, owner, repo, branch, chosen, message, (m) => setMsg({ kind: "info", text: m }));
       setMsg({ kind: "ok", text: "Committed! ", link: { href: c.html_url ?? `https://github.com/${owner}/${repo}/commits/${branch}`, label: "View the commit" } });
       setDone(true);

@@ -5,8 +5,9 @@
 //   GET  /auth/login?return=<page url>&state=<nonce>&scope=public|private   -> redirect to GitHub
 //   GET  /auth/callback?code&state                                        -> redirect back to the page with #pf_token=…
 //   POST /auth/logout  { token }                                          -> revokes the grant (CORS: allowed origins only)
+//   POST /api/graphql  { query, variables }                               -> read-only public GraphQL proxy for the pre-login preview
 //
-// Env: GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET (secret), ALLOWED_ORIGINS (comma-separated page origins).
+// Env: GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET (secret), GITHUB_PUBLIC_TOKEN (secret, no scopes), ALLOWED_ORIGINS (comma-separated page origins).
 // The token travels back in the URL *fragment*, which browsers never send to any server.
 
 const COOKIE = "pf_oauth";
@@ -17,7 +18,7 @@ const originOf = (u) => { try { return new URL(u).origin; } catch { return null;
 const text = (s, status = 200, headers = {}) => new Response(s, { status, headers: { "Content-Type": "text/plain; charset=utf-8", ...headers } });
 const cors = (env, req) => {
   const o = req.headers.get("Origin");
-  return o && origins(env).includes(o) ? { "Access-Control-Allow-Origin": o, "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", Vary: "Origin" } : {};
+  return o && origins(env).includes(o) ? { "Access-Control-Allow-Origin": o, "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type, Authorization", Vary: "Origin" } : {};
 };
 const readCookie = (req, name) => (req.headers.get("Cookie") ?? "").split(/;\s*/).map((c) => c.split("=")).find(([k]) => k === name)?.[1];
 const b64u = (s) => btoa(String.fromCharCode(...new TextEncoder().encode(s))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -74,6 +75,23 @@ export default {
         body: JSON.stringify({ access_token: token }),
       });
       return text(res.status === 204 || res.status === 404 ? "ok" : "revoke failed", res.status === 204 || res.status === 404 ? 200 : 502, headers);
+    }
+
+    // Anonymous read-only GraphQL proxy: lets visitors preview a public profile before signing in. Uses a scope-less token
+    // (GITHUB_PUBLIC_TOKEN), so it can only ever see public data. ponytail: origin check is browser-only; add a Cloudflare rate-limit rule if abused.
+    if (url.pathname === "/api/graphql" && req.method === "POST") {
+      const headers = cors(env, req);
+      if (!headers["Access-Control-Allow-Origin"]) return text("origin not allowed", 403);
+      if (!env.GITHUB_PUBLIC_TOKEN) return text("preview proxy not configured", 501, headers);
+      const raw = await req.text();
+      const body = raw.length <= 20000 ? (() => { try { return JSON.parse(raw); } catch { return null; } })() : null;
+      if (typeof body?.query !== "string" || /\b(mutation|subscription)\b/i.test(body.query)) return text("bad request", 400, headers);
+      const res = await fetch("https://api.github.com/graphql", {
+        method: "POST",
+        headers: { Authorization: `bearer ${env.GITHUB_PUBLIC_TOKEN}`, "Content-Type": "application/json", "User-Agent": "profile-forge-oauth" },
+        body: JSON.stringify({ query: body.query, variables: body.variables ?? {} }),
+      });
+      return new Response(res.body, { status: res.status, headers: { ...headers, "Content-Type": "application/json", "Cache-Control": "no-store" } });
     }
 
     if (url.pathname === "/") return text("profile-forge OAuth backend. Nothing to see here.");
