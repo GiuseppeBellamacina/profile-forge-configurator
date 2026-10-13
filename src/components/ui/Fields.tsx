@@ -153,7 +153,7 @@ export function FieldList({ fields }: { fields: Field[] }) {
   const raw = useRaw();
   return (
     <>
-      {fields.filter((f) => !f.when || valueOf(raw, f.when.path) === f.when.equals).map((f) => (
+      {fields.filter((f) => !f.when || ("not" in f.when ? valueOf(raw, f.when.path) !== f.when.not : valueOf(raw, f.when.path) === f.when.equals)).map((f) => (
         <FieldView key={f.path} field={f} />
       ))}
     </>
@@ -165,7 +165,7 @@ function ColorControl({ field, raw }: { field: Extract<Field, { type: "color" }>
   const first = Object.values(themeSlots(raw))[0] ?? "dark";
   return (
     <Shell path={field.path} label={field.label} hint={field.hint}>
-      <ColorWidget k={name} value={getPath(raw, field.path) ?? ""} theme={first} onSet={(v) => setVal(field.path, v)} />
+      <ColorWidget k={name} label="" value={getPath(raw, field.path) ?? ""} theme={first} onSet={(v) => setVal(field.path, v)} />
     </Shell>
   );
 }

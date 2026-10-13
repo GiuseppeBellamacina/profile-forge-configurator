@@ -5,7 +5,9 @@ import { useUi } from "../../store/ui";
 import { AboutEditor, LinksEditor, StackEditor, WorkingEditor } from "../editors/ContentEditors";
 import { DataBlock } from "../editors/DataBlock";
 import { ImportExport } from "../editors/ImportExport";
+import { FrameGallery } from "../editors/FrameGallery";
 import { ImportFromRepo } from "../editors/ImportFromRepo";
+import { LevelColors } from "../editors/LevelColors";
 import { GridEditor, UseGrid } from "../editors/GridEditor";
 import { LayoutEditor } from "../editors/LayoutEditor";
 import { PresetGallery } from "../editors/PresetGallery";
@@ -55,6 +57,7 @@ export const LookStep = () => (
       <AdvancedSlots />
     </Section>
     <Section title="Make it yours">
+      <Collapse title="Level colors"><LevelColors /></Collapse>
       <Collapse title="Color overrides"><ColorsEditor /></Collapse>
       <Collapse title="Custom themes"><CustomThemes /></Collapse>
     </Section>
@@ -92,6 +95,7 @@ function Accordion({ group, first }: { group: Group; first: boolean }) {
       </summary>
       <div className="acc-body">
         <FieldList fields={group.fields} />
+        {group.id === "header" && <FrameGallery />}
       </div>
     </details>
   );

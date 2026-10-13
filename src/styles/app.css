@@ -291,3 +291,7 @@ option, optgroup { background: var(--surface); color: var(--text); }
 @media (max-width: 640px) { .account .lbl { display: none; } }
 
 img.logo { background: none; box-shadow: none; display: block; border-radius: 8px; }
+.fgallery { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); margin-top: 6px; }
+.fthumb { display: block; aspect-ratio: 1; overflow: hidden; background: var(--bg); }
+.fthumb img { width: 520%; max-width: none; height: auto; display: block; }
+.fthumb-tile .meta { padding: 6px 8px; font-size: 12px; }
