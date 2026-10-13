@@ -13,6 +13,7 @@ export const DEFAULTS: Raw = config.DEFAULTS;
 export const SECTIONS: string[] = config.SECTIONS;
 export const STATS_ITEMS: string[] = config.STATS_ITEMS;
 export const normalize: (raw: Raw) => Raw = config.normalize;
+export const REMOVED_KEYS: Set<string> = config.REMOVED_KEYS;
 export const MIN_SPAN: Record<string, number> = config.MIN_SPAN;
 export const needsExtras: (k: Raw) => boolean = config.needsExtras;
 export const setPath: (o: Raw, path: string, value: unknown) => Raw = config.setPath;
