@@ -8,6 +8,7 @@ export const COL_W = 140;
 export const X0 = 30;
 export const CARD_W = 1000;
 export const STEP = COL_W + GUTTER;
+export const TOP_PAD = 30; // the renderer moves everything down when no header sits at the top
 export const spanWidth = (n: number) => n * COL_W + (n - 1) * GUTTER;
 
 export type Item = { id: string; span: number; height?: number };
@@ -37,7 +38,8 @@ export function pack(items: Item[], heightOf: (id: string) => number | undefined
     for (let i = best; i < best + span; i++) heights[i] = bestY + h + GUTTER;
     out.push({ id, span, x: X0 + best * STEP, y: bestY, w: spanWidth(span), h });
   }
-  return out;
+  const lift = out.length && !out.some((p) => p.id === "header" && p.y === 0) ? TOP_PAD : 0;
+  return out.map((p) => ({ ...p, y: p.y + lift }));
 }
 
 /** Rows layout -> grid items: pairs share the row, the sections that are half width by nature keep their size. */
