@@ -5,6 +5,7 @@ import { useUi } from "../../store/ui";
 import { AboutEditor, LinksEditor, StackEditor, WorkingEditor } from "../editors/ContentEditors";
 import { DataBlock } from "../editors/DataBlock";
 import { ImportExport } from "../editors/ImportExport";
+import { GridEditor, UseGrid } from "../editors/GridEditor";
 import { LayoutEditor } from "../editors/LayoutEditor";
 import { PresetGallery } from "../editors/PresetGallery";
 import { PublishPanel } from "../editors/PublishPanel";
@@ -60,13 +61,16 @@ export const LookStep = () => (
   </>
 );
 
-export const LayoutStep = () => (
-  <>
-    <Section title="Section order" hint="Put two sections in one row for a side-by-side layout. Sections without content (About, Working on, Tech stack) show a sample here so you can see where they go; they are skipped in the published card until you fill them in.">
-      <LayoutEditor />
-    </Section>
-  </>
-);
+export function LayoutStep() {
+  const grid = useRaw().grid;
+  return (
+    <>
+      <Section title={grid ? "Arrange the card" : "Section order"} hint="Sections without content (About, Working on, Tech stack) show a sample here so you can see where they go; they are skipped in the published card until you fill them in.">
+        {grid ? <GridEditor /> : <><UseGrid /><LayoutEditor /></>}
+      </Section>
+    </>
+  );
+}
 
 /** One collapsible group of options; opens by itself when search sends you to one of its fields. */
 function Accordion({ group, first }: { group: Group; first: boolean }) {

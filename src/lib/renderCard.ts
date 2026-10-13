@@ -1,8 +1,8 @@
-import { normalize, render, resolveTheme, summarize, type Raw } from "../core";
+import { normalize, render, resolveTheme, sectionBoxes, summarize, type Box, type Raw } from "../core";
 import { dataUri, fonts } from "./assets";
 import { clone } from "./path";
 
-export type Rendered = { svg: string; missing: string[]; light: boolean; slots: string[]; slot: string };
+export type Rendered = { svg: string; missing: string[]; light: boolean; slots: string[]; slot: string; height: number; boxes: Box[] };
 
 /** The card as an SVG string for one theme slot, using the real renderer. Shared by the live preview and the theme thumbnails. */
 export async function renderCard(raw: Raw, assets: Record<string, { url: string }>, profile: Raw, wanted?: string | null): Promise<Rendered> {
@@ -30,5 +30,6 @@ export async function renderCard(raw: Raw, assets: Record<string, { url: string 
 
   const colors = { ...k.colors, ...k.colorsByTheme[slot] };
   const svg = render(data, { theme, k, colors, fontCss: await fonts() });
-  return { svg, missing, light: resolveTheme(theme).base === "light", slots, slot };
+  const { height, boxes } = sectionBoxes(data, { theme, k, colors });
+  return { svg, missing, light: resolveTheme(theme).base === "light", slots, slot, height, boxes };
 }

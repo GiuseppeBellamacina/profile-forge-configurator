@@ -4,6 +4,8 @@ import { configJson } from "../lib/publish";
 import { useRaw } from "../store/config";
 import { useSession } from "../store/session";
 import { uiStore, useUi } from "../store/ui";
+import { itemsOf } from "../lib/grid";
+import { GridOverlay } from "./GridOverlay";
 import { Icon } from "./ui/Icon";
 
 const copy = async (text: string, setLabel: (s: string) => void, idle: string) => {
@@ -17,6 +19,7 @@ export function Preview() {
   const raw = useRaw();
   const source = useSession((s) => s.source);
   const open = useUi((s) => s.sheetOpen);
+  const step = useUi((s) => s.step);
   const [replay, setReplay] = useState(0);
   const [copyLabel, setCopyLabel] = useState("Copy");
   const json = configJson(raw);
@@ -61,7 +64,12 @@ export function Preview() {
       {pv.error && <div className="pv-error">{pv.error}</div>}
       {!pv.error && pv.missing.length > 0 && <div className="pv-error">Could not load icons: {pv.missing.join(", ")}</div>}
       <div className={`stage ${pv.light ? "light" : ""}`} onClick={() => matchMedia("(max-width: 980px)").matches && !open && uiStore.set({ sheetOpen: true })}>
-        {pv.url && <img key={replay} src={pv.url} alt="Card preview" />}
+        {pv.url && (
+          <div className="card-wrap">
+            <img key={replay} src={pv.url} alt="Card preview" />
+            {step === "layout" && Array.isArray(raw.grid) && pv.boxes.length > 0 && <GridOverlay boxes={pv.boxes} height={pv.height} items={itemsOf(raw.grid)} />}
+          </div>
+        )}
         <span className={`busy${pv.busy ? " on" : ""}`}>Rendering…</span>
       </div>
       <details className="json-drawer">

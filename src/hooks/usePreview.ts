@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type { Box } from "../core";
 import { renderCard } from "../lib/renderCard";
 import { useAssets, useRaw } from "../store/config";
 import { useSession } from "../store/session";
@@ -14,8 +15,8 @@ const withSamples = (raw: Record<string, any>) => {
   return out;
 };
 
-export type Preview = { url: string; error: string; missing: string[]; busy: boolean; light: boolean; slots: string[]; slot: string };
-const EMPTY: Preview = { url: "", error: "", missing: [], busy: true, light: false, slots: [], slot: "" };
+export type Preview = { url: string; error: string; missing: string[]; busy: boolean; light: boolean; slots: string[]; slot: string; height: number; boxes: Box[] };
+const EMPTY: Preview = { url: "", error: "", missing: [], busy: true, light: false, slots: [], slot: "", height: 0, boxes: [] };
 
 /** Renders the card with the real renderer whenever the config, the data or the active slot change (debounced). */
 export function usePreview(): Preview {
@@ -34,7 +35,7 @@ export function usePreview(): Preview {
     setOut((o) => ({ ...o, busy: true }));
     const timer = setTimeout(async () => {
       try {
-        const { svg, missing, light, slots, slot } = await renderCard(
+        const { svg, missing, light, slots, slot, height, boxes } = await renderCard(
           still ? { ...raw, card: { ...raw.card, animations: false } } : samples ? withSamples(raw) : raw,
           assets,
           profile,
@@ -44,7 +45,7 @@ export function usePreview(): Preview {
         const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
         if (lastUrl.current) URL.revokeObjectURL(lastUrl.current);
         lastUrl.current = url;
-        setOut({ url, error: "", missing, busy: false, light, slots, slot });
+        setOut({ url, error: "", missing, busy: false, light, slots, slot, height, boxes });
       } catch (e: any) {
         if (!stale) setOut((o) => ({ ...o, error: e.message ?? String(e), busy: false }));
       }

@@ -13,6 +13,7 @@ export const DEFAULTS: Raw = config.DEFAULTS;
 export const SECTIONS: string[] = config.SECTIONS;
 export const STATS_ITEMS: string[] = config.STATS_ITEMS;
 export const normalize: (raw: Raw) => Raw = config.normalize;
+export const MIN_SPAN: Record<string, number> = config.MIN_SPAN;
 export const needsExtras: (k: Raw) => boolean = config.needsExtras;
 export const setPath: (o: Raw, path: string, value: unknown) => Raw = config.setPath;
 
@@ -21,6 +22,9 @@ export const ICONS: Record<string, string> = icons.ICONS;
 export const BRANDS: Record<string, string> = icons.BRANDS;
 
 export const render: (data: Raw, opts: Raw) => string = renderer.render;
+export type Box = { id: string; x: number; y: number; w: number; h: number };
+/** Where each section lands on the card, in card pixels (the card is 1000 wide). */
+export const sectionBoxes: (data: Raw, opts: Raw) => { height: number; boxes: Box[] } = renderer.sectionBoxes;
 export const summarize: (profile: Raw, k: Raw) => Raw = stats.summarize;
 export const fetchProfile: (opts: Raw) => Promise<Raw> = github.fetchProfile;
 
