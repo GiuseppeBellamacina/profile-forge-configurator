@@ -138,6 +138,14 @@ function IconPicker({ onPick, onClose }: { onPick: (item: { name: string; image:
     const ext = (url.match(/\.(svg|png|jpe?g|gif|webp)(\?|$)/i)?.[1] ?? "svg").toLowerCase();
     add(name.trim(), `assets/img/${slug(name)}.${ext}`, url.trim());
   };
+  const upload = async (file: File) => {
+    if (!/^image\/(svg\+xml|png|jpeg|webp|gif)$/.test(file.type)) return alert("Use an svg, png, jpg, webp or gif image.");
+    if (file.size > 300_000) return alert("The image is larger than 300 KB.");
+    const ext = file.type === "image/svg+xml" ? "svg" : file.type === "image/jpeg" ? "jpg" : file.type.slice(6);
+    const base = file.name.replace(/\.[^.]+$/, "");
+    const data = await new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = rej; r.readAsDataURL(file); });
+    add(base.replace(/^./, (c) => c.toUpperCase()), `assets/img/${slug(base)}.${ext}`, data);
+  };
   const list = all ? searchDevicons(all, q) : [];
 
   return (
@@ -163,6 +171,10 @@ function IconPicker({ onPick, onClose }: { onPick: (item: { name: string; image:
             <input type="text" placeholder="https://…/logo.svg" style={{ flex: "2 1 220px", width: "auto" }} value={url} onChange={(e) => setUrl(e.target.value)} />
             <button className="btn sm" onClick={addCustom}>Add</button>
           </div>
+          <label className="btn sm" style={{ alignSelf: "flex-start" }}>
+            Upload from my computer
+            <input type="file" accept="image/svg+xml,image/png,image/jpeg,image/webp,image/gif" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ""; }} />
+          </label>
         </div>
       </div>
     </dialog>
