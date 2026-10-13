@@ -28,7 +28,7 @@ const cfg = {
   stats: { numberFormat: "short", lineHeight: 40, hide: ["issues"] },
   streak: { mode: "weekly", dateFormat: "j M[ Y]" },
   languages: { layout: "pie", count: 5 },
-  heatmap: { weeks: 30, cell: "moon", mode: "snake", snakePath: "wander" },
+  heatmap: { weeks: 30, cell: "moon", mode: "snake", snakePath: "busy" },
   colors: { icon_color: "ff0066", snakeColor: "ff8a3d" },
 };
 
@@ -73,7 +73,7 @@ try {
   check("Details: languages layout", (await val("languages.layout"))?.startsWith("pie"), await val("languages.layout"));
   check("Details: heatmap weeks", (await val("heatmap.weeks")) === "30", await val("heatmap.weeks"));
   check("Details: heatmap shape", (await val("heatmap.cell"))?.startsWith("moon"), await val("heatmap.cell"));
-  check("Details: snake route shown for snake mode", (await val("heatmap.snakePath"))?.startsWith("wander"), await val("heatmap.snakePath"));
+  check("Details: snake route shown for snake mode", (await val("heatmap.snakePath"))?.startsWith("busy"), await val("heatmap.snakePath"));
   const snakeHex = await ev(`document.getElementById("field-colors.snakeColor")?.querySelector("input[type=text]")?.value`);
   check("Details: snake color shown", snakeHex === "ff8a3d", snakeHex);
   await ev(`(() => { const e = document.getElementById("ctl-heatmap.mode"); e.value = "0"; e.dispatchEvent(new Event("change", { bubbles: true })); })()`);
