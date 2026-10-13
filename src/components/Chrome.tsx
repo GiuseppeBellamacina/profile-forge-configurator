@@ -3,6 +3,7 @@ import { searchFields } from "../schema/fields";
 import { redo, undo, useCanRedo, useCanUndo } from "../store/config";
 import { focusField, setStep, STEPS, uiStore, useUi } from "../store/ui";
 import { shareUrl } from "./editors/ImportExport";
+import { signOut, useSession } from "../store/session";
 import { Icon } from "./ui/Icon";
 
 const SearchIcon = () => (
@@ -71,11 +72,25 @@ export function TopBar() {
         <button className="btn sm icon" title="Redo (Ctrl Y)" aria-label="Redo" disabled={!canRedo} onClick={redo}><Icon n="redo" /></button>
         <button className="btn sm" title="Copy a link to this configuration" onClick={share}><Icon n="link" /> <span className="lbl">{label}</span></button>
       </div>
+      <AccountChip />
       <nav className="toplinks">
         <a href="https://github.com/GiuseppeBellamacina/profile-forge/blob/main/GUIDE.md" target="_blank" rel="noopener">Option guide</a>
         <a href="https://github.com/GiuseppeBellamacina/profile-forge" target="_blank" rel="noopener">GitHub</a>
       </nav>
     </header>
+  );
+}
+
+/** The one place that shows who is signed in and signs out. Nothing is shown while signed out (the steps that need it offer the sign-in). */
+function AccountChip() {
+  const me = useSession((s) => s.me);
+  if (!me) return null;
+  return (
+    <div className="account" title={`Signed in as @${me.login}`}>
+      <img src={me.avatar_url} alt="" />
+      <span className="lbl">@{me.login}</span>
+      <button className="btn sm ghost" onClick={signOut}>Sign out</button>
+    </div>
   );
 }
 
