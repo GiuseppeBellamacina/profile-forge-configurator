@@ -20,10 +20,9 @@ export const GROUPS: Group[] = [
   {
     id: "general", title: "General", step: "start",
     fields: [
-      { type: "text", path: "user", label: "GitHub login", hint: "the action defaults to the repo owner", placeholder: "repo owner" },
       { type: "select", path: "locale", label: "Language", options: LOCALES },
       { type: "text", path: "timezone", label: "Time zone", hint: "decides what “today” is for streaks", list: "timezones" },
-      { type: "bool", path: "includePrivate", label: "Count private repositories", hint: "needs the “private data” sign-in; reloads your profile once" },
+      { type: "bool", path: "includePrivate", label: "Count private repositories", hint: "reloads your profile once; appears after you sign in" },
     ],
   },
   {

@@ -9,7 +9,7 @@ import { ImportExport } from "../editors/ImportExport";
 import { LayoutEditor } from "../editors/LayoutEditor";
 import { PresetGallery } from "../editors/PresetGallery";
 import { PublishPanel } from "../editors/PublishPanel";
-import { ColorsEditor, CustomThemes, ThemeGallery, ThemeSlots } from "../editors/ThemeEditor";
+import { AdvancedSlots, ColorsEditor, CustomThemes, ThemeGallery } from "../editors/ThemeEditor";
 import { FieldList, FieldView } from "../ui/Fields";
 import { Icon } from "../ui/Icon";
 
@@ -33,11 +33,11 @@ export const StartStep = () => (
     <Section title="Start from a preset" hint="Pick a ready-made look, then tweak it in the next steps. Your changes are saved in this browser, and you can undo anything.">
       <PresetGallery />
     </Section>
-    <Section title="Your data" hint="Until you sign in the preview shows demo data. Once signed in, your own profile is fetched one time and every edit reuses it.">
+    <Section title="Your data" hint="Type your GitHub username to preview your real stats (fetched once, every edit reuses them). Without it the preview shows demo data.">
       <DataBlock />
     </Section>
     <Section title="General">
-      <FieldList fields={fieldsOf("general").fields} />
+      <FieldList fields={fieldsOf("general").fields.filter((f) => f.path !== "includePrivate")} />
     </Section>
     <Section title="Import, export & share">
       <ImportExport />
@@ -49,7 +49,7 @@ export const LookStep = () => (
   <>
     <Section title="Themes" hint="Pick the slot you want to change, then click a theme. The slot names (dark / light) decide the file names, so your README never changes when you swap themes.">
       <ThemeGallery />
-      <Collapse title="Slots (advanced)"><ThemeSlots /></Collapse>
+      <AdvancedSlots />
     </Section>
     <Section title="Make it yours">
       <Collapse title="Color overrides"><ColorsEditor /></Collapse>
