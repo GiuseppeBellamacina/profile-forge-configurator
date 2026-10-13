@@ -14,7 +14,7 @@ export function AboutEditor() {
   useEffect(() => setDraft((d) => (d.trim() === stored.trim() ? d : stored)), [stored]);
   return (
     <label className="field" id="field-about">
-      <span className="field-label">About <small>one paragraph per blank line; **bold** markers are stripped</small></span>
+      <span className="field-label">About</span>
       <textarea rows={6} value={draft} placeholder="Tell people who you are and what you build…" onChange={(e) => {
         setDraft(e.target.value);
         setVal("about", e.target.value.split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean));
@@ -153,7 +153,7 @@ function IconPicker({ onPick, onClose }: { onPick: (item: { name: string; image:
             </button>
           ))}
           {!all && !failed && <span className="log">Loading icons…</span>}
-          {failed && <span className="log bad">Could not load the devicon list (offline?). You can still add your own image below.</span>}
+          {failed && <span className="log bad">Icons could not be loaded. Add your own image below.</span>}
           {all && !list.length && <span className="log">No icon matches.</span>}
         </div>
         <div className="card-box stack">

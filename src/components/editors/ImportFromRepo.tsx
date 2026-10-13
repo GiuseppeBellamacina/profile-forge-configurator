@@ -55,7 +55,6 @@ function ReadmePreview() {
           <div className="seg" role="group" aria-label="README theme">
             {(["dark", "light"] as const).map((t) => <button key={t} aria-pressed={tone === t} onClick={() => setTone(t)}>{t}</button>)}
           </div>
-          <span className="hint">GitHub renders your README; the card block is replaced by the card you are editing.</span>
         </div>
         {msg && <div className="log">{msg}</div>}
         {doc && <iframe className="readme-frame" title="README preview" sandbox="" srcDoc={doc} />}
@@ -73,7 +72,7 @@ export function ImportFromRepo() {
   if (!me)
     return (
       <div className="stack">
-        <p className="hint">Already use profile-forge? Sign in to load your current <code>config.json</code>, the icons it uses and your README from <code>your-login/your-login</code>. Nothing is changed on GitHub.</p>
+        <p className="hint">Load the setup you already have on GitHub.</p>
         <ConnectBlock />
       </div>
     );
@@ -84,7 +83,6 @@ export function ImportFromRepo() {
         <button className="btn primary" disabled={loading} onClick={() => importFromRepo(token, me.login)}>
           {loading ? "Importing…" : `Import from ${me.login}/${me.login}`}
         </button>
-        <span className="hint">Replaces what you have here (you can undo).</span>
       </div>
       {error && <div className="log bad">{error}</div>}
       {report && (
@@ -93,23 +91,23 @@ export function ImportFromRepo() {
             report.configError ? (
               <div className="log bad">Found {report.configFile} but it is not valid: {report.configError}</div>
             ) : (
-              <div className="log ok">Loaded {report.configFile} from {report.repo}. Every option below now shows your values.</div>
+              <div className="log ok">Imported {report.configFile}.</div>
             )
           ) : (
-            <div className="log">No config.json in {report.repo} yet: nothing to import, you start from your current settings.</div>
+            <div className="log">No config.json found in {report.repo}.</div>
           )}
           {report.used > 0 && !report.configError && (
             <div className="log">
-              Icons used by your tech stack: {report.loaded.length} of {report.used} loaded (only the ones the config references).
+              Icons loaded: {report.loaded.length} of {report.used}.
               {report.skipped.length > 0 && (
                 <ul style={{ margin: "6px 0 0", paddingLeft: 18 }}>
                   {report.skipped.map((s) => <li key={s.path}><code>{s.path}</code>: {s.reason}</li>)}
                 </ul>
               )}
-              {report.truncated && " Your repository is very large, so some files may be missing from the list."}
+             
             </div>
           )}
-          {report.hasReadme ? <ReadmePreview /> : <div className="log">No README.md in {report.repo}: a new one will be created when you publish.</div>}
+          {report.hasReadme ? <ReadmePreview /> : <div className="log">No README.md found in {report.repo}.</div>}
         </div>
       )}
     </div>

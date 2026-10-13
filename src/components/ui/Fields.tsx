@@ -32,12 +32,11 @@ export function Shell({ path, label, hint, children, inline, onActivate, htmlFor
   const text = (
     <>
       {label}
-      {hint && <small> {hint}</small>}
     </>
   );
   return (
     <div className={`field${inline ? " inline" : ""}${flash ? " flash" : ""}`} id={`field-${path}`} onClick={onActivate}>
-      <span className="field-label">
+      <span className="field-label" title={hint}>
         {set && <span className="dot" title="Different from the default" />}
         {htmlFor ? <label htmlFor={htmlFor}>{text}</label> : <span>{text}</span>}
         {set && (
