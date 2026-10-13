@@ -5,7 +5,7 @@ import type { StepId } from "../store/ui";
 
 type Base = { path: string; label: string; hint?: string };
 export type Field =
-  | (Base & { type: "text"; placeholder?: string; list?: "timezones" })
+  | (Base & { type: "text"; placeholder?: string; list?: "timezones"; examples?: { value: string; shows: string }[] })
   | (Base & { type: "number"; min?: number; max?: number; step?: number })
   | (Base & { type: "bool" })
   | (Base & { type: "select"; options: (string | number | null)[] })
@@ -73,7 +73,18 @@ export const GROUPS: Group[] = [
       { type: "multi", path: "streak.excludeDays", label: "Excluded weekdays", hint: "neither extend nor break a streak", options: WEEKDAYS },
       { type: "bool", path: "streak.excludeDaysLabel", label: "Show “Excludes: …” label" },
       { type: "number", path: "streak.startingYear", label: "First year counted", min: 2005, max: 2100 },
-      { type: "text", path: "streak.dateFormat", label: "Date format", hint: "d j m n M F y Y; [text] hidden in the current year", placeholder: "M j[, Y]" },
+      {
+        type: "text", path: "streak.dateFormat", label: "Date format", placeholder: "M j[, Y]",
+        hint: "d day 05, j day 5, m month 03, n month 3, M Mar, F March, y 26, Y 2026. Text in [ ] only shows when the year is not the current one.",
+        examples: [
+          { value: "M j[, Y]", shows: "Jul 27, 2025  ·  Aug 19" },
+          { value: "j M[ Y]", shows: "27 Jul 2025  ·  19 Aug" },
+          { value: "j F Y", shows: "27 July 2025" },
+          { value: "d/m/Y", shows: "27/07/2025" },
+          { value: "n/j/y", shows: "7/27/25" },
+          { value: "Y-m-d", shows: "2025-07-27" },
+        ],
+      },
       { type: "bool", path: "streak.shortNumbers", label: "Short numbers" },
     ],
   },
