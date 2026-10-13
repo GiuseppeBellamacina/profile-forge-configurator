@@ -10,7 +10,8 @@
     "dev": "node scripts/sync-core.js && vite",
     "preview": "vite preview",
     "sync": "node scripts/sync-core.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "e2e": "node scripts/e2e.mjs"
   },
   "engines": {
     "node": ">=20"

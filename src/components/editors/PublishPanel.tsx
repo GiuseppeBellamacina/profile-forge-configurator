@@ -16,29 +16,37 @@ const Step = ({ n, title, children }: { n: string; title: string; children: Reac
   </div>
 );
 
+/** Remembered while the page is open, so leaving the Publish step doesn't throw away the repository check. */
+const memo = {
+  owner: "", repo: "", branch: "", readme: "merge" as "merge" | "skip", ref: "v1", hour: 3, onConfig: true, message: "Add profile-forge card",
+  existing: new Map<string, string | null>(), readmeText: null as string | null, off: new Set<string>(), ready: false,
+};
+
 export function PublishPanel() {
   const raw = useRaw();
   const assets = useAssets();
   const me = useSession((s) => s.me);
   const token = useSession((s) => s.token);
 
-  const [owner, setOwner] = useState("");
-  const [repo, setRepo] = useState("");
-  const [branch, setBranch] = useState("");
-  const [readme, setReadme] = useState<"merge" | "skip">("merge");
-  const [ref, setRef] = useState("v1");
-  const [hour, setHour] = useState(3);
-  const [onConfig, setOnConfig] = useState(true);
-  const [message, setMessage] = useState("Add profile-forge card");
-  const [existing, setExisting] = useState<Map<string, string | null>>(new Map());
-  const [readmeText, setReadmeText] = useState<string | null>(null);
-  const [off, setOff] = useState<Set<string>>(new Set());
+  const [owner, setOwner] = useState(memo.owner);
+  const [repo, setRepo] = useState(memo.repo);
+  const [branch, setBranch] = useState(memo.branch);
+  const [readme, setReadme] = useState(memo.readme);
+  const [ref, setRef] = useState(memo.ref);
+  const [hour, setHour] = useState(memo.hour);
+  const [onConfig, setOnConfig] = useState(memo.onConfig);
+  const [message, setMessage] = useState(memo.message);
+  const [existing, setExisting] = useState(memo.existing);
+  const [readmeText, setReadmeText] = useState(memo.readmeText);
+  const [off, setOff] = useState(memo.off);
   const [files, setFiles] = useState<FileEntry[]>([]);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(memo.ready);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<Msg>(null);
   const [done, setDone] = useState(false);
   const [started, setStarted] = useState(false);
+
+  Object.assign(memo, { owner, repo, branch, readme, ref, hour, onConfig, message, existing, readmeText, off, ready });
 
   // Default the repository to the signed-in user's profile repo (<login>/<login>).
   useEffect(() => {

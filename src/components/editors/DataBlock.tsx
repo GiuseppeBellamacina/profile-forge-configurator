@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { loadProfile, useDemoData, useSession } from "../../store/session";
 import { ConnectBlock } from "./ConnectBlock";
 
@@ -8,8 +8,9 @@ export function DataBlock() {
   const fetched = useSession((s) => s.fetched);
   const msg = useSession((s) => s.loadMsg);
   const loading = useSession((s) => s.loading);
-  const [login, setLogin] = useState("");
-  const value = login || fetched?.login || me?.login || "";
+  const [login, setLogin] = useState(fetched?.login ?? me?.login ?? "");
+  useEffect(() => setLogin((l) => l || fetched?.login || me?.login || ""), [fetched, me]);
+  const value = login;
 
   return (
     <div className="stack">

@@ -15,29 +15,35 @@ function useDraft(stored: string, commit: (v: string) => void) {
 }
 
 /** Label, "modified" dot and per-field reset around any control. */
-export function Shell({ path, label, hint, children, inline }: { path: string; label: string; hint?: string; children: ReactNode; inline?: boolean }) {
+export const controlId = (path: string) => `ctl-${path}`;
+
+/**
+ * The root is a div (not a label): a label would forward clicks on its text to the first button inside it, which is the
+ * reset button. Text inputs and selects are tied to the label text with htmlFor; a bool row toggles when clicked anywhere.
+ */
+export function Shell({ path, label, hint, children, inline, onActivate, htmlFor }: { path: string; label: string; hint?: string; children: ReactNode; inline?: boolean; onActivate?: () => void; htmlFor?: string }) {
   const raw = useRaw();
   const flash = useUi((s) => s.focusPath === path);
   const set = isSet(raw, path);
-  const head = (
-    <span className="field-label">
-      {set && <span className="dot" title="Different from the default" />}
-      <span>
-        {label}
-        {hint && <small> {hint}</small>}
-      </span>
-      {set && (
-        <button type="button" className="reset" title="Reset to default" onClick={(e) => (e.preventDefault(), resetPath(path))}>
-          ↺ reset
-        </button>
-      )}
-    </span>
+  const text = (
+    <>
+      {label}
+      {hint && <small> {hint}</small>}
+    </>
   );
   return (
-    <label className={`field${inline ? " inline" : ""}${flash ? " flash" : ""}`} id={`field-${path}`}>
-      {head}
+    <div className={`field${inline ? " inline" : ""}${flash ? " flash" : ""}`} id={`field-${path}`} onClick={onActivate}>
+      <span className="field-label">
+        {set && <span className="dot" title="Different from the default" />}
+        {htmlFor ? <label htmlFor={htmlFor}>{text}</label> : <span>{text}</span>}
+        {set && (
+          <button type="button" className="reset" title="Reset to default" onClick={(e) => (e.stopPropagation(), resetPath(path))}>
+            ↺ reset
+          </button>
+        )}
+      </span>
       {children}
-    </label>
+    </div>
   );
 }
 
@@ -59,15 +65,15 @@ export function FieldView({ field }: { field: Field }) {
       return <ListControl field={field} stored={Array.isArray(own) ? own.join(", ") : ""} />;
     case "bool":
       return (
-        <Shell path={path} label={field.label} hint={field.hint} inline>
-          <button type="button" role="switch" aria-checked={!!cur} className="toggle" onClick={() => setVal(path, !cur)} />
+        <Shell path={path} label={field.label} hint={field.hint} inline onActivate={() => setVal(path, !cur)}>
+          <button type="button" role="switch" aria-checked={!!cur} aria-label={field.label} className="toggle" onClick={(e) => (e.stopPropagation(), setVal(path, !cur))} />
         </Shell>
       );
     case "select": {
       const idx = field.options.findIndex((o) => o === cur);
       return (
-        <Shell path={path} label={field.label} hint={field.hint}>
-          <select value={idx < 0 ? 0 : idx} onChange={(e) => setVal(path, field.options[Number(e.target.value)])}>
+        <Shell path={path} label={field.label} hint={field.hint} htmlFor={controlId(path)}>
+          <select id={controlId(path)} value={idx < 0 ? 0 : idx} onChange={(e) => setVal(path, field.options[Number(e.target.value)])}>
             {field.options.map((o, i) => (
               <option key={i} value={i}>
                 {show(o)}
@@ -88,13 +94,13 @@ export function FieldView({ field }: { field: Field }) {
       };
       return (
         <Shell path={path} label={field.label} hint={field.hint}>
-          <span className="chips">
+          <div className="chips">
             {field.options.map((o) => (
-              <button type="button" key={o} className="chip" aria-pressed={sel.has(o)} onClick={(e) => (e.preventDefault(), toggle(o))}>
+              <button type="button" key={o} className="chip" aria-pressed={sel.has(o)} onClick={() => toggle(o)}>
                 {o}
               </button>
             ))}
-          </span>
+          </div>
         </Shell>
       );
     }
@@ -104,8 +110,8 @@ export function FieldView({ field }: { field: Field }) {
 function TextControl({ field, stored, def }: { field: Extract<Field, { type: "text" }>; stored: string; def: unknown }) {
   const [draft, setDraft] = useDraft(stored, (v) => setVal(field.path, v.trim() || undefined));
   return (
-    <Shell path={field.path} label={field.label} hint={field.hint}>
-      <input type="text" value={draft} list={field.list === "timezones" ? "timezones" : undefined} placeholder={field.placeholder ?? (def == null ? "" : String(def))} onChange={(e) => setDraft(e.target.value)} />
+    <Shell path={field.path} label={field.label} hint={field.hint} htmlFor={controlId(field.path)}>
+      <input id={controlId(field.path)} type="text" value={draft} list={field.list === "timezones" ? "timezones" : undefined} placeholder={field.placeholder ?? (def == null ? "" : String(def))} onChange={(e) => setDraft(e.target.value)} />
     </Shell>
   );
 }
@@ -113,8 +119,8 @@ function TextControl({ field, stored, def }: { field: Extract<Field, { type: "te
 function NumberControl({ field, stored, def }: { field: Extract<Field, { type: "number" }>; stored: string; def: unknown }) {
   const [draft, setDraft] = useDraft(stored, (v) => setVal(field.path, v === "" ? undefined : Number(v)));
   return (
-    <Shell path={field.path} label={field.label} hint={field.hint}>
-      <input type="number" min={field.min} max={field.max} step={field.step ?? 1} value={draft} placeholder={def == null ? "default" : String(def)} onChange={(e) => setDraft(e.target.value)} />
+    <Shell path={field.path} label={field.label} hint={field.hint} htmlFor={controlId(field.path)}>
+      <input id={controlId(field.path)} type="number" min={field.min} max={field.max} step={field.step ?? 1} value={draft} placeholder={def == null ? "default" : String(def)} onChange={(e) => setDraft(e.target.value)} />
     </Shell>
   );
 }
@@ -122,8 +128,8 @@ function NumberControl({ field, stored, def }: { field: Extract<Field, { type: "
 function ListControl({ field, stored }: { field: Extract<Field, { type: "list" }>; stored: string }) {
   const [draft, setDraft] = useDraft(stored, (v) => setVal(field.path, v.split(",").map((x) => x.trim()).filter(Boolean)));
   return (
-    <Shell path={field.path} label={field.label} hint={field.hint ?? "comma separated"}>
-      <input type="text" value={draft} placeholder={field.placeholder} onChange={(e) => setDraft(e.target.value)} />
+    <Shell path={field.path} label={field.label} hint={field.hint ?? "comma separated"} htmlFor={controlId(field.path)}>
+      <input id={controlId(field.path)} type="text" value={draft} placeholder={field.placeholder} onChange={(e) => setDraft(e.target.value)} />
     </Shell>
   );
 }

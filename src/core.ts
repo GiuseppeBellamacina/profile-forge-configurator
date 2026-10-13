@@ -24,7 +24,10 @@ export const render: (data: Raw, opts: Raw) => string = renderer.render;
 export const summarize: (profile: Raw, k: Raw) => Raw = stats.summarize;
 export const fetchProfile: (opts: Raw) => Promise<Raw> = github.fetchProfile;
 
-export const THEME_NAMES: () => string[] = themes.THEME_NAMES;
+/** Built-in theme names, captured before any custom theme gets registered (registerThemes mutates the core's table). */
+export const BUILTIN_THEMES: string[] = themes.THEME_NAMES();
+/** Built-ins plus the custom themes of this config; the only list the UI should offer. */
+export const themeNames = (raw: Raw): string[] => [...BUILTIN_THEMES, ...Object.keys(raw.customThemes ?? {})];
 export const COLOR_NAMES: string[] = themes.COLOR_NAMES;
 export const COLOR_KEYS: Record<string, string[]> = themes.COLOR_KEYS;
 export const registerThemes: (custom: Raw) => void = themes.registerThemes;

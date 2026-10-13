@@ -3,7 +3,7 @@
 // public/core/. The renderer itself (src/*.js) is bundled by Vite through the @core alias (see vite.config.ts).
 //   CORE_DIR=path/to/profile-forge npm run build      (default: ../profile-forge)
 import { cp, mkdir, readdir, rm, writeFile } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -16,7 +16,7 @@ await readdir(join(coreDir, "src")).catch(() => {
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
 const copy = (from, to, filter) => cp(join(coreDir, from), join(out, to), { recursive: true, filter });
-await copy("fonts", "fonts", (p) => p.endsWith(".woff2") || !p.includes("."));
+await copy("fonts", "fonts", (p) => p.endsWith(".woff2") || !basename(p).includes("."));
 await copy("presets", "presets", (p) => !p.endsWith("README.md"));
 await copy("docs/themes", "theme-previews");
 await copy("docs/presets", "preset-previews");

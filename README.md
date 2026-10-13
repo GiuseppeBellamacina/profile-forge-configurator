@@ -64,6 +64,7 @@ npm install
 npm run dev          # http://localhost:8080  (CORE_DIR=path to use another profile-forge checkout)
 npm test             # worker tests (node:test) + unit tests (vitest)
 npm run build        # typecheck + production build into dist/
+npm run e2e          # real clicks and typing in headless Edge/Chrome against `vite preview` (BROWSER=path to override)
 ```
 
 `scripts/sync-core.js` copies the files the page fetches at runtime (fonts, presets, theme and preset preview images) from the profile-forge checkout into `public/core/` (git-ignored). The renderer itself is imported through the `@core` alias (`vite.config.ts`). Open a step directly with `?step=look` (`start`, `look`, `layout`, `sections`, `content`, `publish`).

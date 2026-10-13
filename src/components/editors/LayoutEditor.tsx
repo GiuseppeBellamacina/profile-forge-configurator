@@ -44,6 +44,7 @@ export function LayoutEditor() {
               key={i}
               className={`item${drag === i ? " dragging" : ""}${over === i && drag !== i ? " over" : ""}`}
               draggable={drag === i}
+              onDragStart={(e) => e.dataTransfer.setData("text/plain", String(i))}
               onDragEnd={() => (setDrag(null), setOver(null))}
               onDragOver={(e) => { if (drag !== null) (e.preventDefault(), setOver(i)); }}
               onDrop={(e) => { e.preventDefault(); if (drag !== null) move(drag, i); setDrag(null); setOver(null); }}

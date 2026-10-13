@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { COLOR_KEYS, COLOR_NAMES, registerThemes, resolveTheme, THEME_NAMES } from "../../core";
+import { useEffect, useMemo, useState } from "react";
+import { BUILTIN_THEMES, COLOR_KEYS, COLOR_NAMES, registerThemes, resolveTheme, themeNames } from "../../core";
 import { CORE } from "../../lib/assets";
 import { getPath } from "../../lib/path";
 import { edit, setVal, themeSlots, useRaw } from "../../store/config";
@@ -45,7 +45,7 @@ export function ThemeGallery() {
   const [q, setQ] = useState("");
   const [tone, setTone] = useState<"all" | "dark" | "light">("all");
   const customs = Object.keys(raw.customThemes ?? {});
-  const names = THEME_NAMES();
+  const names = BUILTIN_THEMES;
 
   const list = useMemo(
     () =>
@@ -103,7 +103,6 @@ export function ThemeGallery() {
 export function ThemeSlots() {
   const raw = useRaw();
   const slots = themeSlots(raw);
-  const names = THEME_NAMES();
   const rename = (slot: string, value: string) => {
     const n = value.trim().replace(/[^\w-]/g, "") || slot;
     if (n === slot || n in slots) return;
@@ -115,8 +114,7 @@ export function ThemeSlots() {
         <div className="item" key={slot}>
           <input type="text" defaultValue={slot} key={slot} style={{ width: 110, flex: "none" }} title="Slot name = file name suffix" onBlur={(e) => rename(slot, e.target.value)} />
           <select value={theme} style={{ flex: 1 }} onChange={(e) => edit((r) => (r.themes = { ...themeSlots(r), [slot]: e.target.value }))}>
-            {names.map((n) => <option key={n}>{n}</option>)}
-            {Object.keys(raw.customThemes ?? {}).map((n) => <option key={n}>{n}</option>)}
+            {themeNames(raw).map((n) => <option key={n}>{n}</option>)}
           </select>
           {Object.keys(slots).length > 1 && (
             <button className="btn sm danger" title="Remove slot" onClick={() => edit((r) => { const { [slot]: _, ...rest } = themeSlots(r); r.themes = rest; })}>✕</button>
@@ -132,6 +130,9 @@ export function ThemeSlots() {
 }
 
 function ColorWidget({ k, value, theme, onSet }: { k: string; value: string; theme: string; onSet: (v: string | undefined) => void }) {
+  // The text is kept locally while typing ("f", "ff", "fff"); only a valid or empty value reaches the store.
+  const [draft, setDraft] = useState(value);
+  useEffect(() => setDraft((d) => (d.replace("#", "") === value ? d : value)), [value]);
   let fallback = "#888888";
   try {
     const c = resolveTheme(theme) as Record<string, string>;
@@ -141,7 +142,8 @@ function ColorWidget({ k, value, theme, onSet }: { k: string; value: string; the
     <div className="cf">
       <span title={k}>{k}</span>
       <input type="color" aria-label={k} value={hex6(value || fallback)} onChange={(e) => onSet(e.target.value.slice(1))} />
-      <input type="text" maxLength={9} value={value} placeholder={String(fallback).replace("#", "").slice(0, 8)} onChange={(e) => {
+      <input type="text" maxLength={9} value={draft} aria-label={`${k} hex`} placeholder={String(fallback).replace("#", "").slice(0, 8)} onChange={(e) => {
+        setDraft(e.target.value);
         const v = e.target.value.replace("#", "");
         if (!v) onSet(undefined);
         else if (HEX.test(v)) onSet(v);
@@ -188,7 +190,7 @@ export function ColorsEditor() {
 export function CustomThemes() {
   const raw = useRaw();
   const customs: Record<string, Record<string, string>> = raw.customThemes ?? {};
-  const names = THEME_NAMES();
+  const names = themeNames(raw);
   const setKey = (name: string, k: string, v: string | undefined) =>
     edit((r) => {
       const c = (r.customThemes ??= {});
@@ -215,7 +217,13 @@ export function CustomThemes() {
               {names.filter((n) => n !== name).map((n) => <option key={n}>{n}</option>)}
             </select>
             <span className="grow" />
-            <button className="btn sm danger" onClick={() => edit((r) => { delete r.customThemes[name]; if (!Object.keys(r.customThemes).length) delete r.customThemes; })}>Delete</button>
+            <button className="btn sm danger" onClick={() => edit((r) => {
+              delete r.customThemes[name];
+              if (!Object.keys(r.customThemes).length) delete r.customThemes;
+              // a slot must never point at a theme that no longer exists
+              const s = themeSlots(r);
+              if (Object.values(s).includes(name)) r.themes = Object.fromEntries(Object.entries(s).map(([k, v]) => [k, v === name ? "dark" : v]));
+            })}>Delete</button>
           </div>
           <div className="colors">
             {colorNames.map((k) => (
