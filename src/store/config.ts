@@ -1,5 +1,5 @@
 // The configuration being edited (`raw` = exactly what ends up in config.json) + undo/redo + persistence.
-import { DEFAULTS, normalize, setPath, type Raw } from "../core";
+import { DEFAULTS, REMOVED_KEYS, normalize, setPath, type Raw } from "../core";
 import { clone, deletePath, eq, getPath } from "../lib/path";
 import { local } from "../lib/storage";
 import { createStore, useStore } from "./store";
@@ -9,9 +9,15 @@ export const START: Raw = { themes: { dark: "catppuccin-mocha", light: "catppucc
 const MAX_HISTORY = 100;
 const COALESCE_MS = 800; // typing in one field is one undo step
 
+/** Options of older versions that no longer exist are dropped, so a stored or imported config does not keep them. */
+export const dropRemoved = (raw: Raw): Raw => {
+  for (const p of REMOVED_KEYS) deletePath(raw, p);
+  return raw;
+};
+
 type State = { raw: Raw; assets: Assets; past: string[]; future: string[] };
 export const configStore = createStore<State>({
-  raw: local.get<Raw>("pf:raw") ?? clone(START),
+  raw: dropRemoved(local.get<Raw>("pf:raw") ?? clone(START)),
   assets: local.get<Assets>("pf:assets") ?? {},
   past: [],
   future: [],
@@ -55,7 +61,7 @@ export const resetPath = (path: string) => edit((raw) => deletePath(raw, path));
 export function replaceConfig(raw: Raw, assets?: Assets) {
   edit((r) => {
     for (const k of Object.keys(r)) delete r[k];
-    Object.assign(r, clone(raw));
+    Object.assign(r, dropRemoved(clone(raw)));
   });
   if (assets) addAssets(assets);
 }

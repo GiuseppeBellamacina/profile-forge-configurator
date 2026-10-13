@@ -71,3 +71,14 @@ describe("themeSlots", () => {
     expect(themeSlots({})).toEqual(START.themes);
   });
 });
+
+describe("removed options", () => {
+  it("are dropped from an imported config, and a config that still has one is accepted", async () => {
+    const { dropRemoved, replaceConfig, configStore, validate } = await import("./config");
+    const old = { trophies: { style: "gem", padding: 24 }, themes: { dark: "dark" } };
+    expect(() => validate(old)).not.toThrow();
+    expect(dropRemoved(structuredClone(old))).toEqual({ trophies: { padding: 24 }, themes: { dark: "dark" } });
+    replaceConfig(old);
+    expect(configStore.get().raw.trophies).toEqual({ padding: 24 });
+  });
+});
