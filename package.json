@@ -12,7 +12,8 @@
     "sync": "node scripts/sync-core.js",
     "typecheck": "tsc --noEmit",
     "e2e": "node scripts/e2e.mjs",
-    "e2e:grid": "node scripts/e2e-grid.mjs"
+    "e2e:grid": "node scripts/e2e-grid.mjs",
+    "e2e:import": "node scripts/e2e-import.mjs"
   },
   "engines": {
     "node": ">=20"

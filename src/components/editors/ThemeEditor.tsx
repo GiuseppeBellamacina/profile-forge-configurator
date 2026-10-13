@@ -155,6 +155,7 @@ export function AdvancedSlots() {
   const slots = themeSlots(useRaw());
   const custom = Object.keys(slots).some((s) => s !== "dark" && s !== "light") || Object.keys(slots).length > 2;
   const [on, setOn] = useState(custom);
+  useEffect(() => { if (custom) setOn(true); }, [custom]); // a config with extra slots (import, preset, undo) opens the editor
   return (
     <div className="stack">
       <label className="field inline" onClick={(e) => { e.preventDefault(); setOn(!on); }}>
