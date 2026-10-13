@@ -3,7 +3,7 @@ import type { Box } from "../core";
 import { renderCard } from "../lib/renderCard";
 import { useAssets, useRaw } from "../store/config";
 import { useSession } from "../store/session";
-import { useUi } from "../store/ui";
+import { uiStore, useUi } from "../store/ui";
 
 /** While arranging the layout, sections without content still show a sample so you can see where they land. Preview only: the published card is unchanged. */
 const withSamples = (raw: Record<string, any>) => {
@@ -46,6 +46,7 @@ export function usePreview(): Preview {
         if (lastUrl.current) URL.revokeObjectURL(lastUrl.current);
         lastUrl.current = url;
         setOut({ url, error: "", missing, busy: false, light, slots, slot, height, boxes });
+        uiStore.set({ boxes });
       } catch (e: any) {
         if (!stale) setOut((o) => ({ ...o, error: e.message ?? String(e), busy: false }));
       }

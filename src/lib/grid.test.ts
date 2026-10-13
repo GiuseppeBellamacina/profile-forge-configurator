@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { normalize, sectionBoxes, summarize } from "../core";
 import { demoProfile } from "./demo";
-import { dropOrder, gridOf, heightFor, itemsOf, itemsFromLayout, pack, spanFor } from "./grid";
+import { dropOrder, gridOf, heightFor, heightSteps, itemsOf, itemsFromLayout, pack, spanFor } from "./grid";
 
 const items = itemsOf([
   { section: "header" }, { section: "stats", cols: 3 }, { section: "trophies", cols: 3 }, { section: "heatmap", cols: 3 },
@@ -46,6 +46,8 @@ describe("grid packing", () => {
     expect(pack(tall, heightOf).map(({ id, y, h }) => ({ id, y, h }))).toEqual(r2.map(({ id, y, h }) => ({ id, y, h })));
     expect(r2.find((b) => b.id === "stats")!.h).toBe(400);
     expect(heightFor(200, 100, 100 + 203)).toBeUndefined();
-    expect(heightFor(200, 100, 100 + 347)).toBe(350);
+    expect(heightFor(200, 100, 100 + 340)).toBe(380); // steps above 200: 280 (3 rows), 380 (4 rows)...
+    expect(heightFor(200, 100, 100 + 60)).toBeUndefined();
+    expect(heightSteps(120).map((x) => x.height).slice(0, 3)).toEqual([180, 280, 380]);
   });
 });

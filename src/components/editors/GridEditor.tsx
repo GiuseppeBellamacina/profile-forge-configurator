@@ -1,7 +1,8 @@
 import { DEFAULTS, MIN_SPAN, SECTIONS } from "../../core";
-import { gridOf, itemsFromLayout, itemsOf, sectionLabel, unused, type Item } from "../../lib/grid";
+import { gridOf, heightSteps, itemsFromLayout, itemsOf, sectionLabel, unused, type Item } from "../../lib/grid";
 import { clone } from "../../lib/path";
 import { edit, useRaw } from "../../store/config";
+import { useUi } from "../../store/ui";
 import { Icon } from "../ui/Icon";
 
 const commit = (next: Item[]) => edit((r) => { r.grid = gridOf(next); }, "grid");
@@ -10,6 +11,8 @@ const commit = (next: Item[]) => edit((r) => { r.grid = gridOf(next); }, "grid")
 export function GridEditor() {
   const raw = useRaw();
   const items = itemsOf(raw.grid);
+  const boxes = useUi((s) => s.boxes);
+  const naturalOf = (id: string) => boxes.find((b) => b.id === id)?.minH ?? 0;
   const free = unused(items);
   const move = (from: number, to: number) => {
     if (to < 0 || to >= items.length) return;
@@ -19,7 +22,7 @@ export function GridEditor() {
   };
   return (
     <div className="stack">
-      <p className="hint">Drag a widget on the preview to move it, drag its right edge to make it wider or narrower, or its bottom edge to make it taller (it never gets shorter than its content; a number below that is raised to it). Widgets fall to the lowest free spot, so a short one fills the gap next to a tall one.</p>
+      <p className="hint">Drag a widget on the preview to move it, drag its right edge to make it wider or narrower, or its bottom edge to make it taller. Sizes snap to the grid: 6 columns wide, rows 80px high. "Auto" is the height of the content, which is also the shortest a card can be. Widgets fall to the lowest free spot, so a short one fills the gap next to a tall one.</p>
       <div className="list">
         {items.map((it, i) => (
           <div className="item" key={it.id}>
@@ -37,8 +40,12 @@ export function GridEditor() {
             )}
             <label className="row" style={{ gap: 6 }}>
               <span className="hint">height</span>
-              <input type="number" min={0} max={3000} step={10} placeholder="auto" aria-label={`Height of ${sectionLabel(it.id)} in pixels`} style={{ width: 84 }} value={it.height ?? ""}
-                onChange={(e) => commit(items.map((x) => (x.id === it.id ? { id: x.id, span: x.span, ...(e.target.value ? { height: Math.min(3000, Math.max(0, Math.round(Number(e.target.value)))) } : {}) } : x)))} />
+              <select aria-label={`Height of ${sectionLabel(it.id)}`} style={{ width: "auto" }} value={it.height ?? 0}
+                onChange={(e) => commit(items.map((x) => (x.id === it.id ? { id: x.id, span: x.span, ...(Number(e.target.value) ? { height: Number(e.target.value) } : {}) } : x)))}>
+                <option value={0}>Auto</option>
+                {it.height && !heightSteps(naturalOf(it.id)).some((s) => s.height === it.height) && <option value={it.height}>{it.height}px</option>}
+                {heightSteps(naturalOf(it.id)).map((s) => <option key={s.rows} value={s.height}>{s.rows} {s.rows === 1 ? "row" : "rows"}</option>)}
+              </select>
             </label>
             <span className="grow" />
             <button className="btn sm icon" disabled={i === 0} aria-label="Move earlier" onClick={() => move(i, i - 1)}><Icon n="up" /></button>

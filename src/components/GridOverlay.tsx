@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import type { Box } from "../core";
 import { edit } from "../store/config";
-import { CARD_W, dropOrder, gridOf, heightFor, pack, sectionLabel, spanFor, spanWidth, type Item } from "../lib/grid";
+import { CARD_W, COLS, COL_W, GUTTER, MAX_ROWS, ROW_H, STEP, X0, dropOrder, gridOf, heightFor, pack, sectionLabel, spanFor, spanWidth, type Item } from "../lib/grid";
 
 type Drag = { kind: "move"; id: string; from: { x: number; y: number }; dx: number; dy: number } | { kind: "size"; id: string; span: number }
   | { kind: "tall"; id: string; height: number | undefined };
@@ -103,6 +103,16 @@ export function GridOverlay({ boxes, height, items }: { boxes: Box[]; height: nu
           </div>
         );
       })}
+      {drag && (
+        <div className="gguides" aria-hidden="true">
+          {Array.from({ length: COLS }, (_, i) => <i key={`c${i}`} style={pct({ x: X0 + i * STEP, y: 0, w: COL_W, h: height })} />)}
+          {drag.kind === "tall" && (() => {
+            // the rows a card can take: 80px steps counted from the card's own top edge
+            const b = boxes.find((x) => x.id === drag.id);
+            return b ? Array.from({ length: MAX_ROWS }, (_, j) => <i key={`r${j}`} className="row" style={pct({ x: b.x, y: b.y + j * (ROW_H + GUTTER), w: b.w, h: ROW_H })} />).filter((_, j) => b.y + j * (ROW_H + GUTTER) < height) : null;
+          })()}
+        </div>
+      )}
       {ghost && <div className="gghost" style={pct(ghost)} />}
     </div>
   );
