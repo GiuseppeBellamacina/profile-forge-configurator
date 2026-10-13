@@ -3,10 +3,9 @@ import { Stepper, StepNav, TopBar } from "./components/Chrome";
 import { Preview } from "./components/Preview";
 import { ContentStep, LayoutStep, LookStep, PublishStep, SectionsStep, StartStep } from "./components/steps/Steps";
 import { decodeShare } from "./lib/share";
-import { configStore, redo, replaceConfig, START, undo } from "./store/config";
+import { configStore, redo, replaceConfig, undo } from "./store/config";
 import { bootSession, loadProfile, sessionStore } from "./store/session";
 import { STEPS, useUi } from "./store/ui";
-import { eq } from "./lib/path";
 
 const BODY = { start: StartStep, look: LookStep, layout: LayoutStep, sections: SectionsStep, content: ContentStep, publish: PublishStep };
 
@@ -17,8 +16,6 @@ async function bootShare() {
   history.replaceState(null, "", location.pathname + location.search);
   try {
     const shared = await decodeShare(c);
-    const mine = configStore.get().raw;
-    if (!eq(mine, START) && !eq(mine, {}) && !confirm("Load the shared configuration? It replaces your current one (you can undo).")) return;
     replaceConfig(shared.c, shared.a);
   } catch (e: any) {
     alert(`This share link could not be opened: ${e.message}`);

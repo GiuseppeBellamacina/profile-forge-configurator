@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DEFAULTS, SECTIONS } from "../../core";
 import { clone } from "../../lib/path";
 import { resetPath, setVal, useRaw } from "../../store/config";
+import { Icon } from "../ui/Icon";
 
 type Row = string | string[];
 const NAMES: Record<string, string> = {
@@ -51,21 +52,21 @@ export function LayoutEditor() {
               onDragOver={(e) => { if (drag !== null) (e.preventDefault(), setOver(i)); }}
               onDrop={(e) => { e.preventDefault(); if (drag !== null) move(drag, i); setDrag(null); setOver(null); }}
             >
-              <span className="grip" title="Drag to reorder" onMouseDown={() => setDrag(i)} onMouseUp={() => setDrag(null)}>⋮⋮</span>
+              <span className="grip" title="Drag to reorder" onMouseDown={() => setDrag(i)} onMouseUp={() => setDrag(null)}><Icon n="grip" /></span>
               <span className="num">{i + 1}</span>
               {pick(0)}
               {c[1] ? (
                 <>
                   {pick(1)}
-                  <button className="btn sm" title="Back to a single column" onClick={() => replace(i, c[0])}>−</button>
+                  <button className="btn sm" title="Back to a single column" onClick={() => replace(i, c[0])}><Icon n="minus" /></button>
                 </>
               ) : HALF.includes(c[0]) ? (
-                <button className="btn sm" title="Add a second half-width section in this row" onClick={() => replace(i, [c[0], HALF.find((h) => h !== c[0] && !used.has(h)) ?? HALF.find((h) => h !== c[0])!])}>+ side by side</button>
+                <button className="btn sm" title="Add a second half-width section in this row" onClick={() => replace(i, [c[0], HALF.find((h) => h !== c[0] && !used.has(h)) ?? HALF.find((h) => h !== c[0])!])}><Icon n="plus" /> side by side</button>
               ) : null}
               <span className="grow" />
-              <button className="btn sm icon" disabled={i === 0} aria-label="Move up" onClick={() => move(i, i - 1)}>↑</button>
-              <button className="btn sm icon" disabled={i === rows.length - 1} aria-label="Move down" onClick={() => move(i, i + 1)}>↓</button>
-              <button className="btn sm icon danger" aria-label="Remove row" onClick={() => commit(rows.filter((_, x) => x !== i))}>✕</button>
+              <button className="btn sm icon" disabled={i === 0} aria-label="Move up" onClick={() => move(i, i - 1)}><Icon n="up" /></button>
+              <button className="btn sm icon" disabled={i === rows.length - 1} aria-label="Move down" onClick={() => move(i, i + 1)}><Icon n="down" /></button>
+              <button className="btn sm icon danger" aria-label="Remove row" onClick={() => commit(rows.filter((_, x) => x !== i))}><Icon n="x" /></button>
             </div>
           );
         })}
@@ -77,7 +78,7 @@ export function LayoutEditor() {
           <>
             <span className="hint">Add:</span>
             {free.map((s) => (
-              <button key={s} className="chip" onClick={() => commit([...rows, s])}>+ {label(s)}</button>
+              <button key={s} className="chip" onClick={() => commit([...rows, s])}><Icon n="plus" /> {label(s)}</button>
             ))}
           </>
         )}

@@ -3,6 +3,7 @@ import { searchFields } from "../schema/fields";
 import { redo, undo, useCanRedo, useCanUndo } from "../store/config";
 import { focusField, setStep, STEPS, uiStore, useUi } from "../store/ui";
 import { shareUrl } from "./editors/ImportExport";
+import { Icon } from "./ui/Icon";
 
 const SearchIcon = () => (
   <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
@@ -66,9 +67,9 @@ export function TopBar() {
       <span className="grow" />
       <SearchBox />
       <div className="toolbar">
-        <button className="btn sm icon" title="Undo (Ctrl Z)" aria-label="Undo" disabled={!canUndo} onClick={undo}>↶</button>
-        <button className="btn sm icon" title="Redo (Ctrl Y)" aria-label="Redo" disabled={!canRedo} onClick={redo}>↷</button>
-        <button className="btn sm" title="Copy a link to this configuration" onClick={share}>🔗 <span className="lbl">{label}</span></button>
+        <button className="btn sm icon" title="Undo (Ctrl Z)" aria-label="Undo" disabled={!canUndo} onClick={undo}><Icon n="undo" /></button>
+        <button className="btn sm icon" title="Redo (Ctrl Y)" aria-label="Redo" disabled={!canRedo} onClick={redo}><Icon n="redo" /></button>
+        <button className="btn sm" title="Copy a link to this configuration" onClick={share}><Icon n="link" /> <span className="lbl">{label}</span></button>
       </div>
       <nav className="toplinks">
         <a href="https://github.com/GiuseppeBellamacina/profile-forge/blob/main/GUIDE.md" target="_blank" rel="noopener">Option guide</a>
@@ -100,8 +101,8 @@ export function StepNav() {
   const next = STEPS[i + 1];
   return (
     <div className="editor-foot">
-      {prev ? <button className="btn" onClick={() => setStep(prev.id)}>← {prev.title}</button> : <span />}
-      {next ? <button className="btn primary" onClick={() => setStep(next.id)}>{next.title} →</button> : <span />}
+      {prev ? <button className="btn" onClick={() => setStep(prev.id)}><Icon n="left" /> {prev.title}</button> : <span />}
+      {next ? <button className="btn primary" onClick={() => setStep(next.id)}>{next.title} <Icon n="right" /></button> : <span />}
     </div>
   );
 }

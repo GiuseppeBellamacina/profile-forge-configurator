@@ -3,6 +3,7 @@ import { clone } from "../../lib/path";
 import { configJson } from "../../lib/publish";
 import { encodeShare } from "../../lib/share";
 import { configStore, replaceConfig, validate } from "../../store/config";
+import { Icon } from "../ui/Icon";
 
 export const shareUrl = async () => {
   const { raw, assets } = configStore.get();
@@ -45,7 +46,7 @@ export function ImportExport() {
   return (
     <div className="stack">
       <div className="row">
-        <button className="btn" onClick={share}>🔗 {shareLabel}</button>
+        <button className="btn" onClick={share}><Icon n="link" /> {shareLabel}</button>
         <button className="btn" onClick={download}>Download config.json</button>
       </div>
       <p className="hint">The share link contains your whole configuration (no server involved): anyone who opens it can load it into their own editor.</p>

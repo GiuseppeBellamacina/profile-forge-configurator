@@ -4,6 +4,7 @@ import { CORE } from "../../lib/assets";
 import { getPath } from "../../lib/path";
 import { edit, setVal, themeSlots, useRaw } from "../../store/config";
 import { uiStore, useUi } from "../../store/ui";
+import { Icon } from "../ui/Icon";
 
 const HEX = /^#?([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const hex6 = (v: string) => {
@@ -117,7 +118,7 @@ export function ThemeSlots() {
             {themeNames(raw).map((n) => <option key={n}>{n}</option>)}
           </select>
           {Object.keys(slots).length > 1 && (
-            <button className="btn sm danger" title="Remove slot" onClick={() => edit((r) => { const { [slot]: _, ...rest } = themeSlots(r); r.themes = rest; })}>✕</button>
+            <button className="btn sm danger" title="Remove slot" onClick={() => edit((r) => { const { [slot]: _, ...rest } = themeSlots(r); r.themes = rest; })}><Icon n="x" /></button>
           )}
         </div>
       ))}
@@ -148,7 +149,7 @@ function ColorWidget({ k, value, theme, onSet }: { k: string; value: string; the
         if (!v) onSet(undefined);
         else if (HEX.test(v)) onSet(v);
       }} />
-      <button title="Reset" aria-label={`Reset ${k}`} onClick={() => onSet(undefined)}>↺</button>
+      <button title="Reset" aria-label={`Reset ${k}`} onClick={() => onSet(undefined)}><Icon n="reset" /></button>
     </div>
   );
 }

@@ -18,7 +18,6 @@ export function PresetGallery() {
   }, []);
 
   const load = async (name: string) => {
-    if (!confirm(`Replace your current configuration with the “${cap(name)}” preset? You can undo this.`)) return;
     try {
       const json = await (await fetch(`${CORE}presets/${name}.json`)).json();
       delete json.$schema;
@@ -49,7 +48,7 @@ export function PresetGallery() {
         <button
           className="btn sm"
           onClick={() => {
-            if (confirm("Reset everything to the defaults? You can undo this.")) (replaceConfig(clone(START)), setMsg("Back to the defaults."));
+            (replaceConfig(clone(START)), setMsg("Back to the defaults."));
           }}
         >
           Reset to defaults

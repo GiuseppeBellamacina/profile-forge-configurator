@@ -4,6 +4,7 @@ import { imgSrc } from "../../lib/assets";
 import { deviconUrl, loadDevicons, searchDevicons, type Devicon } from "../../lib/devicon";
 import { slug } from "../../lib/publish";
 import { addAssets, edit, setVal, useAssets, useRaw } from "../../store/config";
+import { Icon } from "../ui/Icon";
 
 // ── about ────────────────────────────────────────────────────────────────────
 export function AboutEditor() {
@@ -47,7 +48,7 @@ function RowsEditor({ path, cols, blank, noun, max }: { path: string; cols: Col[
               <input key={c.key} type="text" list={c.list} placeholder={c.label} aria-label={c.label} style={{ flex: c.wide ? "2 1 170px" : "1 1 110px", width: "auto" }} value={it[c.key] ?? ""} onChange={(e) => update(i, c.key, e.target.value)} />
             ),
           )}
-          <button className="btn sm icon danger" aria-label={`Remove ${noun}`} onClick={() => write(items.filter((_, x) => x !== i))}>✕</button>
+          <button className="btn sm icon danger" aria-label={`Remove ${noun}`} onClick={() => write(items.filter((_, x) => x !== i))}><Icon n="x" /></button>
         </div>
       ))}
       <div className="row">
@@ -98,7 +99,7 @@ export function StackEditor() {
               <span className="tool" key={`${it.image}-${j}`}>
                 <img src={imgSrc(assets, it.image)} alt="" />
                 {it.name}
-                <button title="Remove" aria-label={`Remove ${it.name}`} onClick={() => upd(i, (c) => ({ ...c, items: c.items.filter((_, y) => y !== j) }))}>✕</button>
+                <button title="Remove" aria-label={`Remove ${it.name}`} onClick={() => upd(i, (c) => ({ ...c, items: c.items.filter((_, y) => y !== j) }))}><Icon n="x" /></button>
               </span>
             ))}
             <button className="btn sm" onClick={() => setPicking(i)}>+ Add icon</button>
