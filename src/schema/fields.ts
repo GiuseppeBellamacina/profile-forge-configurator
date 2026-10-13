@@ -122,6 +122,7 @@ export const GROUPS: Group[] = [
   {
     id: "heatmap", title: "Heatmap", blurb: "The contribution calendar.", step: "sections",
     fields: [
+      { type: "select", path: "heatmap.mode", label: "Style", hint: "snake: an animated snake eats the contributions (use it instead of a separate snake image)", options: ["grid", "snake"] },
       { type: "number", path: "heatmap.weeks", label: "Weeks", min: 4, max: 53 },
       { type: "select", path: "heatmap.cell", label: "Cell shape", options: ["square", "round"] },
       { type: "select", path: "heatmap.weekStart", label: "Week starts on", options: ["sun", "mon"] },
