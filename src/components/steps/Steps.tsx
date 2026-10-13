@@ -5,6 +5,7 @@ import { useUi } from "../../store/ui";
 import { AboutEditor, LinksEditor, StackEditor, WorkingEditor } from "../editors/ContentEditors";
 import { DataBlock } from "../editors/DataBlock";
 import { ImportExport } from "../editors/ImportExport";
+import { ImportFromRepo } from "../editors/ImportFromRepo";
 import { GridEditor, UseGrid } from "../editors/GridEditor";
 import { LayoutEditor } from "../editors/LayoutEditor";
 import { PresetGallery } from "../editors/PresetGallery";
@@ -35,6 +36,9 @@ export const StartStep = () => (
     </Section>
     <Section title="Your data" hint="Type your GitHub username to preview your real stats (fetched once, every edit reuses them). Without it the preview shows demo data.">
       <DataBlock />
+    </Section>
+    <Section title="Import my current setup" hint="Optional. Pulls your existing config.json and README from GitHub instead of starting from a preset.">
+      <ImportFromRepo />
     </Section>
     <Section title="General">
       <FieldList fields={fieldsOf("general").fields.filter((f) => f.path !== "includePrivate")} />

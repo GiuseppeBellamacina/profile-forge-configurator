@@ -283,3 +283,4 @@ option, optgroup { background: var(--surface); color: var(--text); }
 .gguides { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 .gguides i { position: absolute; background: rgba(255, 255, 255, 0.05); border-left: 1px solid rgba(255, 255, 255, 0.12); border-right: 1px solid rgba(255, 255, 255, 0.12); }
 .gguides i.row { border: 0; border-top: 1px solid rgba(255, 255, 255, 0.12); border-bottom: 1px solid rgba(255, 255, 255, 0.12); background: transparent; }
+.readme-frame { width: 100%; height: 520px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #0d1117; }

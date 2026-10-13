@@ -132,6 +132,21 @@ export const api = {
     if (!j || Array.isArray(j) || j.content === undefined) return null;
     return { text: dec.decode(fromB64(j.content)), sha: j.sha };
   },
+  /** Every file of the branch with its size, in one request ({ path, size }; may be truncated on huge repos). */
+  tree: async (t: string, o: string, r: string, ref: string): Promise<{ path: string; size: number }[]> => {
+    const j = await call(t, "GET", `/repos/${o}/${r}/git/trees/${encodeURIComponent(ref)}?recursive=1`);
+    return (j.tree ?? []).filter((x: { type: string }) => x.type === "blob").map((x: { path: string; size: number }) => ({ path: x.path, size: x.size }));
+  },
+  /** GitHub-flavored markdown rendered to (sanitized) html. */
+  markdown: async (t: string, text: string, context: string): Promise<string> => {
+    const res = await fetch(`${API}/markdown`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${t}`, Accept: "text/html", "Content-Type": "application/json", "X-GitHub-Api-Version": "2022-11-28" },
+      body: JSON.stringify({ text, mode: "gfm", context }),
+    });
+    if (!res.ok) throw new GitHubError(res.status, `GitHub could not render the README (${res.status})`, "");
+    return res.text();
+  },
   dispatch: (t: string, o: string, r: string, file: string, ref: string) => call(t, "POST", `/repos/${o}/${r}/actions/workflows/${file}/dispatches`, { ref }),
 };
 
