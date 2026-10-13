@@ -53,10 +53,10 @@ export function useDemoData() {
 
 /** Fetch a profile once; later edits reuse it. Cached per login (and private flag) in this tab. */
 export async function loadProfile(login: string, { force = false } = {}) {
-  const { token } = sessionStore.get();
+  const { token, priv: granted } = sessionStore.get();
   if (!token && !AUTH_URL) throw new Error("Preview needs the sign-in backend, which isn’t configured on this site.");
   const raw = configStore.get().raw;
-  const priv = !!token && !!raw.includePrivate; // private data needs the user's own token
+  const priv = !!token && granted && !!raw.includePrivate; // private data needs the user's own token with the "repo" grant
   const key = `pf:profile:${login}:${priv}`;
   const cached = !force && ss.get<Raw>(key);
   if (cached) {
