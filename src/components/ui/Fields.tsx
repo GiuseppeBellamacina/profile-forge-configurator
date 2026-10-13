@@ -7,11 +7,13 @@ import { useUi } from "../../store/ui";
 import { Icon } from "./Icon";
 
 /** Keeps what the user is typing, and only re-syncs from the store when the value changed from outside (undo, reset, preset). */
-function useDraft(stored: string, commit: (v: string) => void) {
-  const [draft, setDraft] = useState(stored);
+function useDraft(stored: string, commit: (v: string) => void, shown = stored) {
+  const [draft, setDraft] = useState(shown);
   useEffect(() => {
-    setDraft((d) => (d.trim() === stored.trim() ? d : stored));
-  }, [stored]);
+    // `shown` is what an unset field displays (a number's default): the store drops values equal to the default, so a
+    // draft equal to either is already in sync. Without this, stepping onto the default blanked the input and the next arrow restarted at the minimum.
+    setDraft((d) => (d.trim() === stored.trim() || d.trim() === shown.trim() ? d : shown));
+  }, [stored, shown]);
   return [draft, (v: string) => (setDraft(v), commit(v))] as const;
 }
 
@@ -118,7 +120,7 @@ function TextControl({ field, stored, def }: { field: Extract<Field, { type: "te
 }
 
 function NumberControl({ field, stored, def }: { field: Extract<Field, { type: "number" }>; stored: string; def: unknown }) {
-  const [draft, setDraft] = useDraft(stored, (v) => setVal(field.path, v === "" ? undefined : Number(v)));
+  const [draft, setDraft] = useDraft(stored, (v) => setVal(field.path, v === "" ? undefined : Number(v)), stored === "" && typeof def === "number" ? String(def) : stored);
   return (
     <Shell path={field.path} label={field.label} hint={field.hint} htmlFor={controlId(field.path)}>
       <input id={controlId(field.path)} type="number" min={field.min} max={field.max} step={field.step ?? 1} value={draft} placeholder={def == null ? "default" : String(def)} onChange={(e) => setDraft(e.target.value)} />
