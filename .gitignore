@@ -3,3 +3,8 @@ dist/
 public/core/
 _site/
 core/
+.wrangler/
+.dev.vars
+.env
+.env.*
+worker/.wrangler/

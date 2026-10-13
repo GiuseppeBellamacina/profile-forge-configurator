@@ -9,6 +9,8 @@ const NAMES: Record<string, string> = {
   languages: "Languages", trophies: "Trophies", heatmap: "Heatmap", techStack: "Tech stack",
 };
 const label = (s: string) => NAMES[s] ?? s;
+// Only these can share a row; the renderer stacks anything else (languages only when its layout is not "bar" / "compact").
+const HALF = ["stats", "streak", "languages"];
 
 /** Section order. Drag a row by its handle (mouse) or use the arrows (touch). A row can hold two half-width sections. */
 export function LayoutEditor() {
@@ -36,7 +38,7 @@ export function LayoutEditor() {
           const pick = (j: number) => (
             <select className="lay-chip" aria-label={`Section ${j + 1} of row ${i + 1}`} style={{ width: "auto" }} value={c[j]}
               onChange={(e) => { const n = [...c]; n[j] = e.target.value; replace(i, n.length === 1 ? n[0] : n); }}>
-              {SECTIONS.map((s) => <option key={s} value={s}>{label(s)}</option>)}
+              {(c.length === 2 ? HALF : SECTIONS).map((s) => <option key={s} value={s}>{label(s)}</option>)}
             </select>
           );
           return (
@@ -57,9 +59,9 @@ export function LayoutEditor() {
                   {pick(1)}
                   <button className="btn sm" title="Back to a single column" onClick={() => replace(i, c[0])}>−</button>
                 </>
-              ) : (
-                <button className="btn sm" title="Add a second section in this row (half width)" onClick={() => replace(i, [c[0], free[0] ?? "stats"])}>+ side by side</button>
-              )}
+              ) : HALF.includes(c[0]) ? (
+                <button className="btn sm" title="Add a second half-width section in this row" onClick={() => replace(i, [c[0], HALF.find((h) => h !== c[0] && !used.has(h)) ?? HALF.find((h) => h !== c[0])!])}>+ side by side</button>
+              ) : null}
               <span className="grow" />
               <button className="btn sm icon" disabled={i === 0} aria-label="Move up" onClick={() => move(i, i - 1)}>↑</button>
               <button className="btn sm icon" disabled={i === rows.length - 1} aria-label="Move down" onClick={() => move(i, i + 1)}>↓</button>
@@ -68,6 +70,7 @@ export function LayoutEditor() {
           );
         })}
       </div>
+      <p className="hint">Only <b>Stats</b>, <b>Streak</b> and <b>Languages</b> (donut or pie layout) are half width, so only they can sit side by side. Other sections always take the full width.</p>
       {!rows.length && <div className="empty">The card would be empty. Add a section.</div>}
       <div className="row">
         {free.length > 0 && (

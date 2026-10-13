@@ -244,3 +244,19 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(3px); }
   .lay-chip { min-width: 0; padding: 5px 8px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+/* ── minimal pass: fewer boxes, more black ── */
+.brand small, .step .n { display: none; }
+.step { padding: 8px 6px 12px; font-size: 13px; }
+.stage { border: 0; padding: 8px; }
+.json-drawer { border: 0; background: transparent; }
+.btn { border-color: transparent; background: var(--surface-2); }
+.btn.primary { border-color: var(--text); }
+.btn.ghost { background: transparent; }
+input[type="text"], input[type="number"], input[type="search"], input[type="password"], select, textarea { background: transparent; }
+.search input[type="search"] { background: transparent; }
+.card-box, .acc, .pub-step, .me, .item, .cf, .files { background: transparent; }
+.section > h3::after { display: none; }
+.section > h3 { color: var(--muted); font-weight: 500; letter-spacing: 1px; }
+.tile { background: transparent; }
+.seg { border-color: var(--line); }

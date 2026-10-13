@@ -5,6 +5,7 @@ compatibility_date = "2024-11-01"
 [vars]
 # Origins of the page(s) allowed to start a sign-in and receive the token (no trailing slash).
 ALLOWED_ORIGINS = "https://giuseppebellamacina.github.io,http://localhost:8080"
-# Your OAuth App's client id (public). The secret is set with: wrangler secret put GITHUB_CLIENT_SECRET
-GITHUB_CLIENT_ID = "REPLACE_WITH_CLIENT_ID"
-# Also set (secret): wrangler secret put GITHUB_PUBLIC_TOKEN  (fine-grained PAT, public read-only; powers the pre-login preview)
+# Your OAuth App's client id (public). Secrets are never stored here; set them with:
+#   wrangler secret put GITHUB_CLIENT_SECRET   (OAuth App client secret)
+#   wrangler secret put GITHUB_PUBLIC_TOKEN    (fine-grained PAT, public read-only; powers the pre-login preview)
+GITHUB_CLIENT_ID = "Ov23liqzKThFQkfY7CCM"
