@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { assetBytes } from "../../lib/assets";
 import { api, commitFiles, configJson, mergeReadme, readmeBlock, toBytes, workflowYaml, type FileEntry } from "../../lib/publish";
 import { zip } from "../../lib/zip";
@@ -41,6 +41,7 @@ export function PublishPanel() {
   const [readmeText, setReadmeText] = useState(memo.readmeText);
   const [off, setOff] = useState(memo.off);
   const [files, setFiles] = useState<FileEntry[]>([]);
+  const [iconInfo, setIconInfo] = useState<{ missing: string[]; inRepo: number }>({ missing: [], inRepo: 0 });
   const [ready, setReady] = useState(memo.ready);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<Msg>(null);
@@ -54,6 +55,15 @@ export function PublishPanel() {
     if (me) (setOwner((o) => o || me.login), setRepo((r) => r || me.login));
   }, [me]);
 
+  // Signed in with a repository filled in: check it straight away, so the files are ready to review
+  const autoChecked = useRef(false);
+  useEffect(() => {
+    if (me && owner && repo && !ready && !autoChecked.current) {
+      autoChecked.current = true;
+      check(true);
+    }
+  });
+
   // Everything that would be committed, recomputed when anything it depends on changes.
   useEffect(() => {
     let stale = false;
@@ -63,21 +73,31 @@ export function PublishPanel() {
         { path: ".github/workflows/profile-forge.yml", content: workflowYaml({ ref, hour, onConfigChange: onConfig }) },
       ];
       const images = [...new Set<string>((raw.techStack ?? []).flatMap((c: { items: { image: string }[] }) => c.items.map((i) => i.image)))];
-      for (const p of images) list.push({ path: p, content: await assetBytes(assets, p).catch(() => null), binary: true });
+      const missing: string[] = [];
+      let inRepo = 0;
+      const mine = owner && repo ? `https://raw.githubusercontent.com/${owner}/${repo}/` : null;
+      for (const p of images) {
+        if (mine && assets[p]?.url.startsWith(mine)) { inRepo++; continue; } // imported from this repository: it is already there
+        const bytes = await assetBytes(assets, p).catch(() => null);
+        if (bytes === null) missing.push(p.split("/").pop() ?? p);
+        else list.push({ path: p, content: bytes, binary: true });
+      }
+      if (!stale) setIconInfo({ missing, inRepo });
       if (readme === "merge") list.push({ path: "README.md", content: mergeReadme(readmeText, readmeBlock(raw)), readme: true });
       if (readme === "replace") list.push({ path: "README.md", content: readmeBlock(raw), readme: true });
       if (!stale) setFiles(list.filter((f) => f.content !== null));
     })();
     return () => { stale = true; };
-  }, [raw, assets, ref, hour, onConfig, readme, readmeText]);
+  }, [raw, assets, ref, hour, onConfig, readme, readmeText, owner, repo]);
 
-  const check = async () => {
+  const check = async (auto = false) => {
     if (!me) return setMsg({ kind: "bad", text: "Connect to GitHub first." });
     if (!owner || !repo) return setMsg({ kind: "bad", text: "Fill in the repository." });
     setMsg({ kind: "info", text: "Checking the repository…" });
     try {
       let r = await api.repo(token, owner, repo);
       if (!r) {
+        if (auto) return setMsg({ kind: "bad", text: `${owner}/${repo} does not exist yet. Press the button below to create it.` });
         if (owner.toLowerCase() === me.login.toLowerCase() && confirm(`${owner}/${repo} does not exist. Create it now? It must be public to show on your profile.`)) r = await api.createRepo(token, repo);
         else return setMsg({ kind: "bad", text: "Repository not found." });
       }
@@ -185,10 +205,10 @@ export function PublishPanel() {
           </label>
         </div>
         <label className="field inline">
-          <span className="field-label">Also rebuild the card whenever config.json changes</span>
+          <span className="field-label" title="Adds a trigger to the workflow, so the card is rebuilt right after each commit that changes config.json instead of waiting for the daily run">Update the card as soon as config.json changes</span>
           <button type="button" role="switch" aria-checked={onConfig} className="toggle" onClick={() => setOnConfig(!onConfig)} />
         </label>
-        <button className="btn" onClick={check}>Check repository & review files</button>
+        <button className="btn" onClick={() => check()}>Check repository</button>
       </Step>
 
       <Step n="3" title="Review & commit">
@@ -204,6 +224,8 @@ export function PublishPanel() {
             );
           })}
         </div>
+        {iconInfo.missing.length > 0 && <div className="log bad">These icons could not be loaded and will be missing: {iconInfo.missing.join(", ")}.</div>}
+        {iconInfo.inRepo > 0 && <div className="log">{iconInfo.inRepo} {iconInfo.inRepo === 1 ? "icon is" : "icons are"} already in your repository.</div>}
         <div className="row">
           <button className="btn primary" disabled={!ready || busy || files.every((f) => off.has(f.path))} onClick={commit}>
             {busy ? "Committing…" : "Commit to my repository"}
