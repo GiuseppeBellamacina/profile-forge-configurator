@@ -2,7 +2,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { DEFAULTS } from "../../core";
 import { getPath } from "../../lib/path";
 import type { Field } from "../../schema/fields";
-import { isSet, resetPath, setVal, useRaw, valueOf } from "../../store/config";
+import { isSet, resetPath, setVal, themeSlots, useRaw, valueOf } from "../../store/config";
+import { ColorWidget } from "../editors/ThemeEditor";
 import { useUi } from "../../store/ui";
 import { Icon } from "./Icon";
 
@@ -66,6 +67,8 @@ export function FieldView({ field }: { field: Field }) {
       return <NumberControl field={field} stored={own === undefined ? "" : String(own)} def={def} />;
     case "list":
       return <ListControl field={field} stored={Array.isArray(own) ? own.join(", ") : ""} />;
+    case "color":
+      return <ColorControl field={field} raw={raw} />;
     case "bool":
       return (
         <Shell path={path} label={field.label} hint={field.hint} inline onActivate={() => setVal(path, !cur)}>
@@ -146,11 +149,24 @@ function ListControl({ field, stored }: { field: Extract<Field, { type: "list" }
   );
 }
 
-/** A group's fields in one list. */
-export const FieldList = ({ fields }: { fields: Field[] }) => (
-  <>
-    {fields.map((f) => (
-      <FieldView key={f.path} field={f} />
-    ))}
-  </>
-);
+/** A group's fields in one list; a field with `when` only shows while that other option has the value. */
+export function FieldList({ fields }: { fields: Field[] }) {
+  const raw = useRaw();
+  return (
+    <>
+      {fields.filter((f) => !f.when || valueOf(raw, f.when.path) === f.when.equals).map((f) => (
+        <FieldView key={f.path} field={f} />
+      ))}
+    </>
+  );
+}
+
+function ColorControl({ field, raw }: { field: Extract<Field, { type: "color" }>; raw: Record<string, any> }) {
+  const name = field.path.split(".")[1];
+  const first = Object.values(themeSlots(raw))[0] ?? "dark";
+  return (
+    <Shell path={field.path} label={field.label} hint={field.hint}>
+      <ColorWidget k={name} value={getPath(raw, field.path) ?? ""} theme={first} onSet={(v) => setVal(field.path, v)} />
+    </Shell>
+  );
+}

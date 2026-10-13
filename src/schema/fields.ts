@@ -3,11 +3,13 @@
 import { LOCALES, STATS_ITEMS } from "../core";
 import type { StepId } from "../store/ui";
 
-type Base = { path: string; label: string; hint?: string };
+// `when`: the field only shows while another option has that value (e.g. the snake options while the heatmap style is "snake").
+type Base = { path: string; label: string; hint?: string; when?: { path: string; equals: unknown } };
 export type Field =
   | (Base & { type: "text"; placeholder?: string; list?: "timezones"; examples?: { value: string; shows: string }[] })
   | (Base & { type: "number"; min?: number; max?: number; step?: number })
   | (Base & { type: "bool" })
+  | (Base & { type: "color" }) // a colour override: path is colors.<name>
   | (Base & { type: "select"; options: (string | number | null)[] })
   | (Base & { type: "multi"; options: string[]; max?: number })
   | (Base & { type: "list"; placeholder?: string });
@@ -123,9 +125,14 @@ export const GROUPS: Group[] = [
     id: "heatmap", title: "Heatmap", blurb: "The contribution calendar.", step: "sections",
     fields: [
       { type: "select", path: "heatmap.mode", label: "Style", hint: "snake: an animated snake eats the contributions (use it instead of a separate snake image)", options: ["grid", "snake"] },
-      { type: "select", path: "heatmap.snakePath", label: "Snake route", hint: "smart: eats the quietest days first, then the busiest, planned around its own body. sweep: column by column. Only for the snake style.", options: ["smart", "sweep"] },
+      {
+        type: "select", path: "heatmap.snakePath", label: "Snake route", when: { path: "heatmap.mode", equals: "snake" },
+        hint: "smart: quietest days first, then busier ones. busy: busiest first. nearest: always the closest day. wander: one of the closest, picked at random (always the same). sweep: column by column. rows: row by row. spiral: outside in.",
+        options: ["smart", "busy", "nearest", "wander", "sweep", "rows", "spiral"],
+      },
+      { type: "color", path: "colors.snakeColor", label: "Snake color", hint: "default: the theme ring color. For one theme only, use Look, Color overrides.", when: { path: "heatmap.mode", equals: "snake" } },
       { type: "number", path: "heatmap.weeks", label: "Weeks", min: 4, max: 53 },
-      { type: "select", path: "heatmap.cell", label: "Cell shape", options: ["square", "round"] },
+      { type: "select", path: "heatmap.cell", label: "Cell shape", hint: "triangle tiles up and down; snowflake is brighter with more contributions; moon grows from an empty disc to a full moon; mixed is a stable random mix of square, round and triangle", options: ["square", "round", "triangle", "snowflake", "moon", "mixed"] },
       { type: "select", path: "heatmap.weekStart", label: "Week starts on", options: ["sun", "mon"] },
       { type: "bool", path: "heatmap.legend", label: "Legend" },
       { type: "bool", path: "heatmap.monthLabels", label: "Month labels" },
