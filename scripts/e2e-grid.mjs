@@ -48,13 +48,14 @@ try {
   // make "Heatmap" taller by dragging its bottom edge down 100 card pixels
   await sleep(1500);
   const hm = await box("Heatmap");
-  const dy = (hm.w / 460) * 100;
+  const dy = (hm.w / 460) * 200; // about two rows
   await mouse("mouseMoved", hm.vx, hm.vy); await mouse("mousePressed", hm.vx, hm.vy);
   for (let i = 1; i <= 8; i++) await mouse("mouseMoved", hm.vx, hm.vy + (dy * i) / 8);
   await mouse("mouseReleased", hm.vx, hm.vy + dy);
   await sleep(400);
   const heat = (await grid()).find((g) => g.section === "heatmap");
   check("dragging the bottom edge makes Heatmap taller", heat.height > 100, heat);
+  check("the height snaps to a whole number of 80px rows", (heat.height + 20) % 100 === 0, heat);
 
   await sleep(1500);
   // move "About" next to Stats's old neighbour: drop it on the Trophies box

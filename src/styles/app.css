@@ -280,3 +280,6 @@ option, optgroup { background: var(--surface); color: var(--text); }
 .ghandle { position: absolute; right: -7px; top: 50%; width: 14px; height: 44px; margin-top: -22px; border-radius: 7px; background: #fff; border: 1px solid #000; cursor: ew-resize; touch-action: none; z-index: 2; }
 .gghost { position: absolute; border: 2px solid var(--accent); border-radius: 14px; background: var(--accent-soft); pointer-events: none; z-index: 1; }
 .gvhandle { position: absolute; left: 50%; bottom: -7px; width: 44px; height: 14px; margin-left: -22px; border-radius: 7px; background: #fff; border: 1px solid #000; cursor: ns-resize; touch-action: none; z-index: 2; }
+.gguides { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+.gguides i { position: absolute; background: rgba(255, 255, 255, 0.05); border-left: 1px solid rgba(255, 255, 255, 0.12); border-right: 1px solid rgba(255, 255, 255, 0.12); }
+.gguides i.row { border: 0; border-top: 1px solid rgba(255, 255, 255, 0.12); border-bottom: 1px solid rgba(255, 255, 255, 0.12); background: transparent; }

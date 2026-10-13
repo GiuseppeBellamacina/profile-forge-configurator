@@ -72,10 +72,23 @@ export function dropOrder(items: Item[], id: string, target: { x: number; y: num
 export const spanFor = (id: string, left: number, pointerX: number) =>
   Math.min(COLS, Math.max(MIN_SPAN[id] ?? 1, Math.round((pointerX - left + GUTTER) / STEP)));
 
-/** Card height for a bottom-edge drag: snaps to 10px, and back to automatic at (or below) the content height. */
+// Heights come in whole rows of 80px with the same 20px gutter as the columns (1 row = 80, 2 = 180, 3 = 280, ...),
+// so cards in neighbouring columns can line up. "Auto" is the height of the content.
+export const ROW_H = 80;
+export const MAX_ROWS = 12;
+export const rowsHeight = (n: number) => n * ROW_H + (n - 1) * GUTTER;
+/** The heights a card can take, above what its content needs (that one is "auto"). */
+export const heightSteps = (natural: number) => Array.from({ length: MAX_ROWS }, (_, i) => i + 1).map((n) => ({ rows: n, height: rowsHeight(n) })).filter((s) => s.height > natural + 2);
+/** Card height for a bottom-edge drag: the nearest step; undefined (auto) when the content height is the nearest. */
 export const heightFor = (natural: number, top: number, pointerY: number): number | undefined => {
-  const h = Math.round((pointerY - top) / 10) * 10;
-  return h <= natural + 4 ? undefined : Math.min(3000, h);
+  const h = pointerY - top;
+  let best: number | undefined;
+  let bestD = Math.abs(h - natural);
+  for (const s of heightSteps(natural)) {
+    const d = Math.abs(h - s.height);
+    if (d < bestD) (bestD = d, best = s.height);
+  }
+  return best;
 };
 
 export const unused = (items: Item[]) => SECTIONS.filter((s) => !items.some((i) => i.id === s));
