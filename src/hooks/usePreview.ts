@@ -13,6 +13,7 @@ export function usePreview(): Preview {
   const assets = useAssets();
   const profile = useSession((s) => s.profile);
   const wanted = useUi((s) => s.slot);
+  const still = useUi((s) => s.step === "look"); // while picking themes / colors: no intro animation, near-instant updates
   const [out, setOut] = useState<Preview>(EMPTY);
   const lastUrl = useRef("");
 
@@ -21,7 +22,7 @@ export function usePreview(): Preview {
     setOut((o) => ({ ...o, busy: true }));
     const timer = setTimeout(async () => {
       try {
-        const { svg, missing, light, slots, slot } = await renderCard(raw, assets, profile, wanted);
+        const { svg, missing, light, slots, slot } = await renderCard(still ? { ...raw, card: { ...raw.card, animations: false } } : raw, assets, profile, wanted);
         if (stale) return;
         const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
         if (lastUrl.current) URL.revokeObjectURL(lastUrl.current);
@@ -30,12 +31,12 @@ export function usePreview(): Preview {
       } catch (e: any) {
         if (!stale) setOut((o) => ({ ...o, error: e.message ?? String(e), busy: false }));
       }
-    }, 140);
+    }, still ? 30 : 140);
     return () => {
       stale = true;
       clearTimeout(timer);
     };
-  }, [raw, assets, profile, wanted]);
+  }, [raw, assets, profile, wanted, still]);
 
   return out;
 }
