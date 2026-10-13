@@ -25,8 +25,8 @@ export function usePreview(): Preview {
   const profile = useSession((s) => s.profile);
   const wanted = useUi((s) => s.slot);
   const step = useUi((s) => s.step);
-  const still = step === "look";
-  const samples = step === "layout"; // while picking themes / colors: no intro animation, near-instant updates
+  const still = ["look", "layout", "sections", "content"].includes(step); // while editing: no animation, near-instant updates
+  const samples = step === "layout";
   const [out, setOut] = useState<Preview>(EMPTY);
   const lastUrl = useRef("");
 
@@ -36,7 +36,7 @@ export function usePreview(): Preview {
     const timer = setTimeout(async () => {
       try {
         const { svg, missing, light, slots, slot, height, boxes } = await renderCard(
-          still ? { ...raw, card: { ...raw.card, animations: false } } : samples ? withSamples(raw) : raw,
+          still ? { ...(samples ? withSamples(raw) : raw), card: { ...raw.card, animations: false } } : raw,
           assets,
           profile,
           wanted,
