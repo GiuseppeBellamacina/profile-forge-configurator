@@ -62,7 +62,7 @@ export const LookStep = () => (
 
 export const LayoutStep = () => (
   <>
-    <Section title="Section order" hint="Put two sections in one row for a side-by-side layout.">
+    <Section title="Section order" hint="Put two sections in one row for a side-by-side layout. Sections without content (About, Working on, Tech stack) show a sample here so you can see where they go; they are skipped in the published card until you fill them in.">
       <LayoutEditor />
     </Section>
   </>
