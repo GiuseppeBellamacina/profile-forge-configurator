@@ -62,7 +62,7 @@ export function TopBar() {
   return (
     <header className="topbar">
       <div className="brand">
-        <span className="logo">pf</span>
+        <img className="logo" src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width="30" height="30" />
         <div><b>profile-forge</b> configurator</div>
       </div>
       <span className="grow" />
