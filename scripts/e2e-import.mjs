@@ -86,6 +86,9 @@ try {
   check("Details: trophy padding", (await val("trophies.padding")) === "30", await val("trophies.padding"));
   check("Details: trophy parts", (await pressed("trophies.parts")).join() === "title,bar", await pressed("trophies.parts"));
   check("Details: the frame gallery is there", (await ev(`document.querySelectorAll(".fthumb-tile").length`)) >= 10);
+  await ev(`(() => { const e = document.getElementById("ctl-header.avatar"); e.value = "2"; e.dispatchEvent(new Event("change", { bubbles: true })); })()`);
+  await sleep(300);
+  check("Details: no frame picker when the avatar is hidden", (await ev(`document.querySelectorAll(".fthumb-tile").length`)) === 0 && (await ev(`!document.getElementById("field-colors.frameColor") && !document.getElementById("ctl-header.frameAnimation")`)));
   const facts = await pressed("header.facts");
   check("Details: header facts", facts.join() === "stars,followers", facts);
   check("Details: stats hide", (await pressed("stats.hide")).join() === "issues", await pressed("stats.hide"));
