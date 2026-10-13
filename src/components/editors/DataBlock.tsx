@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { AUTH_URL, loadProfile, useDemoData, useSession } from "../../store/session";
-import { ConnectBlock } from "./ConnectBlock";
 
-/** Where the preview gets its numbers: demo data until a login is typed; signing in is only needed to publish. */
+/** Where the preview gets its numbers: demo data until a login is typed; sign-in is only needed in the Publish step. */
 export function DataBlock() {
   const me = useSession((s) => s.me);
   const fetched = useSession((s) => s.fetched);
@@ -27,7 +26,6 @@ export function DataBlock() {
         <button className="btn" onClick={useDemoData}>Use demo data</button>
       </div>
       {msg && <div className="log">{msg}</div>}
-      <ConnectBlock />
     </div>
   );
 }
