@@ -115,6 +115,15 @@ function TextControl({ field, stored, def }: { field: Extract<Field, { type: "te
   return (
     <Shell path={field.path} label={field.label} hint={field.hint} htmlFor={controlId(field.path)}>
       <input id={controlId(field.path)} type="text" value={draft} list={field.list === "timezones" ? "timezones" : undefined} placeholder={field.placeholder ?? (def == null ? "" : String(def))} onChange={(e) => setDraft(e.target.value)} />
+      {field.examples && (
+        <div className="chips" aria-label="Examples">
+          {field.examples.map((x) => (
+            <button type="button" key={x.value} className="chip" aria-pressed={draft === x.value} title={`Use ${x.value}`} onClick={() => setDraft(x.value)}>
+              <code>{x.value}</code> {x.shows}
+            </button>
+          ))}
+        </div>
+      )}
     </Shell>
   );
 }
