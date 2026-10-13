@@ -1,8 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BUILTIN_THEMES, COLOR_KEYS, COLOR_NAMES, registerThemes, resolveTheme, themeNames } from "../../core";
 import { CORE } from "../../lib/assets";
 import { getPath } from "../../lib/path";
-import { edit, setVal, themeSlots, useRaw } from "../../store/config";
+import { renderCard } from "../../lib/renderCard";
+import { edit, setVal, themeSlots, useAssets, useRaw } from "../../store/config";
+import { useSession } from "../../store/session";
 import { uiStore, useUi } from "../../store/ui";
 import { Icon } from "../ui/Icon";
 
@@ -37,7 +39,49 @@ function Swatch({ name, customs }: { name: string; customs: Record<string, unkno
   );
 }
 
-/** Gallery of all themes (preview images come from the profile-forge docs), assigned to the selected slot. */
+
+// Thumbnails render serially (one card per frame) so a 47-tile gallery never blocks typing or scrolling.
+let queue: Promise<unknown> = Promise.resolve();
+const later = <T,>(job: () => Promise<T>) => (queue = queue.then(() => new Promise((r) => setTimeout(r, 0))).then(job, job)) as Promise<T>;
+
+/** The user's own card (their config, colors and profile) rendered with one theme, drawn when the tile scrolls into view. */
+function Thumb({ name, target, cache }: { name: string; target: string; cache: Map<string, string> }) {
+  const raw = useRaw();
+  const assets = useAssets();
+  const profile = useSession((s) => s.profile);
+  const box = useRef<HTMLSpanElement>(null);
+  const [url, setUrl] = useState(cache.get(name) ?? "");
+  const [seen, setSeen] = useState(false);
+
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && (setSeen(true), io.disconnect()), { rootMargin: "200px" });
+    box.current && io.observe(box.current);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => setUrl(cache.get(name) ?? ""), [cache, name]); // cache replaced: drop the revoked url
+
+  useEffect(() => {
+    if (!seen || cache.has(name)) return;
+    let live = true;
+    later(() => renderCard({ ...raw, themes: { [target]: name }, card: { ...raw.card, animations: false } }, assets, profile, target))
+      .then((r) => {
+        const u = URL.createObjectURL(new Blob([r.svg], { type: "image/svg+xml" }));
+        cache.set(name, u);
+        live ? setUrl(u) : undefined;
+      })
+      .catch(() => {});
+    return () => { live = false; };
+  }, [seen, cache, name]);
+
+  return (
+    <span className="thumb" ref={box}>
+      <img alt="" src={url || `${CORE}theme-previews/${name}.png`} />
+    </span>
+  );
+}
+
+/** Gallery of all themes (each tile is your own card drawn with that theme), assigned to the selected slot. */
 export function ThemeGallery() {
   const raw = useRaw();
   const slots = themeSlots(raw);
@@ -47,6 +91,12 @@ export function ThemeGallery() {
   const [tone, setTone] = useState<"all" | "dark" | "light">("all");
   const customs = Object.keys(raw.customThemes ?? {});
   const names = BUILTIN_THEMES;
+  // Thumbnails depend on everything in the config except the theme list, and on the loaded profile and slot.
+  const assets = useAssets();
+  const profile = useSession((s) => s.profile);
+  const key = JSON.stringify([{ ...raw, themes: 0 }, target]);
+  const cache = useMemo(() => new Map<string, string>(), [key, assets, profile]);
+  useEffect(() => () => cache.forEach((u) => URL.revokeObjectURL(u)), [cache]);
 
   const list = useMemo(
     () =>
@@ -87,7 +137,7 @@ export function ThemeGallery() {
         ))}
         {list.filter((n) => !customs.includes(n)).map((n) => (
           <button key={n} className="tile" aria-pressed={slots[target] === n} onClick={() => pick(n)} title={`Use ${n} for “${target}”`}>
-            <span className="thumb"><img loading="lazy" alt="" src={`${CORE}theme-previews/${n}.png`} /></span>
+            <Thumb name={n} target={target} cache={cache} />
             <span className="meta">
               <b>{n}</b>
               {using(n).map((s) => <span key={s} className="tag on">{s}</span>)}
