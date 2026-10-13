@@ -22,7 +22,6 @@ export function GridEditor() {
   };
   return (
     <div className="stack">
-      <p className="hint">Drag a widget on the preview to move it, drag its right edge to make it wider or narrower, or its bottom edge to make it taller. Sizes snap to the grid: 6 columns wide, rows 80px high. "Auto" is the height of the content, which is also the shortest a card can be. Widgets fall to the lowest free spot, so a short one fills the gap next to a tall one.</p>
       <div className="list">
         {items.map((it, i) => (
           <div className="item" key={it.id}>
@@ -79,10 +78,8 @@ export function UseGrid() {
     commit(itemsFromLayout(layout, chart).filter((i) => SECTIONS.includes(i.id)));
   };
   return (
-    <div className="hint-box">
-      <b>Want to place and resize sections by hand?</b>
-      <p style={{ margin: "6px 0 10px" }}>The free grid lets you drag sections around the card and give each one its own width, like widgets on a phone. Your current layout is converted (you can undo or go back).</p>
-      <button className="btn primary" onClick={start}>Use the free grid</button>
+    <div className="row">
+      <button className="btn primary" onClick={start}>Arrange sections freely</button>
     </div>
   );
 }

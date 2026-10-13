@@ -148,18 +148,14 @@ export function PublishPanel() {
 
   return (
     <div>
-      <p className="hint" style={{ marginBottom: 14 }}>
-        Publishing adds <code>config.json</code>, the workflow, the icons you picked (<code>assets/img/</code>) and the card block in <code>README.md</code>, in one commit.
-      </p>
 
       <Step n="1" title="Connect GitHub">
         <ConnectBlock />
-        {!me && <p className="hint">Sign-in is only needed to commit for you. You can always download the files instead (below).</p>}
       </Step>
 
       <Step n="2" title="Choose the repository & options">
         <label className="field">
-          <span className="field-label">Repository <small>your profile repo is named after your login</small></span>
+          <span className="field-label">Repository</span>
           <span className="row" style={{ flexWrap: "nowrap" }}>
             <input type="text" placeholder="login" value={owner} onChange={(e) => (setOwner(e.target.value.trim()), setReady(false))} />
             <span>/</span>
@@ -173,8 +169,8 @@ export function PublishPanel() {
         <label className="field">
           <span className="field-label">README.md</span>
           <select value={readme} onChange={(e) => setReadme(e.target.value as "merge" | "replace" | "skip")}>
-            <option value="merge">Add the card block to my README (keeps the rest)</option>
-            <option value="replace">Replace my whole README with the card (removes everything else)</option>
+            <option value="merge">Add the card to my README</option>
+            <option value="replace">Replace my README with the card</option>
             <option value="skip">Don’t touch my README</option>
           </select>
         </label>
@@ -184,7 +180,7 @@ export function PublishPanel() {
             <input type="text" value={ref} onChange={(e) => setRef(e.target.value.trim() || "v1")} />
           </label>
           <label className="field" style={{ flex: 1 }}>
-            <span className="field-label">Daily refresh <small>UTC hour</small></span>
+            <span className="field-label">Daily refresh (UTC)</span>
             <input type="number" min={0} max={23} value={hour} onChange={(e) => setHour(Math.min(23, Math.max(0, Number(e.target.value) || 0)))} />
           </label>
         </div>
@@ -221,7 +217,7 @@ export function PublishPanel() {
         )}
         {done && (
           <div className="stack">
-            <p>The card is created by the workflow. Run it once now (it also runs daily and when config.json changes):</p>
+            <p>Run the workflow to create the card.</p>
             <div className="row">
               <button className="btn primary" disabled={started} onClick={run}>{started ? "Workflow started ✓" : "Run the workflow now"}</button>
               <a href={`https://github.com/${owner}/${repo}/actions/workflows/profile-forge.yml`} target="_blank" rel="noopener">Open Actions</a>
@@ -236,7 +232,6 @@ export function PublishPanel() {
           <button className="btn" onClick={downloadZip}>Download everything as .zip</button>
           <button className="btn" onClick={async () => { await navigator.clipboard?.writeText(readmeBlock(raw)); setSnip("Copied ✓"); setTimeout(() => setSnip("Copy README snippet"), 1500); }}>{snip}</button>
         </div>
-        <p className="hint">No token? Create the two text files on github.com (the page pre-fills them), then upload the icons from the .zip, or just unzip into the repo.</p>
         <div className="row">
           <button className="btn sm" onClick={() => newFile("config.json", configJson(raw))}>Create config.json on GitHub</button>
           <button className="btn sm" onClick={() => newFile(".github/workflows/profile-forge.yml", workflowYaml({ ref, hour, onConfigChange: onConfig }))}>Create workflow on GitHub</button>

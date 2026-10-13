@@ -103,7 +103,6 @@ export function LayoutEditor() {
         <span className="grow" />
         <button className="btn sm ghost" onClick={() => resetPath("layout")}>Reset order</button>
       </div>
-      <p className="hint">Any two sections except the header can share a row at half width. Stats, streak and languages (donut / pie) are always half width, so on their own they are centered.</p>
     </div>
   );
 }

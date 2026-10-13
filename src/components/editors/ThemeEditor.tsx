@@ -159,7 +159,7 @@ export function AdvancedSlots() {
   return (
     <div className="stack">
       <label className="field inline" onClick={(e) => { e.preventDefault(); setOn(!on); }}>
-        <span className="field-label">Advanced slots <small>extra card files, e.g. for a portfolio site; GitHub only needs dark and light</small></span>
+        <span className="field-label">Advanced slots</span>
         <button type="button" role="switch" aria-checked={on} aria-label="Advanced slots" className="toggle" />
       </label>
       {on && <ThemeSlots />}
@@ -191,7 +191,6 @@ export function ThemeSlots() {
       ))}
       <div className="row">
         <button className="btn sm" onClick={() => edit((r) => { const s = themeSlots(r); r.themes = { ...s, [`slot${Object.keys(s).length + 1}`]: "dracula" }; })}><Icon n="plus" /> Add slot</button>
-        <span className="hint">dark / light are the names GitHub’s README picture switch expects.</span>
       </div>
     </div>
   );
@@ -249,7 +248,7 @@ export function ColorsEditor() {
         ))}
       </div>
       <label className="field">
-        <span className="field-label">bg_gradient <small>angle,color1,color2,…</small></span>
+        <span className="field-label" title="angle,color1,color2,…">bg_gradient</span>
         <input type="text" placeholder="120,0f2027,203a43,2c5364" defaultValue={getPath(raw, `${base}.bg_gradient`) ?? ""} key={base} onChange={(e) => setVal(`${base}.bg_gradient`, e.target.value.trim() || undefined)} />
       </label>
     </div>
@@ -301,7 +300,7 @@ export function CustomThemes() {
             ))}
           </div>
           <label className="field">
-            <span className="field-label">bg_gradient <small>angle,color1,color2,…</small></span>
+            <span className="field-label" title="angle,color1,color2,…">bg_gradient</span>
             <input type="text" defaultValue={spec.bg_gradient ?? ""} onChange={(e) => setKey(name, "bg_gradient", e.target.value.trim() || undefined)} />
           </label>
         </div>
@@ -312,7 +311,6 @@ export function CustomThemes() {
           while (names.includes(n) || n in (r.customThemes ?? {})) n = `my-theme-${++i}`;
           (r.customThemes ??= {})[n] = { base: "dark" };
         })}>+ New custom theme</button>
-        <span className="hint">Then pick it in the gallery above.</span>
       </div>
     </div>
   );

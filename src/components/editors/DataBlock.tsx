@@ -18,7 +18,7 @@ export function DataBlock() {
   return (
     <div className="stack">
       <label className="field">
-        <span className="field-label">GitHub username <small>shows your real stats in the preview. No password, no sign-in.</small></span>
+        <span className="field-label">GitHub username</span>
         <input type="text" placeholder="e.g. octocat" value={value} onChange={(e) => setLogin(e.target.value)} onKeyDown={(e) => e.key === "Enter" && load()} />
       </label>
       <div className="row">

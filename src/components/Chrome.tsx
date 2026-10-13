@@ -63,7 +63,7 @@ export function TopBar() {
     <header className="topbar">
       <div className="brand">
         <span className="logo">pf</span>
-        <div><b>profile-forge</b> configurator<small>Live preview · publish to your profile repo</small></div>
+        <div><b>profile-forge</b> configurator</div>
       </div>
       <span className="grow" />
       <SearchBox />

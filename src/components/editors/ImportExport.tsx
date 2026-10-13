@@ -49,7 +49,6 @@ export function ImportExport() {
         <button className="btn" onClick={share}><Icon n="link" /> {shareLabel}</button>
         <button className="btn" onClick={download}>Download config.json</button>
       </div>
-      <p className="hint">The share link contains your whole configuration (no server involved): anyone who opens it can load it into their own editor.</p>
       <textarea rows={4} placeholder="Paste an existing config.json here" value={text} onChange={(e) => setText(e.target.value)} />
       <div className="row">
         <button className="btn sm" disabled={!text.trim()} onClick={() => apply(text)}>Import pasted JSON</button>

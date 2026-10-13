@@ -12,7 +12,6 @@ import { PresetGallery } from "../editors/PresetGallery";
 import { PublishPanel } from "../editors/PublishPanel";
 import { AdvancedSlots, ColorsEditor, CustomThemes, ThemeGallery } from "../editors/ThemeEditor";
 import { FieldList } from "../ui/Fields";
-import { Icon } from "../ui/Icon";
 
 export const Section = ({ title, hint, children }: { title: string; hint?: ReactNode; children: ReactNode }) => (
   <section className="section">
@@ -31,13 +30,13 @@ const Collapse = ({ title, children }: { title: string; children: ReactNode }) =
 
 export const StartStep = () => (
   <>
-    <Section title="Start from a preset" hint="Pick a ready-made look, then tweak it in the next steps. Your changes are saved in this browser, and you can undo anything.">
+    <Section title="Start from a preset">
       <PresetGallery />
     </Section>
-    <Section title="Your data" hint="Type your GitHub username to preview your real stats (fetched once, every edit reuses them). Without it the preview shows demo data.">
+    <Section title="Your data">
       <DataBlock />
     </Section>
-    <Section title="Import my current setup" hint="Optional. Pulls your existing config.json and README from GitHub instead of starting from a preset.">
+    <Section title="Import my current setup">
       <ImportFromRepo />
     </Section>
     <Section title="General">
@@ -51,7 +50,7 @@ export const StartStep = () => (
 
 export const LookStep = () => (
   <>
-    <Section title="Themes" hint="Pick the slot you want to change, then click a theme. The slot names (dark / light) decide the file names, so your README never changes when you swap themes.">
+    <Section title="Themes">
       <ThemeGallery />
       <AdvancedSlots />
     </Section>
@@ -59,7 +58,7 @@ export const LookStep = () => (
       <Collapse title="Color overrides"><ColorsEditor /></Collapse>
       <Collapse title="Custom themes"><CustomThemes /></Collapse>
     </Section>
-    <Section title="Card" hint={fieldsOf("card").blurb}>
+    <Section title="Card">
       <FieldList fields={fieldsOf("card").fields} />
     </Section>
   </>
@@ -69,7 +68,7 @@ export function LayoutStep() {
   const grid = useRaw().grid;
   return (
     <>
-      <Section title={grid ? "Arrange the card" : "Section order"} hint="Sections without content (About, Working on, Tech stack) show a sample here so you can see where they go; they are skipped in the published card until you fill them in.">
+      <Section title={grid ? "Arrange the card" : "Section order"}>
         {grid ? <GridEditor /> : <><UseGrid /><LayoutEditor /></>}
       </Section>
     </>
@@ -89,7 +88,6 @@ function Accordion({ group, first }: { group: Group; first: boolean }) {
     <details className="acc" open={open} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
       <summary>
         {group.title}
-        {group.blurb && <small>{group.blurb}</small>}
         {changed > 0 && <span className="badge-n">{changed} changed</span>}
       </summary>
       <div className="acc-body">
@@ -101,23 +99,22 @@ function Accordion({ group, first }: { group: Group; first: boolean }) {
 
 export const SectionsStep = () => (
   <>
-    <p className="hint" style={{ marginBottom: 14 }}>Every option of every section. A dot marks what differs from the default; <b><Icon n="reset" /> reset</b> puts one back.</p>
     {groupsOf("sections").map((g, i) => <Accordion key={g.id} group={g} first={i === 0} />)}
   </>
 );
 
 export const ContentStep = () => (
   <>
-    <Section title="About" hint="Shown as a panel under the header. Leave it empty to skip it.">
+    <Section title="About">
       <AboutEditor />
     </Section>
-    <Section title="Working on" hint="Up to four project cards.">
+    <Section title="Working on">
       <WorkingEditor />
     </Section>
-    <Section title="Links" hint="Each link becomes its own clickable button image (GitHub doesn’t make links inside an SVG clickable).">
+    <Section title="Links">
       <LinksEditor />
     </Section>
-    <Section title="Tech stack" hint="Icons come from devicon (or your own image URL). They are committed to your repo under assets/img/.">
+    <Section title="Tech stack">
       <StackEditor />
     </Section>
   </>
