@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { fieldsOf } from "../../schema/fields";
 import { FieldList } from "../ui/Fields";
-import { AUTH_URL, loadProfile, useDemoData, useSession } from "../../store/session";
+import { AUTH_URL, loadProfile, signIn, useDemoData, useSession } from "../../store/session";
+import { useRaw } from "../../store/config";
 
 /** Where the preview gets its numbers: demo data until a login is typed; sign-in is only needed in the Publish step. */
 export function DataBlock() {
@@ -9,6 +10,8 @@ export function DataBlock() {
   const fetched = useSession((s) => s.fetched);
   const msg = useSession((s) => s.loadMsg);
   const loading = useSession((s) => s.loading);
+  const granted = useSession((s) => s.priv);
+  const wantsPrivate = !!useRaw().includePrivate;
   const [login, setLogin] = useState(fetched?.login ?? me?.login ?? "");
   useEffect(() => setLogin((l) => l || fetched?.login || me?.login || ""), [fetched, me]);
   const value = login;
@@ -28,6 +31,12 @@ export function DataBlock() {
         <button className="btn" onClick={useDemoData}>Use demo data</button>
       </div>
       {msg && <div className="log">{msg}</div>}
+      {me && wantsPrivate && !granted && (
+        <div className="log bad">
+          Private repositories are not visible with this sign-in.
+          <button className="btn" onClick={() => signIn(true)}>Grant private access</button>
+        </div>
+      )}
       {me && <FieldList fields={fieldsOf("general").fields.filter((f) => f.path === "includePrivate")} />}
     </div>
   );
