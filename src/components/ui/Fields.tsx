@@ -153,7 +153,7 @@ export function FieldList({ fields }: { fields: Field[] }) {
   const raw = useRaw();
   return (
     <>
-      {fields.filter((f) => !f.when || ("not" in f.when ? valueOf(raw, f.when.path) !== f.when.not : valueOf(raw, f.when.path) === f.when.equals)).map((f) => (
+      {fields.filter((f) => [f.when ?? []].flat().every((w) => ("not" in w ? valueOf(raw, w.path) !== w.not : valueOf(raw, w.path) === w.equals))).map((f) => (
         <FieldView key={f.path} field={f} />
       ))}
     </>

@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePreview } from "../hooks/usePreview";
+import { useZoomPan } from "../hooks/useZoomPan";
 import { configJson } from "../lib/publish";
 import { useRaw } from "../store/config";
 import { useSession } from "../store/session";
@@ -21,6 +22,11 @@ export function Preview() {
   const open = useUi((s) => s.sheetOpen);
   const step = useUi((s) => s.step);
   const [replay, setReplay] = useState(0);
+  const stage = useRef<HTMLDivElement>(null);
+  const card = useRef<HTMLDivElement>(null);
+  const zoom = useZoomPan(stage, card);
+  // until the user takes over, keep the whole card in view while it changes size
+  useEffect(() => { if (!zoom.touched.current) requestAnimationFrame(zoom.fit); }, [pv.url, pv.height, zoom.fit]);
   const [copyLabel, setCopyLabel] = useState("Copy");
   const json = configJson(raw);
 
@@ -57,15 +63,20 @@ export function Preview() {
         )}
         <span className="status" title="Where the numbers come from">{source}</span>
         <span className="grow" />
+        <div className="zoom" role="group" aria-label="Zoom">
+          <button className="btn sm icon" aria-label="Zoom out" onClick={zoom.zoomOut}><Icon n="minus" /></button>
+          <button className="btn sm zoom-val" title="Fit the card (or double click it)" onClick={zoom.reset}>{zoom.percent}%</button>
+          <button className="btn sm icon" aria-label="Zoom in" onClick={zoom.zoomIn}><Icon n="plus" /></button>
+        </div>
         <button className="btn sm" title="Replay the animation" onClick={() => setReplay((n) => n + 1)}>
           <Icon n="replay" /> Replay
         </button>
       </div>
       {pv.error && <div className="pv-error">{pv.error}</div>}
       {!pv.error && pv.missing.length > 0 && <div className="pv-error">Could not load icons: {pv.missing.join(", ")}</div>}
-      <div className={`stage ${pv.light ? "light" : ""}`} onClick={() => matchMedia("(max-width: 980px)").matches && !open && uiStore.set({ sheetOpen: true })}>
+      <div ref={stage} className={`stage ${pv.light ? "light" : ""}`} {...zoom.handlers} onClick={() => matchMedia("(max-width: 980px)").matches && !open && uiStore.set({ sheetOpen: true })}>
         {pv.url && (
-          <div className="card-wrap">
+          <div ref={card} className="card-wrap" style={zoom.style}>
             <img key={replay} src={pv.url} alt="Card preview" />
             {step === "layout" && Array.isArray(raw.grid) && pv.boxes.length > 0 && <GridOverlay boxes={pv.boxes} height={pv.height} items={itemsOf(raw.grid)} />}
           </div>

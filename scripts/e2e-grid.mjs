@@ -34,6 +34,21 @@ try {
   await sleep(2500);
 
   if (process.env.SHOT) (await import("node:fs")).writeFileSync(process.env.SHOT, Buffer.from((await send("Page.captureScreenshot", { format: "png" })).data, "base64"));
+  // zoom with the wheel, pan by dragging an empty spot, double click to reset
+  const tf = () => ev(`getComputedStyle(document.querySelector(".card-wrap")).transform`);
+  const stg = await ev(`(() => { const r = document.querySelector(".stage").getBoundingClientRect(); return { x: r.x + r.width - 30, y: r.y + r.height - 30 }; })()`);
+  await send("Input.dispatchMouseEvent", { type: "mouseWheel", x: stg.x, y: stg.y, deltaX: 0, deltaY: -300 });
+  await sleep(300);
+  const zoomed = await tf();
+  check("the wheel zooms the card", zoomed !== "none" && Number(/matrix\(([\d.]+)/.exec(zoomed)?.[1]) > 1, zoomed);
+  await mouse("mousePressed", stg.x, stg.y); await mouse("mouseMoved", stg.x - 60, stg.y - 40); await mouse("mouseReleased", stg.x - 60, stg.y - 40);
+  await sleep(200);
+  const panned = await tf();
+  check("dragging an empty spot pans", panned !== zoomed, [zoomed, panned]);
+  await ev(`document.querySelector(".stage").dispatchEvent(new MouseEvent("dblclick", { bubbles: true }))`);
+  await sleep(200);
+  check("double click fits the card again", /^matrix\(/.test(await tf()) && Number(/matrix\(([\d.]+)/.exec(await tf())?.[1]) <= 1, await tf());
+
   check("overlay shows the sections", (await ev(`document.querySelectorAll(".gbox").length`)) >= 5);
 
   // resize "Stats" from 3 to 4 columns by dragging its right handle

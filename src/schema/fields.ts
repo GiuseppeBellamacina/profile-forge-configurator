@@ -4,7 +4,8 @@ import { LOCALES, STATS_ITEMS } from "../core";
 import type { StepId } from "../store/ui";
 
 // `when`: the field only shows while another option has that value (e.g. the snake options while the heatmap style is "snake").
-type Base = { path: string; label: string; hint?: string; when?: { path: string; equals?: unknown; not?: unknown } };
+type Cond = { path: string; equals?: unknown; not?: unknown };
+type Base = { path: string; label: string; hint?: string; when?: Cond | Cond[] };
 export type Field =
   | (Base & { type: "text"; placeholder?: string; list?: "timezones"; examples?: { value: string; shows: string }[] })
   | (Base & { type: "number"; min?: number; max?: number; step?: number })
@@ -43,8 +44,8 @@ export const GROUPS: Group[] = [
     fields: [
       { type: "text", path: "title", label: "Title", hint: "shown next to @login" },
       { type: "select", path: "header.avatar", label: "Avatar", options: ["circle", "rounded", "hide"] },
-      { type: "select", path: "header.frameAnimation", label: "Frame motion", options: ["default", "none", "spin", "pulse", "twinkle"], when: { path: "header.frame", not: "none" } },
-      { type: "color", path: "colors.frameColor", label: "Frame color", hint: "default: the color of your level", when: { path: "header.frame", not: "none" } },
+      { type: "select", path: "header.frameAnimation", label: "Frame motion", options: ["default", "none", "spin", "pulse", "twinkle"], when: [{ path: "header.frame", not: "none" }, { path: "header.avatar", not: "hide" }] },
+      { type: "color", path: "colors.frameColor", label: "Frame color", hint: "default: the color of your level", when: [{ path: "header.frame", not: "none" }, { path: "header.avatar", not: "hide" }] },
       { type: "select", path: "header.rankIcon", label: "Rank shows", options: ["level", "percentile", "github"] },
       { type: "select", path: "header.rankStyle", label: "Rank shape", options: ["ring", "hexagon", "shield"] },
       { type: "number", path: "header.rankThickness", label: "Rank thickness", min: 4, max: 16 },

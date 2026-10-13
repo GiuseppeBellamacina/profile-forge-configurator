@@ -295,3 +295,11 @@ img.logo { background: none; box-shadow: none; display: block; border-radius: 8p
 .fthumb { display: block; aspect-ratio: 1; overflow: hidden; background: var(--bg); }
 .fthumb img { width: 520%; max-width: none; height: auto; display: block; }
 .fthumb-tile .meta { padding: 6px 8px; font-size: 12px; }
+
+/* zoom and pan of the card */
+.stage { overflow: hidden; cursor: grab; touch-action: none; user-select: none; }
+.stage:active { cursor: grabbing; }
+.card-wrap { transform-origin: 0 0; will-change: transform; }
+.zoom { display: inline-flex; align-items: center; gap: 4px; }
+.zoom-val { min-width: 56px; font-variant-numeric: tabular-nums; }
+@media (max-width: 980px) { .stage { overflow: hidden; } }

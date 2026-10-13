@@ -95,7 +95,7 @@ function Accordion({ group, first }: { group: Group; first: boolean }) {
       </summary>
       <div className="acc-body">
         <FieldList fields={group.fields} />
-        {group.id === "header" && <FrameGallery />}
+        {group.id === "header" && raw.header?.avatar !== "hide" && <FrameGallery />}
       </div>
     </details>
   );
