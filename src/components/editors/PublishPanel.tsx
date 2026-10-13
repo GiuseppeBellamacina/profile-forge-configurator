@@ -5,11 +5,12 @@ import { zip } from "../../lib/zip";
 import { useAssets, useRaw } from "../../store/config";
 import { useSession } from "../../store/session";
 import { ConnectBlock } from "./ConnectBlock";
+import { Icon } from "../ui/Icon";
 
 type Msg = { kind: "info" | "ok" | "bad"; text: string; link?: { href: string; label: string } } | null;
 const errText = (e: any) => e.message + (e.hint ? ` ${e.hint}` : "");
 
-const Step = ({ n, title, children }: { n: string; title: string; children: ReactNode }) => (
+const Step = ({ n, title, children }: { n: ReactNode; title: string; children: ReactNode }) => (
   <div className="pub-step">
     <h3><i>{n}</i>{title}</h3>
     {children}
@@ -228,7 +229,7 @@ export function PublishPanel() {
         )}
       </Step>
 
-      <Step n="↓" title="Prefer to do it by hand?">
+      <Step n={<Icon n="down" />} title="Prefer to do it by hand?">
         <div className="row">
           <button className="btn" onClick={downloadZip}>Download everything as .zip</button>
           <button className="btn" onClick={async () => { await navigator.clipboard?.writeText(readmeBlock(raw)); setSnip("Copied ✓"); setTimeout(() => setSnip("Copy README snippet"), 1500); }}>{snip}</button>

@@ -4,6 +4,7 @@ import { getPath } from "../../lib/path";
 import type { Field } from "../../schema/fields";
 import { isSet, resetPath, setVal, useRaw, valueOf } from "../../store/config";
 import { useUi } from "../../store/ui";
+import { Icon } from "./Icon";
 
 /** Keeps what the user is typing, and only re-syncs from the store when the value changed from outside (undo, reset, preset). */
 function useDraft(stored: string, commit: (v: string) => void) {
@@ -38,7 +39,7 @@ export function Shell({ path, label, hint, children, inline, onActivate, htmlFor
         {htmlFor ? <label htmlFor={htmlFor}>{text}</label> : <span>{text}</span>}
         {set && (
           <button type="button" className="reset" title="Reset to default" onClick={(e) => (e.stopPropagation(), resetPath(path))}>
-            ↺ reset
+            <Icon n="reset" /> reset
           </button>
         )}
       </span>

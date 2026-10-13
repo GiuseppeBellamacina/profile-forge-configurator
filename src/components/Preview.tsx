@@ -4,6 +4,7 @@ import { configJson } from "../lib/publish";
 import { useRaw } from "../store/config";
 import { useSession } from "../store/session";
 import { uiStore, useUi } from "../store/ui";
+import { Icon } from "./ui/Icon";
 
 const copy = async (text: string, setLabel: (s: string) => void, idle: string) => {
   await navigator.clipboard?.writeText(text);
@@ -54,7 +55,7 @@ export function Preview() {
         <span className="status" title="Where the numbers come from">{source}</span>
         <span className="grow" />
         <button className="btn sm" title="Replay the animation" onClick={() => setReplay((n) => n + 1)}>
-          ↻ Replay
+          <Icon n="replay" /> Replay
         </button>
       </div>
       {pv.error && <div className="pv-error">{pv.error}</div>}

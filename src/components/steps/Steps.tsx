@@ -11,6 +11,7 @@ import { PresetGallery } from "../editors/PresetGallery";
 import { PublishPanel } from "../editors/PublishPanel";
 import { ColorsEditor, CustomThemes, ThemeGallery, ThemeSlots } from "../editors/ThemeEditor";
 import { FieldList, FieldView } from "../ui/Fields";
+import { Icon } from "../ui/Icon";
 
 export const Section = ({ title, hint, children }: { title: string; hint?: ReactNode; children: ReactNode }) => (
   <section className="section">
@@ -98,7 +99,7 @@ function Accordion({ group, first }: { group: Group; first: boolean }) {
 
 export const SectionsStep = () => (
   <>
-    <p className="hint" style={{ marginBottom: 14 }}>Every option of every section. A dot marks what differs from the default; <b>↺ reset</b> puts one back.</p>
+    <p className="hint" style={{ marginBottom: 14 }}>Every option of every section. A dot marks what differs from the default; <b><Icon n="reset" /> reset</b> puts one back.</p>
     {groupsOf("sections").map((g, i) => <Accordion key={g.id} group={g} first={i === 0} />)}
   </>
 );
