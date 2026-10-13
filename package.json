@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "sync": "node scripts/sync-core.js",
     "typecheck": "tsc --noEmit",
-    "e2e": "node scripts/e2e.mjs"
+    "e2e": "node scripts/e2e.mjs",
+    "e2e:grid": "node scripts/e2e-grid.mjs"
   },
   "engines": {
     "node": ">=20"

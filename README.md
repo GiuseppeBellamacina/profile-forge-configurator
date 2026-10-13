@@ -7,6 +7,7 @@ Design your card with a live preview, then publish everything to your profile re
 - **Guided steps**: *Start* (preset, data, general) → *Look* (themes, colors) → *Layout* → *Details* (every section's options) → *Content* (about, projects, links, tech stack) → *Publish*. The preview stays visible; on a phone it is a bottom sheet.
 - **Live preview** with the real renderer (`profile-forge/src/render.js` is bundled into the page), dark/light slots, demo data or your own numbers.
 - **Theme gallery** with a preview of each of the 47 themes, custom themes, per-color overrides.
+- **Free grid**: arrange the card like widgets on a phone. Drag a section on the preview to move it, drag its right edge to resize it (6 columns); sections fall to the lowest free spot so gaps fill themselves. Written as `grid` in `config.json`; the simple row layout is still there.
 - **Presets gallery**, undo / redo (Ctrl Z / Ctrl Y), a search box for any option (Ctrl K), a dot and a reset button on every field that differs from the default.
 - **Share a configuration** as a link (`#c=…`, no server) or import / export `config.json`.
 - **One-click publish**: `config.json`, `.github/workflows/profile-forge.yml`, the icons under `assets/img/` and the card block in `README.md` go into your `<login>/<login>` repo in a single commit. It can create the repo, shows which files are new / changed, and starts the first workflow run.
