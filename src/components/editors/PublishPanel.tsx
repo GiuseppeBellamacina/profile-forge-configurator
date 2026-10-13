@@ -19,7 +19,7 @@ const Step = ({ n, title, children }: { n: ReactNode; title: string; children: R
 
 /** Remembered while the page is open, so leaving the Publish step doesn't throw away the repository check. */
 const memo = {
-  owner: "", repo: "", branch: "", readme: "merge" as "merge" | "skip", ref: "v1", hour: 3, onConfig: true, message: "Add profile-forge card",
+  owner: "", repo: "", branch: "", readme: "merge" as "merge" | "replace" | "skip", ref: "v1", hour: 3, onConfig: true, message: "Add profile-forge card",
   existing: new Map<string, string | null>(), readmeText: null as string | null, off: new Set<string>(), ready: false,
 };
 
@@ -65,6 +65,7 @@ export function PublishPanel() {
       const images = [...new Set<string>((raw.techStack ?? []).flatMap((c: { items: { image: string }[] }) => c.items.map((i) => i.image)))];
       for (const p of images) list.push({ path: p, content: await assetBytes(assets, p).catch(() => null), binary: true });
       if (readme === "merge") list.push({ path: "README.md", content: mergeReadme(readmeText, readmeBlock(raw)), readme: true });
+      if (readme === "replace") list.push({ path: "README.md", content: readmeBlock(raw), readme: true });
       if (!stale) setFiles(list.filter((f) => f.content !== null));
     })();
     return () => { stale = true; };
@@ -102,7 +103,7 @@ export function PublishPanel() {
       // merge into the latest README, not the one seen at "Check"
       const latest = (await api.file(token, owner, repo, "README.md", branch))?.text ?? null;
       const chosen = files
-        .map((f) => (f.readme ? { ...f, content: mergeReadme(latest, readmeBlock(raw)) } : f))
+        .map((f) => (f.readme && readme === "merge" ? { ...f, content: mergeReadme(latest, readmeBlock(raw)) } : f))
         .filter((f) => !off.has(f.path)) as { path: string; content: string | Uint8Array }[];
       const c = await commitFiles(token, owner, repo, branch, chosen, message, (m) => setMsg({ kind: "info", text: m }));
       setMsg({ kind: "ok", text: "Committed! ", link: { href: c.html_url ?? `https://github.com/${owner}/${repo}/commits/${branch}`, label: "View the commit" } });
@@ -171,8 +172,9 @@ export function PublishPanel() {
         </label>
         <label className="field">
           <span className="field-label">README.md</span>
-          <select value={readme} onChange={(e) => setReadme(e.target.value as "merge" | "skip")}>
+          <select value={readme} onChange={(e) => setReadme(e.target.value as "merge" | "replace" | "skip")}>
             <option value="merge">Add the card block to my README (keeps the rest)</option>
+            <option value="replace">Replace my whole README with the card (removes everything else)</option>
             <option value="skip">Don’t touch my README</option>
           </select>
         </label>
