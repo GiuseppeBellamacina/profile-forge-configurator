@@ -127,8 +127,8 @@ export const GROUPS: Group[] = [
       { type: "select", path: "heatmap.mode", label: "Style", hint: "snake: an animated snake eats the contributions (use it instead of a separate snake image)", options: ["grid", "snake"] },
       {
         type: "select", path: "heatmap.snakePath", label: "Snake route", when: { path: "heatmap.mode", equals: "snake" },
-        hint: "smart: quietest days first, then busier ones. busy: busiest first. nearest: always the closest day. wander: one of the closest, picked at random (always the same). sweep: column by column. rows: row by row. spiral: outside in.",
-        options: ["smart", "busy", "nearest", "wander", "sweep", "rows", "spiral"],
+        hint: "smart: quietest days first, then busier ones. busy: busiest first. nearest: always the closest day. sweep: column by column. rows: row by row. spiral: outside in.",
+        options: ["smart", "busy", "nearest", "sweep", "rows", "spiral"],
       },
       { type: "color", path: "colors.snakeColor", label: "Snake color", hint: "default: the theme ring color. For one theme only, use Look, Color overrides.", when: { path: "heatmap.mode", equals: "snake" } },
       { type: "number", path: "heatmap.weeks", label: "Weeks", min: 4, max: 53 },
