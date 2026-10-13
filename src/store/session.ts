@@ -13,25 +13,27 @@ export const AUTH_URL: string = ((import.meta.env.VITE_AUTH_URL as string | unde
 
 type Me = { login: string; avatar_url: string };
 type S = {
-  token: string; me: Me | null; via: "oauth" | null; authError: string;
+  token: string; priv: boolean; me: Me | null; via: "oauth" | null; authError: string;
   profile: Raw; source: string; loadMsg: string; loading: boolean; fetched: { login: string; priv: boolean } | null;
 };
 export const sessionStore = createStore<S>({
-  token: "", me: null, via: null, authError: "", profile: demoProfile(), source: "demo data", loadMsg: "", loading: false, fetched: null,
+  token: "", priv: false, me: null, via: null, authError: "", profile: demoProfile(), source: "demo data", loadMsg: "", loading: false, fetched: null,
 });
 export const useSession = <T,>(select: (s: S) => T) => useStore(sessionStore, select);
 
 export async function setSession(token: string, via: "oauth") {
   const u = await api.user(token);
   const me = { login: u.login as string, avatar_url: u.avatar_url as string };
-  sessionStore.set({ token, via, authError: "", me });
-  ss.set("pf:session", { token, via, me });
+  const priv = !!ss.get("pf:priv"); // the grant asked at sign-in: only "repo" lets the API see private repositories
+  sessionStore.set({ token, priv, via, authError: "", me });
+  ss.set("pf:session", { token, priv, via, me });
   loadProfile(me.login).catch(() => {});
 }
 
 export function signIn(priv: boolean) {
   const nonce = crypto.randomUUID().replace(/-/g, "");
   ss.set("pf:nonce", nonce);
+  ss.set("pf:priv", priv);
   ss.set("pf:tab", uiStore.get().step);
   const ret = encodeURIComponent(location.origin + location.pathname);
   location.href = `${AUTH_URL}/auth/login?return=${ret}&state=${nonce}&scope=${priv ? "private" : "public"}`;
@@ -42,7 +44,7 @@ export async function signOut() {
   if (via === "oauth" && AUTH_URL)
     await fetch(`${AUTH_URL}/auth/logout`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) }).catch(() => {});
   ss.set("pf:session", null);
-  sessionStore.set({ token: "", me: null, via: null, fetched: null, loadMsg: "", profile: demoProfile(), source: "demo data" });
+  sessionStore.set({ token: "", priv: false, me: null, via: null, fetched: null, loadMsg: "", profile: demoProfile(), source: "demo data" });
 }
 
 export function useDemoData() {
@@ -90,9 +92,9 @@ export async function bootSession(): Promise<boolean> {
     else await setSession(hash.get("pf_token")!, "oauth").catch((e) => sessionStore.set({ authError: e.message }));
     return true;
   }
-  const s = ss.get<{ token: string; via: "oauth"; me: Me }>("pf:session");
+  const s = ss.get<{ token: string; priv?: boolean; via: "oauth"; me: Me }>("pf:session");
   if (s?.token) {
-    sessionStore.set({ token: s.token, via: s.via, me: s.me });
+    sessionStore.set({ token: s.token, priv: !!s.priv, via: s.via, me: s.me });
     loadProfile(s.me.login).catch(() => {});
   }
   return false;
