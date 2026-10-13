@@ -10,22 +10,24 @@ export const CARD_W = 1000;
 export const STEP = COL_W + GUTTER;
 export const spanWidth = (n: number) => n * COL_W + (n - 1) * GUTTER;
 
-export type Item = { id: string; span: number };
+export type Item = { id: string; span: number; height?: number };
 export type Placed = Item & { x: number; y: number; w: number; h: number };
 
 /** Config value -> items. */
 export const itemsOf = (grid: Raw[] | undefined): Item[] =>
-  (grid ?? []).map((g) => ({ id: g.section as string, span: Math.max(g.cols ?? (g.section === "header" ? 6 : 3), MIN_SPAN[g.section] ?? 1) }));
+  (grid ?? []).map((g) => ({ id: g.section as string, span: Math.max(g.cols ?? (g.section === "header" ? 6 : 3), MIN_SPAN[g.section] ?? 1), ...(g.height ? { height: g.height as number } : {}) }));
 /** Items -> config value. */
-export const gridOf = (items: Item[]): Raw[] => items.map(({ id, span }) => ({ section: id, cols: span }));
+export const gridOf = (items: Item[]): Raw[] => items.map(({ id, span, height }) => ({ section: id, cols: span, ...(height ? { height } : {}) }));
 
 /** Skyline packing, exactly like the renderer: each item goes to the lowest free spot, leftmost on a tie. Items without a height (empty sections) are skipped. */
 export function pack(items: Item[], heightOf: (id: string) => number | undefined): Placed[] {
+  // heightOf is the height the content needs; an item may ask for a taller card
   const heights = Array(COLS).fill(0);
   const out: Placed[] = [];
-  for (const { id, span } of items) {
-    const h = heightOf(id);
-    if (h === undefined) continue;
+  for (const { id, span, height } of items) {
+    const natural = heightOf(id);
+    if (natural === undefined) continue;
+    const h = Math.max(natural, height ?? 0);
     let best = 0;
     let bestY = Infinity;
     for (let c = 0; c + span <= COLS; c++) {
@@ -69,6 +71,12 @@ export function dropOrder(items: Item[], id: string, target: { x: number; y: num
 /** Width in columns for a right-edge drag: the pointer x (card pixels) against the widget's left edge. */
 export const spanFor = (id: string, left: number, pointerX: number) =>
   Math.min(COLS, Math.max(MIN_SPAN[id] ?? 1, Math.round((pointerX - left + GUTTER) / STEP)));
+
+/** Card height for a bottom-edge drag: snaps to 10px, and back to automatic at (or below) the content height. */
+export const heightFor = (natural: number, top: number, pointerY: number): number | undefined => {
+  const h = Math.round((pointerY - top) / 10) * 10;
+  return h <= natural + 4 ? undefined : Math.min(3000, h);
+};
 
 export const unused = (items: Item[]) => SECTIONS.filter((s) => !items.some((i) => i.id === s));
 

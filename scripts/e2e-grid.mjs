@@ -15,7 +15,7 @@ const send = (method, params = {}) => new Promise((res, rej) => { const i = ++id
 const ev = async (expression) => { const r = await send("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true }); if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description ?? r.exceptionDetails.text); return r.result.value; };
 const mouse = (type, x, y) => send("Input.dispatchMouseEvent", { type, x, y, button: "left", buttons: type === "mouseReleased" ? 0 : 1, clickCount: 1, pointerType: "mouse" });
 const grid = async () => JSON.parse(await ev(`localStorage.getItem("pf:raw")`)).grid;
-const box = (name) => ev(`(() => { const b = [...document.querySelectorAll(".gbox")].find((e) => e.querySelector(".gname").textContent === ${JSON.stringify(name)}); if (!b) return null; const r = b.getBoundingClientRect(); const h = b.querySelector(".ghandle")?.getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height, hx: h && h.x + h.width / 2, hy: h && h.y + h.height / 2 }; })()`);
+const box = (name) => ev(`(() => { const b = [...document.querySelectorAll(".gbox")].find((e) => e.querySelector(".gname").textContent === ${JSON.stringify(name)}); if (!b) return null; const r = b.getBoundingClientRect(); const h = b.querySelector(".ghandle")?.getBoundingClientRect(); const v = b.querySelector(".gvhandle").getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height, hx: h && h.x + h.width / 2, hy: h && h.y + h.height / 2, vx: v.x + v.width / 2, vy: v.y + v.height / 2 }; })()`);
 let ok = true;
 const check = (name, pass, extra = "") => { ok &&= pass; console.log(`${pass ? "PASS" : "FAIL"}  ${name}${pass ? "" : "  " + JSON.stringify(extra)}`); };
 
@@ -44,6 +44,17 @@ try {
   await mouse("mouseReleased", s.hx + step, s.hy);
   await sleep(400);
   check("dragging the right edge widens Stats", (await grid()).find((g) => g.section === "stats").cols === 4, await grid());
+
+  // make "Heatmap" taller by dragging its bottom edge down 100 card pixels
+  await sleep(1500);
+  const hm = await box("Heatmap");
+  const dy = (hm.w / 460) * 100;
+  await mouse("mouseMoved", hm.vx, hm.vy); await mouse("mousePressed", hm.vx, hm.vy);
+  for (let i = 1; i <= 8; i++) await mouse("mouseMoved", hm.vx, hm.vy + (dy * i) / 8);
+  await mouse("mouseReleased", hm.vx, hm.vy + dy);
+  await sleep(400);
+  const heat = (await grid()).find((g) => g.section === "heatmap");
+  check("dragging the bottom edge makes Heatmap taller", heat.height > 100, heat);
 
   await sleep(1500);
   // move "About" next to Stats's old neighbour: drop it on the Trophies box

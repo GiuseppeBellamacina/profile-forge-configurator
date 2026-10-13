@@ -19,7 +19,7 @@ export function GridEditor() {
   };
   return (
     <div className="stack">
-      <p className="hint">Drag a widget on the preview to move it, or drag its right edge to make it wider or narrower. Widgets fall to the lowest free spot, so a short one fills the gap next to a tall one.</p>
+      <p className="hint">Drag a widget on the preview to move it, drag its right edge to make it wider or narrower, or its bottom edge to make it taller (it never gets shorter than its content; a number below that is raised to it). Widgets fall to the lowest free spot, so a short one fills the gap next to a tall one.</p>
       <div className="list">
         {items.map((it, i) => (
           <div className="item" key={it.id}>
@@ -35,6 +35,11 @@ export function GridEditor() {
                 </select>
               </label>
             )}
+            <label className="row" style={{ gap: 6 }}>
+              <span className="hint">height</span>
+              <input type="number" min={0} max={3000} step={10} placeholder="auto" aria-label={`Height of ${sectionLabel(it.id)} in pixels`} style={{ width: 84 }} value={it.height ?? ""}
+                onChange={(e) => commit(items.map((x) => (x.id === it.id ? { id: x.id, span: x.span, ...(e.target.value ? { height: Math.min(3000, Math.max(0, Math.round(Number(e.target.value)))) } : {}) } : x)))} />
+            </label>
             <span className="grow" />
             <button className="btn sm icon" disabled={i === 0} aria-label="Move earlier" onClick={() => move(i, i - 1)}><Icon n="up" /></button>
             <button className="btn sm icon" disabled={i === items.length - 1} aria-label="Move later" onClick={() => move(i, i + 1)}><Icon n="down" /></button>
