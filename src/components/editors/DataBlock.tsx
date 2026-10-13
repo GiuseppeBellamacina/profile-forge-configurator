@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { fieldsOf } from "../../schema/fields";
+import { FieldList } from "../ui/Fields";
 import { AUTH_URL, loadProfile, useDemoData, useSession } from "../../store/session";
 
 /** Where the preview gets its numbers: demo data until a login is typed; sign-in is only needed in the Publish step. */
@@ -26,6 +28,7 @@ export function DataBlock() {
         <button className="btn" onClick={useDemoData}>Use demo data</button>
       </div>
       {msg && <div className="log">{msg}</div>}
+      {me && <FieldList fields={fieldsOf("general").fields.filter((f) => f.path === "includePrivate")} />}
     </div>
   );
 }

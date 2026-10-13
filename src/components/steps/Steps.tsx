@@ -33,11 +33,11 @@ export const StartStep = () => (
     <Section title="Start from a preset" hint="Pick a ready-made look, then tweak it in the next steps. Your changes are saved in this browser, and you can undo anything.">
       <PresetGallery />
     </Section>
-    <Section title="Your data" hint="Until you sign in the preview shows demo data. Once signed in, your own profile is fetched one time and every edit reuses it.">
+    <Section title="Your data" hint="Type your GitHub username to preview your real stats (fetched once, every edit reuses them). Without it the preview shows demo data.">
       <DataBlock />
     </Section>
     <Section title="General">
-      <FieldList fields={fieldsOf("general").fields} />
+      <FieldList fields={fieldsOf("general").fields.filter((f) => f.path !== "includePrivate")} />
     </Section>
     <Section title="Import, export & share">
       <ImportExport />
