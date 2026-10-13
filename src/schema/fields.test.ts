@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULTS, normalize, setPath } from "../core";
+import { COLOR_NAMES, DEFAULTS, normalize, setPath } from "../core";
 import { getPath } from "../lib/path";
 import { ALL_FIELDS, searchFields, type Field } from "./fields";
 
@@ -9,6 +9,7 @@ const sample = (f: Field): unknown => {
     case "text": return f.path === "card.background.gradient" ? "35,aaaaaa,bbbbbb" : f.path === "timezone" ? "Europe/Rome" : "x";
     case "number": return f.min ?? 1;
     case "bool": return true;
+    case "color": return "ff8a3d";
     case "select": return f.options.find((o) => o !== null) ?? null;
     case "multi": return [f.options[0]];
     case "list": return ["a"];
@@ -21,7 +22,8 @@ describe("fields table", () => {
     expect(new Set(paths).size).toBe(paths.length);
   });
   it.each(ALL_FIELDS.map((f) => [f.path, f] as const))("%s exists in the profile-forge defaults and accepts a sample value", (path, f) => {
-    expect(getPath(DEFAULTS, path)).not.toBeUndefined();
+    if (f.type === "color") expect(COLOR_NAMES).toContain(path.split(".")[1]); // colour overrides live under colors.<name>
+    else expect(getPath(DEFAULTS, path)).not.toBeUndefined();
     const raw = setPath({}, path, sample(f));
     expect(() => normalize(structuredClone(raw))).not.toThrow();
   });

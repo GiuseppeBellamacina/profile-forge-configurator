@@ -197,7 +197,7 @@ export function ThemeSlots() {
   );
 }
 
-function ColorWidget({ k, value, theme, onSet }: { k: string; value: string; theme: string; onSet: (v: string | undefined) => void }) {
+export function ColorWidget({ k, value, theme, onSet }: { k: string; value: string; theme: string; onSet: (v: string | undefined) => void }) {
   // The text is kept locally while typing ("f", "ff", "fff"); only a valid or empty value reaches the store.
   const [draft, setDraft] = useState(value);
   useEffect(() => setDraft((d) => (d.replace("#", "") === value ? d : value)), [value]);
@@ -222,6 +222,8 @@ function ColorWidget({ k, value, theme, onSet }: { k: string; value: string; the
 }
 
 const colorNames = COLOR_NAMES.filter((k) => k !== "bg_gradient");
+// the snake colour is only offered while the heatmap is a snake
+const shownColors = (raw: Record<string, any>) => colorNames.filter((k) => k !== "snakeColor" || raw.heatmap?.mode === "snake");
 
 /** Color overrides for all slots, or for one slot only. */
 export function ColorsEditor() {
@@ -242,7 +244,7 @@ export function ColorsEditor() {
         </select>
       </label>
       <div className="colors">
-        {colorNames.map((k) => (
+        {shownColors(raw).map((k) => (
           <ColorWidget key={k} k={k} theme={theme} value={getPath(raw, `${base}.${k}`) ?? ""} onSet={(v) => setVal(`${base}.${k}`, v)} />
         ))}
       </div>
@@ -294,7 +296,7 @@ export function CustomThemes() {
             })}>Delete</button>
           </div>
           <div className="colors">
-            {colorNames.map((k) => (
+            {shownColors(raw).map((k) => (
               <ColorWidget key={k} k={k} theme={spec.base ?? "dark"} value={spec[k] ?? ""} onSet={(v) => setKey(name, k, v)} />
             ))}
           </div>
