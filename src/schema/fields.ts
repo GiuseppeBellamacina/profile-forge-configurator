@@ -43,7 +43,6 @@ export const GROUPS: Group[] = [
     fields: [
       { type: "text", path: "title", label: "Title", hint: "shown next to @login" },
       { type: "select", path: "header.avatar", label: "Avatar", options: ["circle", "rounded", "hide"] },
-      { type: "select", path: "header.frame", label: "Avatar frame", options: ["ring", "none", "auto", "double", "dashed", "neon", "pixel", "glitch", "laurel", "flames", "sakura", "stars", "halo", "aurora"], hint: "auto follows your level; the top 1% gets the animated aurora" },
       { type: "select", path: "header.frameAnimation", label: "Frame motion", options: ["default", "none", "spin", "pulse", "twinkle"], when: { path: "header.frame", not: "none" } },
       { type: "color", path: "colors.frameColor", label: "Frame color", hint: "default: the color of your level", when: { path: "header.frame", not: "none" } },
       { type: "select", path: "header.rankIcon", label: "Rank shows", options: ["level", "percentile", "github"] },
@@ -120,7 +119,6 @@ export const GROUPS: Group[] = [
       { type: "list", path: "trophies.hideRanks", label: "Hide ranks" },
       { type: "number", path: "trophies.columns", label: "Columns", min: -1, max: 12, hint: "0 = all in one row" },
       { type: "number", path: "trophies.rows", label: "Rows", min: 0, max: 10, hint: "0 = no limit" },
-      { type: "select", path: "trophies.style", label: "Trophy style", options: ["cup", "medal", "shield", "gem", "letter"] },
       { type: "multi", path: "trophies.parts", label: "Show on each trophy", options: ["title", "label", "score", "bar"] },
       { type: "number", path: "trophies.marginW", label: "Horizontal margin", min: 0, max: 60 },
       { type: "number", path: "trophies.marginH", label: "Vertical margin", min: 0, max: 60 },
