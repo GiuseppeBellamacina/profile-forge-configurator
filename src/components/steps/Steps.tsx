@@ -1,6 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { SECTIONS } from "../../core";
-import { fieldsOf, groupsOf, type Field, type Group } from "../../schema/fields";
+import { fieldsOf, groupsOf, type Group } from "../../schema/fields";
 import { isSet, useRaw } from "../../store/config";
 import { useUi } from "../../store/ui";
 import { AboutEditor, LinksEditor, StackEditor, WorkingEditor } from "../editors/ContentEditors";
@@ -10,7 +9,7 @@ import { LayoutEditor } from "../editors/LayoutEditor";
 import { PresetGallery } from "../editors/PresetGallery";
 import { PublishPanel } from "../editors/PublishPanel";
 import { AdvancedSlots, ColorsEditor, CustomThemes, ThemeGallery } from "../editors/ThemeEditor";
-import { FieldList, FieldView } from "../ui/Fields";
+import { FieldList } from "../ui/Fields";
 import { Icon } from "../ui/Icon";
 
 export const Section = ({ title, hint, children }: { title: string; hint?: ReactNode; children: ReactNode }) => (
@@ -61,15 +60,10 @@ export const LookStep = () => (
   </>
 );
 
-const HIDE: Field = { type: "multi", path: "hideSections", label: "Hide sections", hint: "“rank” hides only the ring in the header", options: [...SECTIONS, "rank"] };
-
 export const LayoutStep = () => (
   <>
     <Section title="Section order" hint="Put two sections in one row for a side-by-side layout.">
       <LayoutEditor />
-    </Section>
-    <Section title="Visibility">
-      <FieldView field={HIDE} />
     </Section>
   </>
 );

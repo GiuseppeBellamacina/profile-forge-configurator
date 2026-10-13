@@ -42,6 +42,7 @@ export const GROUPS: Group[] = [
       { type: "text", path: "title", label: "Title", hint: "shown next to @login" },
       { type: "select", path: "header.avatar", label: "Avatar", options: ["circle", "rounded", "hide"] },
       { type: "select", path: "header.rankIcon", label: "Rank ring shows", options: ["level", "percentile", "github"] },
+      { type: "multi", path: "hideSections", label: "Hide", hint: "to drop a whole section, just remove it in Layout", options: ["rank"] },
       {
         type: "multi", path: "header.facts", label: "Facts", hint: "up to 4", max: 4,
         options: ["contributionsThisYear", "bestDay", "busiestWeekday", "currentStreak", "longestStreak", "topLanguage", "stars", "followers"],
