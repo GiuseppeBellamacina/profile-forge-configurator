@@ -10,8 +10,8 @@ const NAMES: Record<string, string> = {
   languages: "Languages", trophies: "Trophies", heatmap: "Heatmap", techStack: "Tech stack",
 };
 const label = (s: string) => NAMES[s] ?? s;
-// Only these can share a row; the renderer stacks anything else (languages only when its layout is not "bar" / "compact").
-const HALF = ["stats", "streak", "languages"];
+// Any two sections can share a row at half width, except the header (which always spans the card).
+const PAIRABLE = SECTIONS.filter((s) => s !== "header");
 
 /** Section order. Drag a row by its handle (mouse) or use the arrows (touch). A row can hold two half-width sections. */
 export function LayoutEditor() {
@@ -23,6 +23,15 @@ export function LayoutEditor() {
   const free = SECTIONS.filter((s) => !used.has(s));
   const commit = (next: Row[]) => setVal("layout", next);
   const cells = (row: Row) => (Array.isArray(row) ? row : [row]);
+  // Put section `id` next to row i's section: it leaves the row it was in (that row shrinks or disappears).
+  const beside = (i: number, id: string) => {
+    const first = cells(rows[i])[0];
+    const next = rows
+      .map((r, x) => (x === i ? [first, id] : cells(r).filter((y) => y !== id)))
+      .filter((r) => r.length)
+      .map((r) => (r.length === 1 ? r[0] : r));
+    commit(next);
+  };
   const replace = (i: number, row: Row) => commit(rows.map((r, x) => (x === i ? row : r)));
   const move = (from: number, to: number) => {
     if (to < 0 || to >= rows.length || from === to) return;
@@ -39,7 +48,7 @@ export function LayoutEditor() {
           const pick = (j: number) => (
             <select className="lay-chip" aria-label={`Section ${j + 1} of row ${i + 1}`} style={{ width: "auto" }} value={c[j]}
               onChange={(e) => { const n = [...c]; n[j] = e.target.value; replace(i, n.length === 1 ? n[0] : n); }}>
-              {(c.length === 2 ? HALF : SECTIONS).map((s) => <option key={s} value={s}>{label(s)}</option>)}
+              {(c.length === 2 ? PAIRABLE : SECTIONS).map((s) => <option key={s} value={s}>{label(s)}</option>)}
             </select>
           );
           return (
@@ -60,8 +69,18 @@ export function LayoutEditor() {
                   {pick(1)}
                   <button className="btn sm" title="Back to a single column" onClick={() => replace(i, c[0])}><Icon n="minus" /></button>
                 </>
-              ) : HALF.includes(c[0]) ? (
-                <button className="btn sm" title="Add a second half-width section in this row" onClick={() => replace(i, [c[0], HALF.find((h) => h !== c[0] && !used.has(h)) ?? HALF.find((h) => h !== c[0])!])}><Icon n="plus" /> side by side</button>
+              ) : PAIRABLE.includes(c[0]) ? (
+                <select className="lay-chip" aria-label={`Put a section next to ${label(c[0])}`} style={{ width: "auto" }} value="" onChange={(e) => e.target.value && beside(i, e.target.value)}>
+                  <option value="">+ Put next to it…</option>
+                  {PAIRABLE.filter((x) => x !== c[0] && !used.has(x)).length > 0 && (
+                    <optgroup label="Not in the card yet">
+                      {PAIRABLE.filter((x) => x !== c[0] && !used.has(x)).map((x) => <option key={x} value={x}>{label(x)}</option>)}
+                    </optgroup>
+                  )}
+                  <optgroup label="Move from another row">
+                    {rows.flatMap((r, ri) => (ri === i ? [] : cells(r).filter((x) => PAIRABLE.includes(x) && x !== c[0]))).map((x) => <option key={x} value={x}>{label(x)}</option>)}
+                  </optgroup>
+                </select>
               ) : null}
               <span className="grow" />
               <button className="btn sm icon" disabled={i === 0} aria-label="Move up" onClick={() => move(i, i - 1)}><Icon n="up" /></button>
@@ -71,7 +90,6 @@ export function LayoutEditor() {
           );
         })}
       </div>
-      <p className="hint">Only <b>Stats</b>, <b>Streak</b> and <b>Languages</b> (donut or pie layout) are half width, so only they can sit side by side. Other sections always take the full width.</p>
       {!rows.length && <div className="empty">The card would be empty. Add a section.</div>}
       <div className="row">
         {free.length > 0 && (
@@ -85,7 +103,7 @@ export function LayoutEditor() {
         <span className="grow" />
         <button className="btn sm ghost" onClick={() => resetPath("layout")}>Reset order</button>
       </div>
-      <p className="hint">Half-width sections (stats, streak, and languages as donut / pie) can share a row; a half-width section on its own is centered.</p>
+      <p className="hint">Any two sections except the header can share a row at half width. Stats, streak and languages (donut / pie) are always half width, so on their own they are centered.</p>
     </div>
   );
 }
