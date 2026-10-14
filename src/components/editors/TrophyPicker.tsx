@@ -2,10 +2,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { SECRETS, normalize, summarize } from "../../core";
 import { clone } from "../../lib/path";
 import { renderCard } from "../../lib/renderCard";
-import { birthdayInput, birthdayOf, tiles, type Tile } from "../../lib/trophies";
+import { tiles, type Tile } from "../../lib/trophies";
 import { setVal, edit, useAssets, useRaw } from "../../store/config";
 import { useSession } from "../../store/session";
 import { later } from "./ThemeEditor";
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const DAYS = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const pad = (n: number) => String(n).padStart(2, "0");
 
 const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
 
@@ -81,6 +85,8 @@ export function TrophyPicker() {
     }
     if (t.title === "Birthday" && has) delete tr.birthday;
   });
+  const [bm = "", bd = ""] = String(raw.trophies?.birthday ?? "").split("-").slice(-2); // "MM-DD" or "YYYY-MM-DD"
+  const saveBirthday = (m: string, d: string) => setVal("trophies.birthday", `${m}-${pad(Math.min(+d, DAYS[+m - 1]))}`);
   const birthdayOn = titles.some((x) => same(x, "Birthday"));
 
   return (
@@ -97,11 +103,20 @@ export function TrophyPicker() {
               {titles.length > 0 && <> <button className="btn sm" onClick={() => setVal("trophies.titles", [])}>Clear selection</button></>}
             </span>
             {birthdayOn && (
-              <label className="field">
+              <div className="field">
                 <span className="field-label">Birthday</span>
-                <input type="date" value={birthdayInput(raw.trophies?.birthday)} onChange={(e) => setVal("trophies.birthday", birthdayOf(e.target.value) ?? undefined)} />
+                <span className="row">
+                  <select aria-label="Month" value={bm} onChange={(e) => saveBirthday(e.target.value, bd || "01")}>
+                    <option value="" disabled>Month</option>
+                    {MONTHS.map((m, i) => <option key={m} value={pad(i + 1)}>{m}</option>)}
+                  </select>
+                  <select aria-label="Day" value={bd} disabled={!bm} onChange={(e) => saveBirthday(bm, e.target.value)}>
+                    <option value="" disabled>Day</option>
+                    {Array.from({ length: DAYS[+bm - 1] ?? 31 }, (_, i) => <option key={i} value={pad(i + 1)}>{i + 1}</option>)}
+                  </select>
+                </span>
                 <span className="hint">Only used for the Happy Birthday trophy, which shows on that day. Only month and day are saved.</span>
-              </label>
+              </div>
             )}
             {[["Level trophies", false], ["Secret trophies", true]].map(([name, secret]) => (
               <section key={String(name)} className="stack">
