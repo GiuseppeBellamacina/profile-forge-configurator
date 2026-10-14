@@ -3,6 +3,7 @@ import { b64 } from "./publish";
 
 export const BASE = import.meta.env.BASE_URL; // "./" (relative: works under any subpath)
 export const CORE = `${BASE}core/`;
+export const FLAGS = "https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3";
 export const DEVICON = "https://cdn.jsdelivr.net/gh/devicons/devicon@v2.16.0";
 
 const MIME: Record<string, string> = { svg: "image/svg+xml", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif", webp: "image/webp" };

@@ -13,7 +13,7 @@ const kb = (n: number) => `${Math.round(n / 1000)} KB`;
 
 /** Image paths the config really uses (tech stack icons that live in the repo), in order, without duplicates. */
 export function usedAssets(raw: Raw): string[] {
-  const all = (raw.techStack ?? []).flatMap((c: Raw) => (c.items ?? []).map((i: Raw) => i.image));
+  const all = [...(raw.techStack ?? []).flatMap((c: Raw) => (c.items ?? []).map((i: Raw) => i.image)), raw.header?.flag];
   return [...new Set<string>(all.filter((p: unknown): p is string => typeof p === "string" && !!p && !isRemote(p)))];
 }
 

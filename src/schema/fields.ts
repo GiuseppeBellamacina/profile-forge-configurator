@@ -113,8 +113,6 @@ export const GROUPS: Group[] = [
     id: "trophies", title: "Trophies", blurb: "The trophy case.", step: "sections",
     fields: [
       { type: "text", path: "trophies.title", label: "Title" },
-      { type: "multi", path: "trophies.extra", label: "Opt-in trophies", options: ["Issues", "Reviews"] },
-      { type: "list", path: "trophies.titles", label: "Only these trophies", placeholder: "Star, Commit, PR, Followers" },
       { type: "list", path: "trophies.ranks", label: "Only these ranks", placeholder: "-E  (E D C B A S S+ SECRET)", hint: "“-” drops a rank" },
       { type: "list", path: "trophies.hideRanks", label: "Hide ranks" },
       { type: "number", path: "trophies.columns", label: "Columns", min: -1, max: 12, hint: "0 = all in one row" },
@@ -126,6 +124,15 @@ export const GROUPS: Group[] = [
       { type: "select", path: "trophies.align", label: "Alignment", options: ["center", "left"] },
       { type: "bool", path: "trophies.noBg", label: "No trophy background" },
       { type: "bool", path: "trophies.noFrame", label: "No trophy frame" },
+    ],
+  },
+  {
+    id: "techStack", title: "Tech stack", blurb: "The scrolling logos.", step: "sections",
+    fields: [
+      { type: "number", path: "marquee.speed", label: "Speed", min: 5, max: 200, hint: "pixels per second" },
+      { type: "number", path: "marquee.rows", label: "Rows", min: 1, max: 4, hint: "they scroll in alternating directions" },
+      { type: "select", path: "marquee.order", label: "Order", options: ["shuffle", "config", "name"], hint: "shuffle: random at every generation (the preview keeps one fixed order). config: as listed. name: A-Z" },
+      { type: "bool", path: "marquee.byCategory", label: "Order inside each category", hint: "keeps the categories in sequence instead of mixing all the logos" },
     ],
   },
   {

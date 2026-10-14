@@ -72,7 +72,7 @@ export function PublishPanel() {
         { path: "config.json", content: configJson(raw) },
         { path: ".github/workflows/profile-forge.yml", content: workflowYaml({ ref, hour, onConfigChange: onConfig }) },
       ];
-      const images = [...new Set<string>((raw.techStack ?? []).flatMap((c: { items: { image: string }[] }) => c.items.map((i) => i.image)))];
+      const images = [...new Set<string>([...(raw.techStack ?? []).flatMap((c: { items: { image: string }[] }) => c.items.map((i) => i.image)), raw.header?.flag].filter(Boolean))];
       const missing: string[] = [];
       let inRepo = 0;
       const mine = owner && repo ? `https://raw.githubusercontent.com/${owner}/${repo}/` : null;

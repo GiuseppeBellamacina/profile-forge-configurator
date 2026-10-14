@@ -17,6 +17,7 @@ export const normalize: (raw: Raw) => Raw = config.normalize;
 export const REMOVED_KEYS: Set<string> = config.REMOVED_KEYS;
 export const MIN_SPAN: Record<string, number> = config.MIN_SPAN;
 export const needsExtras: (k: Raw) => boolean = config.needsExtras;
+export const stackItems: <T extends { name: string }>(techStack: { items: T[] }[], o: Raw, rand?: () => number) => T[] = config.stackItems;
 export const setPath: (o: Raw, path: string, value: unknown) => Raw = config.setPath;
 
 export const LOCALES: string[] = i18n.LOCALES;

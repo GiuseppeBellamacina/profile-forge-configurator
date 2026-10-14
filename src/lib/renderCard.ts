@@ -1,4 +1,4 @@
-import { normalize, render, resolveTheme, sectionBoxes, summarize, type Box, type Raw } from "../core";
+import { normalize, render, stackItems, resolveTheme, sectionBoxes, summarize, type Box, type Raw } from "../core";
 import { dataUri, fonts } from "./assets";
 import { clone } from "./path";
 
@@ -15,7 +15,10 @@ export async function renderCard(raw: Raw, assets: Record<string, { url: string 
 
   tweak?.(data);
   const missing: string[] = [];
-  const items: { name: string; image: string }[] = k.techStack.flatMap((c: { items: { name: string; image: string }[] }) => c.items);
+  // a fixed seed: the shuffle must not jump at every keystroke (the published card reshuffles at each generation)
+  let seed = 1;
+  const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  const items = stackItems<{ name: string; image: string }>(k.techStack, k.marquee, rand);
   k.stack = (
     await Promise.all(
       items.map(async (it, n) => {
@@ -28,6 +31,8 @@ export async function renderCard(raw: Raw, assets: Record<string, { url: string 
       }),
     )
   ).filter(Boolean);
+
+  if (k.header.flag) k.flagData = await dataUri(assets, k.header.flag).catch(() => null);
 
   const colors = { ...k.colors, ...k.colorsByTheme[slot] };
   const svg = render(data, { theme, k, colors, fontCss: await fonts() });

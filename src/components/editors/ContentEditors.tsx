@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BRANDS, ICONS } from "../../core";
 import { imgSrc } from "../../lib/assets";
-import { deviconUrl, loadDevicons, searchDevicons, type Devicon } from "../../lib/devicon";
+import { deviconUrl, findDevicon, loadDevicons, searchDevicons, type Devicon } from "../../lib/devicon";
 import { slug } from "../../lib/publish";
 import { addAssets, edit, setVal, useAssets, useRaw } from "../../store/config";
 import { Icon } from "../ui/Icon";
@@ -102,7 +102,7 @@ export function StackEditor() {
                 <button title="Remove" aria-label={`Remove ${it.name}`} onClick={() => upd(i, (c) => ({ ...c, items: c.items.filter((_, y) => y !== j) }))}><Icon n="x" /></button>
               </span>
             ))}
-            <button className="btn sm" onClick={() => setPicking(i)}>+ Add icon</button>
+            <button className="btn primary sm" onClick={() => setPicking(i)}>+ Add icon</button>
           </div>
         </div>
       ))}
@@ -110,13 +110,13 @@ export function StackEditor() {
         <button className="btn sm" onClick={() => write([...cats, { category: `Category ${cats.length + 1}`, items: [] }])}>+ Add category</button>
       </div>
       {picking !== null && (
-        <IconPicker used={new Set(cats.flatMap((c) => c.items.map((it) => it.image)))} onClose={() => setPicking(null)} onPick={(item) => upd(picking, (c) => ({ ...c, items: [...c.items, item] }))} />
+        <IconPicker items={cats.flatMap((c) => c.items)} onClose={() => setPicking(null)} onPick={(item) => upd(picking, (c) => ({ ...c, items: [...c.items, item] }))} />
       )}
     </div>
   );
 }
 
-function IconPicker({ used, onPick, onClose }: { used: Set<string>; onPick: (item: { name: string; image: string }) => void; onClose: () => void }) {
+function IconPicker({ items, onPick, onClose }: { items: { name: string; image: string }[]; onPick: (item: { name: string; image: string }) => void; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [all, setAll] = useState<Devicon[] | null>(null);
   const [failed, setFailed] = useState(false);
@@ -129,6 +129,9 @@ function IconPicker({ used, onPick, onClose }: { used: Set<string>; onPick: (ite
     loadDevicons().then(setAll).catch(() => setFailed(true));
   }, []);
 
+  const used = new Set(items.map((it) => it.image));
+  // an item counts as added when it is that icon by file, by name or by a very similar name (Python3 = python)
+  const added = useMemo(() => new Set(all ? items.map((it) => findDevicon(all, it)?.name) : []), [all, items]);
   const add = (n: string, file: string, u: string) => {
     if (used.has(file)) return alert(`${n} is already in your tech stack.`);
     addAssets({ [file]: { url: u } });
@@ -171,7 +174,7 @@ function IconPicker({ used, onPick, onClose }: { used: Set<string>; onPick: (ite
         <div className="pk-grid">
           {list.map((d) => {
             const file = `assets/img/${slug(d.name)}.svg`;
-            const taken = used.has(file);
+            const taken = used.has(file) || added.has(d.name);
             return (
             <button key={d.name} type="button" disabled={taken} title={taken ? `${d.name} (already added)` : d.name} onClick={() => add(d.name.replace(/^./, (c) => c.toUpperCase()), file, deviconUrl(d))}>
               <img src={deviconUrl(d)} loading="lazy" alt="" />

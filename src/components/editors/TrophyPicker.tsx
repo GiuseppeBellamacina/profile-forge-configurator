@@ -85,7 +85,7 @@ export function TrophyPicker() {
 
   return (
     <div className="stack" style={{ marginTop: 8 }}>
-      <button type="button" className="btn sm" style={{ alignSelf: "flex-start" }} onClick={() => setOpen(true)}>
+      <button type="button" className="btn primary" style={{ alignSelf: "flex-start" }} onClick={() => setOpen(true)}>
         Choose trophies{titles.length ? ` (${titles.length})` : ""}
       </button>
       {open && (

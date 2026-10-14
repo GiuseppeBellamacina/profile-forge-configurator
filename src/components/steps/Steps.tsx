@@ -1,10 +1,12 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { DEFAULTS } from "../../core";
 import { fieldsOf, groupsOf, type Group } from "../../schema/fields";
 import { isSet, useRaw } from "../../store/config";
 import { useUi } from "../../store/ui";
 import { AboutEditor, LinksEditor, StackEditor, WorkingEditor } from "../editors/ContentEditors";
 import { DataBlock } from "../editors/DataBlock";
 import { ImportExport } from "../editors/ImportExport";
+import { FlagPicker } from "../editors/FlagPicker";
 import { TrophyPicker } from "../editors/TrophyPicker";
 import { FrameGallery } from "../editors/FrameGallery";
 import { ImportFromRepo } from "../editors/ImportFromRepo";
@@ -95,19 +97,23 @@ function Accordion({ group, first }: { group: Group; first: boolean }) {
         {changed > 0 && <span className="badge-n">{changed} changed</span>}
       </summary>
       <div className="acc-body">
+        {group.id === "trophies" && <TrophyPicker />}
+        {group.id === "header" && <FlagPicker />}
         <FieldList fields={group.fields} />
         {group.id === "header" && raw.header?.avatar !== "hide" && <FrameGallery />}
-        {group.id === "trophies" && <TrophyPicker />}
+        {group.id === "techStack" && <StackEditor />}
       </div>
     </details>
   );
 }
 
-export const SectionsStep = () => (
-  <>
-    {groupsOf("sections").map((g, i) => <Accordion key={g.id} group={g} first={i === 0} />)}
-  </>
-);
+/** Only the sections that are in the card, in the order of the card. */
+export function SectionsStep() {
+  const raw = useRaw();
+  const groups = groupsOf("sections");
+  const shown: Group[] = (raw.layout ?? DEFAULTS.layout).flat().flatMap((id: string) => groups.filter((g) => g.id === id));
+  return <>{shown.map((g, i) => <Accordion key={g.id} group={g} first={i === 0} />)}</>;
+}
 
 export const ContentStep = () => (
   <>
