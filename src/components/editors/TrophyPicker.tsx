@@ -63,6 +63,8 @@ export function TrophyPicker() {
   const profile = useSession((s) => s.profile);
   const ref = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
+  const [drag, setDrag] = useState<number | null>(null);
+  const [over, setOver] = useState<number | null>(null);
   const titles: string[] = raw.trophies?.titles ?? [];
 
   const list = useMemo(() => {
@@ -115,7 +117,16 @@ export function TrophyPicker() {
                 <b>Order on the card</b>
                 <div className="list">
                   {titles.map((title, i) => (
-                    <div className="item" key={title}>
+                    <div
+                      key={title}
+                      className={`item${drag === i ? " dragging" : ""}${over === i && drag !== i ? " over" : ""}`}
+                      draggable={drag === i}
+                      onDragStart={(e) => e.dataTransfer.setData("text/plain", String(i))}
+                      onDragEnd={() => (setDrag(null), setOver(null))}
+                      onDragOver={(e) => { if (drag !== null) (e.preventDefault(), setOver(i)); }}
+                      onDrop={(e) => { e.preventDefault(); if (drag !== null) move(drag, i); setDrag(null); setOver(null); }}
+                    >
+                      <span className="grip" title="Drag to reorder" onMouseDown={() => setDrag(i)} onMouseUp={() => setDrag(null)}><Icon n="grip" /></span>
                       <span className="num">{i + 1}</span>
                       <span className="grow">{nameOf(title)}</span>
                       <button className="btn sm icon" disabled={i === 0} aria-label={`Move ${nameOf(title)} up`} onClick={() => move(i, i - 1)}><Icon n="up" /></button>
@@ -123,7 +134,7 @@ export function TrophyPicker() {
                     </div>
                   ))}
                 </div>
-                <span className="hint">New picks go last. The card shows them in this order.</span>
+                <span className="hint">Drag by the handle (or use the arrows). New picks go last.</span>
               </div>
             )}
             {birthdayOn && (
