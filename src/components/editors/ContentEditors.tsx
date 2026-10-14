@@ -110,13 +110,13 @@ export function StackEditor() {
         <button className="btn sm" onClick={() => write([...cats, { category: `Category ${cats.length + 1}`, items: [] }])}>+ Add category</button>
       </div>
       {picking !== null && (
-        <IconPicker onClose={() => setPicking(null)} onPick={(item) => { upd(picking, (c) => ({ ...c, items: [...c.items, item] })); setPicking(null); }} />
+        <IconPicker used={new Set(cats.flatMap((c) => c.items.map((it) => it.image)))} onClose={() => setPicking(null)} onPick={(item) => { upd(picking, (c) => ({ ...c, items: [...c.items, item] })); setPicking(null); }} />
       )}
     </div>
   );
 }
 
-function IconPicker({ onPick, onClose }: { onPick: (item: { name: string; image: string }) => void; onClose: () => void }) {
+function IconPicker({ used, onPick, onClose }: { used: Set<string>; onPick: (item: { name: string; image: string }) => void; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [all, setAll] = useState<Devicon[] | null>(null);
   const [failed, setFailed] = useState(false);
@@ -130,6 +130,7 @@ function IconPicker({ onPick, onClose }: { onPick: (item: { name: string; image:
   }, []);
 
   const add = (n: string, file: string, u: string) => {
+    if (used.has(file)) return alert(`${n} is already in your tech stack.`);
     addAssets({ [file]: { url: u } });
     onPick({ name: n, image: file });
   };
@@ -152,18 +153,6 @@ function IconPicker({ onPick, onClose }: { onPick: (item: { name: string; image:
     <dialog ref={ref} onClose={onClose} onClick={(e) => e.target === ref.current && ref.current?.close()}>
       <div className="dlg-head"><b>Pick an icon</b><button className="btn sm" onClick={() => ref.current?.close()}>Close</button></div>
       <div className="dlg-body">
-        <input type="search" autoFocus placeholder="Search devicon (python, docker, react…)" value={q} onChange={(e) => setQ(e.target.value)} />
-        <div className="pk-grid">
-          {list.map((d) => (
-            <button key={d.name} type="button" title={d.name} onClick={() => add(d.name.replace(/^./, (c) => c.toUpperCase()), `assets/img/${slug(d.name)}.svg`, deviconUrl(d))}>
-              <img src={deviconUrl(d)} loading="lazy" alt="" />
-              {d.name}
-            </button>
-          ))}
-          {!all && !failed && <span className="log">Loading icons…</span>}
-          {failed && <span className="log bad">Icons could not be loaded. Add your own image below.</span>}
-          {all && !list.length && <span className="log">No icon matches.</span>}
-        </div>
         <div className="card-box stack">
           <b>Or use your own image</b>
           <div className="row">
@@ -175,6 +164,23 @@ function IconPicker({ onPick, onClose }: { onPick: (item: { name: string; image:
             Upload from my computer
             <input type="file" accept="image/svg+xml,image/png,image/jpeg,image/webp,image/gif" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f); e.target.value = ""; }} />
           </label>
+        </div>
+        <input type="search" autoFocus placeholder="Search devicon (python, docker, react…)" value={q} onChange={(e) => setQ(e.target.value)} />
+        <div className="pk-grid">
+          {list.map((d) => {
+            const file = `assets/img/${slug(d.name)}.svg`;
+            const taken = used.has(file);
+            return (
+            <button key={d.name} type="button" disabled={taken} title={taken ? `${d.name} (already added)` : d.name} onClick={() => add(d.name.replace(/^./, (c) => c.toUpperCase()), file, deviconUrl(d))}>
+              <img src={deviconUrl(d)} loading="lazy" alt="" />
+              {d.name}
+              {taken && <small>✓ added</small>}
+            </button>
+            );
+          })}
+          {!all && !failed && <span className="log">Loading icons…</span>}
+          {failed && <span className="log bad">Icons could not be loaded. Add your own image below.</span>}
+          {all && !list.length && <span className="log">No icon matches.</span>}
         </div>
       </div>
     </dialog>
