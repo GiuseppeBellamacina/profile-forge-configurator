@@ -110,7 +110,7 @@ export function StackEditor() {
         <button className="btn sm" onClick={() => write([...cats, { category: `Category ${cats.length + 1}`, items: [] }])}>+ Add category</button>
       </div>
       {picking !== null && (
-        <IconPicker used={new Set(cats.flatMap((c) => c.items.map((it) => it.image)))} onClose={() => setPicking(null)} onPick={(item) => { upd(picking, (c) => ({ ...c, items: [...c.items, item] })); setPicking(null); }} />
+        <IconPicker used={new Set(cats.flatMap((c) => c.items.map((it) => it.image)))} onClose={() => setPicking(null)} onPick={(item) => upd(picking, (c) => ({ ...c, items: [...c.items, item] }))} />
       )}
     </div>
   );
@@ -138,6 +138,8 @@ function IconPicker({ used, onPick, onClose }: { used: Set<string>; onPick: (ite
     if (!name.trim() || !/^https:\/\//.test(url.trim())) return alert("Enter a name and an https:// image URL.");
     const ext = (url.match(/\.(svg|png|jpe?g|gif|webp)(\?|$)/i)?.[1] ?? "svg").toLowerCase();
     add(name.trim(), `assets/img/${slug(name)}.${ext}`, url.trim());
+    setName("");
+    setUrl("");
   };
   const upload = async (file: File) => {
     if (!/^image\/(svg\+xml|png|jpeg|webp|gif)$/.test(file.type)) return alert("Use an svg, png, jpg, webp or gif image.");
