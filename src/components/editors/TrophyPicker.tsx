@@ -33,8 +33,8 @@ function TrophyTile({ t, on, cache, onClick }: { t: Tile; on: boolean; cache: Ma
     const tweak = secret && ((d: any) => { d.trophies = [{ title: secret.title, rank: "SECRET", label: secret.label, score: null, progress: 1, secret: { glyph: secret.glyph, tone: secret.tone, hint: secret.hint, special: secret.special ?? null, value: null } }]; });
     later(() => renderCard({ ...rest, layout: ["trophies"], trophies, card: { ...raw.card, animations: false } }, assets, profile, null, tweak))
       .then((r) => {
-        // crop to the single 110×110 trophy (x 30, y 546 in a trophies-only card)
-        const svg = r.svg.replace(/(<svg[^>]*?) width="\d+" height="\d+" viewBox="[^"]*"/, '$1 width="110" height="110" viewBox="30 546 110 110"');
+        // crop to the single 110×110 trophy (x 30, y 72 = 42 inside the section + 30 top padding, in a trophies-only card)
+        const svg = r.svg.replace(/(<svg[^>]*?) width="\d+" height="\d+" viewBox="[^"]*"/, '$1 width="110" height="110" viewBox="30 72 110 110"');
         const u = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
         cache.set(t.title, u);
         if (live) setUrl(u);

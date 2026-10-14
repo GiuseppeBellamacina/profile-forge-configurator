@@ -115,7 +115,6 @@ export const GROUPS: Group[] = [
       { type: "text", path: "trophies.title", label: "Title" },
       { type: "multi", path: "trophies.extra", label: "Opt-in trophies", options: ["Issues", "Reviews"] },
       { type: "list", path: "trophies.titles", label: "Only these trophies", placeholder: "Star, Commit, PR, Followers" },
-      { type: "list", path: "trophies.hideTitles", label: "Hide trophies" },
       { type: "list", path: "trophies.ranks", label: "Only these ranks", placeholder: "-E  (E D C B A S S+ SECRET)", hint: "“-” drops a rank" },
       { type: "list", path: "trophies.hideRanks", label: "Hide ranks" },
       { type: "number", path: "trophies.columns", label: "Columns", min: -1, max: 12, hint: "0 = all in one row" },
