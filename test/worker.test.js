@@ -18,7 +18,7 @@ test("login redirects to GitHub with scope, state and a cookie", async () => {
   assert.equal(loc.searchParams.get("scope"), "public_repo workflow");
   assert.equal(loc.searchParams.get("state"), STATE);
   assert.match(res.headers.get("Set-Cookie"), /HttpOnly; Secure; SameSite=Lax/);
-  assert.equal(new URL((await login("&scope=private")).headers.get("Location")).searchParams.get("scope"), "repo workflow");
+  assert.equal(new URL((await login("&scope=private")).headers.get("Location")).searchParams.get("scope"), "repo read:org workflow");
 });
 
 test("login rejects unknown return origins and weak state", async () => {

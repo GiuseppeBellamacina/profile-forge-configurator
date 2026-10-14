@@ -11,7 +11,7 @@
 // The token travels back in the URL *fragment*, which browsers never send to any server.
 
 const COOKIE = "pf_oauth";
-const SCOPES = { public: "public_repo workflow", private: "repo workflow" };
+const SCOPES = { public: "public_repo workflow", private: "repo read:org workflow" };
 
 const origins = (env) => (env.ALLOWED_ORIGINS ?? "").split(",").map((s) => s.trim().replace(/\/$/, "")).filter(Boolean);
 const originOf = (u) => { try { return new URL(u).origin; } catch { return null; } };

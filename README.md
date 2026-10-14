@@ -35,7 +35,7 @@ page ──▶ worker /auth/login ──▶ github.com (approve) ──▶ worke
 
 It uses a full-page redirect instead of a popup, so it works on phones. Your edits are saved in the browser before the redirect and restored on return.
 
-Scopes: `public_repo` + `workflow` by default (enough for a public profile repo). The *“Also read my private contributions”* checkbox asks for `repo` instead. Disconnecting revokes the grant.
+Scopes: `public_repo` + `workflow` by default (enough for a public profile repo). The *“Also read my private contributions”* checkbox asks for `repo` + `read:org` instead (`read:org` lets the API count organizations you belong to privately). Disconnecting revokes the grant.
 
 ### Setting it up once
 
