@@ -5,7 +5,7 @@ import { clone } from "./path";
 export type Rendered = { svg: string; missing: string[]; light: boolean; slots: string[]; slot: string; height: number; boxes: Box[] };
 
 /** The card as an SVG string for one theme slot, using the real renderer. Shared by the live preview and the theme thumbnails. */
-export async function renderCard(raw: Raw, assets: Record<string, { url: string }>, profile: Raw, wanted?: string | null): Promise<Rendered> {
+export async function renderCard(raw: Raw, assets: Record<string, { url: string }>, profile: Raw, wanted?: string | null, tweak?: (data: Raw) => void): Promise<Rendered> {
   const k = normalize(clone(raw));
   const slots: string[] = k.slots.map(([s]: [string]) => s);
   const slot = slots.includes(wanted ?? "") ? (wanted as string) : slots[0];
@@ -13,6 +13,7 @@ export async function renderCard(raw: Raw, assets: Record<string, { url: string 
   const sy = k.streak.startingYear as number | null;
   const data = summarize(sy ? { ...profile, days: profile.days.filter(([d]: [string]) => Number(d.slice(0, 4)) >= sy) } : profile, k);
 
+  tweak?.(data);
   const missing: string[] = [];
   const items: { name: string; image: string }[] = k.techStack.flatMap((c: { items: { name: string; image: string }[] }) => c.items);
   k.stack = (

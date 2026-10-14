@@ -4,6 +4,7 @@ import * as github from "@core/github.js";
 import * as i18n from "@core/i18n.js";
 import * as icons from "@core/icons.js";
 import * as renderer from "@core/render.js";
+import * as secrets from "@core/secrets.js";
 import * as stats from "@core/stats.js";
 import * as themes from "@core/themes.js";
 
@@ -37,3 +38,10 @@ export const COLOR_NAMES: string[] = themes.COLOR_NAMES;
 export const COLOR_KEYS: Record<string, string[]> = themes.COLOR_KEYS;
 export const registerThemes: (custom: Raw) => void = themes.registerThemes;
 export const resolveTheme: (name: string, colors?: Raw) => Raw = themes.resolveTheme;
+
+export type Secret = { title: string; label: string; glyph: string; tone: string; hint: string; special?: string };
+/** Every secret trophy (only shown on the card once earned). */
+export const SECRETS: Secret[] = secrets.SECRETS;
+export type TrophyRow = { title: string; key: string; optional: boolean; levels: { level: string; min: number; label: string }[] };
+/** The level trophies and what each level needs (highest level first). */
+export const trophyTable: () => TrophyRow[] = stats.trophyTable;

@@ -305,3 +305,11 @@ img.logo { background: none; box-shadow: none; display: block; border-radius: 8p
 .zoom { display: inline-flex; align-items: center; gap: 4px; }
 .zoom-val { min-width: 56px; font-variant-numeric: tabular-nums; }
 @media (max-width: 980px) { .stage { overflow: hidden; } }
+
+/* trophy picker */
+.tgallery { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+.tgallery .tile.dim .fthumb { opacity: .3; }
+.tgallery .tile.dim:hover .fthumb { opacity: .6; }
+.tgallery .fthumb { padding: 6px; }
+.tgallery .fthumb img { width: 100%; }
+.tgallery .meta small { color: var(--muted); font-size: 11px; }

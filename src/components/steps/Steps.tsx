@@ -5,6 +5,7 @@ import { useUi } from "../../store/ui";
 import { AboutEditor, LinksEditor, StackEditor, WorkingEditor } from "../editors/ContentEditors";
 import { DataBlock } from "../editors/DataBlock";
 import { ImportExport } from "../editors/ImportExport";
+import { TrophyPicker } from "../editors/TrophyPicker";
 import { FrameGallery } from "../editors/FrameGallery";
 import { ImportFromRepo } from "../editors/ImportFromRepo";
 import { LevelColors } from "../editors/LevelColors";
@@ -96,6 +97,7 @@ function Accordion({ group, first }: { group: Group; first: boolean }) {
       <div className="acc-body">
         <FieldList fields={group.fields} />
         {group.id === "header" && raw.header?.avatar !== "hide" && <FrameGallery />}
+        {group.id === "trophies" && <TrophyPicker />}
       </div>
     </details>
   );
