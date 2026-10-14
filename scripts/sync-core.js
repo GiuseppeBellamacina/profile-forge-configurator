@@ -15,14 +15,12 @@ await readdir(join(coreDir, "src")).catch(() => {
 });
 await rm(out, { recursive: true, force: true });
 await mkdir(out, { recursive: true });
-// presets of profile-forge that this page does not offer (the theme of the same name stays)
-const HIDDEN = ["matrix"];
 const copy = (from, to, filter) => cp(join(coreDir, from), join(out, to), { recursive: true, filter });
 await copy("fonts", "fonts", (p) => p.endsWith(".woff2") || !basename(p).includes("."));
-await copy("presets", "presets", (p) => !p.endsWith("README.md") && !HIDDEN.includes(basename(p, ".json")));
+await copy("presets", "presets", (p) => !p.endsWith("README.md"));
 await copy("docs/themes", "theme-previews");
-await copy("docs/presets", "preset-previews", (p) => !HIDDEN.some((h) => basename(p).startsWith(`${h}-`)));
+await copy("docs/presets", "preset-previews");
 
-const presets = (await readdir(join(coreDir, "presets"))).filter((f) => f.endsWith(".json") && !HIDDEN.includes(f.slice(0, -5))).map((f) => f.slice(0, -5)).sort();
+const presets = (await readdir(join(coreDir, "presets"))).filter((f) => f.endsWith(".json")).map((f) => f.slice(0, -5)).sort();
 await writeFile(join(out, "manifest.json"), JSON.stringify({ presets }, null, 2));
 console.log(`synced ${presets.length} presets from ${coreDir}`);
