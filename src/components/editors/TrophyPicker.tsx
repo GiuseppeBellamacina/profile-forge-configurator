@@ -5,6 +5,7 @@ import { renderCard } from "../../lib/renderCard";
 import { tiles, type Tile } from "../../lib/trophies";
 import { setVal, edit, useAssets, useRaw } from "../../store/config";
 import { useSession } from "../../store/session";
+import { Icon } from "../ui/Icon";
 import { later } from "./ThemeEditor";
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -87,6 +88,13 @@ export function TrophyPicker() {
   });
   const [bm = "", bd = ""] = String(raw.trophies?.birthday ?? "").split("-").slice(-2); // "MM-DD" or "YYYY-MM-DD"
   const saveBirthday = (m: string, d: string) => setVal("trophies.birthday", `${m}-${pad(Math.min(+d, DAYS[+m - 1]))}`);
+  const move = (i: number, to: number) => edit((r) => {
+    const cur: string[] = [...(r.trophies?.titles ?? [])];
+    if (to < 0 || to >= cur.length) return;
+    cur.splice(to, 0, cur.splice(i, 1)[0]);
+    r.trophies.titles = cur;
+  });
+  const nameOf = (title: string) => list.find((t) => same(t.title, title))?.name ?? title;
   const birthdayOn = titles.some((x) => same(x, "Birthday"));
 
   return (
@@ -99,9 +107,25 @@ export function TrophyPicker() {
           <div className="dlg-head"><b>Choose trophies</b><button className="btn sm" onClick={() => ref.current?.close()}>Close</button></div>
           <div className="dlg-body">
             <span className="log">
-              In colour: trophies you have (with their level). Faded: not yet, hover one to see how to get it. Nothing selected = every earned trophy is shown.
+              In colour: trophies you have (with their level). Faded: not yet, hover one to see how to get it. Nothing selected = every earned trophy is shown, in the default order.
               {titles.length > 0 && <> <button className="btn sm" onClick={() => setVal("trophies.titles", [])}>Clear selection</button></>}
             </span>
+            {titles.length > 1 && (
+              <div className="stack">
+                <b>Order on the card</b>
+                <div className="list">
+                  {titles.map((title, i) => (
+                    <div className="item" key={title}>
+                      <span className="num">{i + 1}</span>
+                      <span className="grow">{nameOf(title)}</span>
+                      <button className="btn sm icon" disabled={i === 0} aria-label={`Move ${nameOf(title)} up`} onClick={() => move(i, i - 1)}><Icon n="up" /></button>
+                      <button className="btn sm icon" disabled={i === titles.length - 1} aria-label={`Move ${nameOf(title)} down`} onClick={() => move(i, i + 1)}><Icon n="down" /></button>
+                    </div>
+                  ))}
+                </div>
+                <span className="hint">New picks go last. The card shows them in this order.</span>
+              </div>
+            )}
             {birthdayOn && (
               <div className="field">
                 <span className="field-label">Birthday</span>
