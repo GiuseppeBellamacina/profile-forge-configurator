@@ -313,3 +313,12 @@ img.logo { background: none; box-shadow: none; display: block; border-radius: 8p
 .tgallery .fthumb { padding: 6px; }
 .tgallery .fthumb img { width: 100%; }
 .tgallery .meta small { color: var(--muted); font-size: 11px; }
+
+/* trophy order grid: looks like the trophy panel of the card */
+.tsort { display: flex; flex-wrap: wrap; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); }
+.tcell { position: relative; flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gx)) / var(--cols)); max-width: 12%; aspect-ratio: 1; cursor: grab; border: 1px solid var(--line-2); border-radius: 8px; overflow: hidden; background: var(--surface-2); }
+.tcell img { display: block; width: 100%; height: 100%; }
+.tcell.dim img { opacity: .3; }
+.tcell.dragging { opacity: .4; }
+.tcell.over { outline: 2px solid var(--text); }
+.tcell .tnum { position: absolute; top: 3px; left: 5px; font-size: 10px; color: var(--muted); }
