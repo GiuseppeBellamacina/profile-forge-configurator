@@ -28,7 +28,8 @@ export async function assetBytes(assets: Record<string, { url: string }>, path: 
   const hit = bytes.get(key);
   if (hit) return hit;
   const res = await fetch(key);
-  if (!res.ok) throw new Error(`Could not fetch ${path} (${res.status})`);
+  // the dev/preview server answers unknown paths with index.html (status 200): that is not an image
+  if (!res.ok || res.headers.get("content-type")?.includes("text/html")) throw new Error(`Could not fetch ${path} (${res.status})`);
   const b = new Uint8Array(await res.arrayBuffer());
   bytes.set(key, b);
   return b;

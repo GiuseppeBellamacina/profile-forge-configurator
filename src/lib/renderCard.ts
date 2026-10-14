@@ -32,7 +32,7 @@ export async function renderCard(raw: Raw, assets: Record<string, { url: string 
     )
   ).filter(Boolean);
 
-  if (k.header.flag) k.flagData = await dataUri(assets, k.header.flag).catch(() => null);
+  if (k.header.flag) k.flagData = await dataUri(assets, k.header.flag).catch((e) => (console.warn("flag not loaded:", e.message), null));
 
   const colors = { ...k.colors, ...k.colorsByTheme[slot] };
   const svg = render(data, { theme, k, colors, fontCss: await fonts() });
