@@ -1,8 +1,18 @@
 import { normalize, render, stackItems, resolveTheme, sectionBoxes, summarize, type Box, type Raw } from "../core";
 import { dataUri, fonts } from "./assets";
+import { deviconUrl, findDevicon, loadDevicons } from "./devicon";
+import { b64 } from "./publish";
 import { clone } from "./path";
 
 export type Rendered = { svg: string; missing: string[]; light: boolean; slots: string[]; slot: string; height: number; boxes: Box[] };
+
+/** An icon whose file cannot be loaded (renamed, not pushed yet) is looked up in devicon by its name or file name. */
+async function deviconData(it: { name: string; image: string }) {
+  const d = findDevicon(await loadDevicons(), it);
+  const res = d && (await fetch(deviconUrl(d)));
+  if (!res?.ok) throw new Error(`no devicon for ${it.name}`);
+  return `data:image/svg+xml;base64,${b64(new Uint8Array(await res.arrayBuffer()))}`;
+}
 
 /** The card as an SVG string for one theme slot, using the real renderer. Shared by the live preview and the theme thumbnails. */
 export async function renderCard(raw: Raw, assets: Record<string, { url: string }>, profile: Raw, wanted?: string | null, tweak?: (data: Raw) => void): Promise<Rendered> {
@@ -23,7 +33,7 @@ export async function renderCard(raw: Raw, assets: Record<string, { url: string 
     await Promise.all(
       items.map(async (it, n) => {
         try {
-          return { name: it.name, id: `i${n}`, data: await dataUri(assets, it.image) };
+          return { name: it.name, id: `i${n}`, data: await dataUri(assets, it.image).catch(() => deviconData(it)) };
         } catch {
           missing.push(it.name);
           return null;
