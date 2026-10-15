@@ -131,10 +131,13 @@ function TextControl({ field, stored, def }: { field: Extract<Field, { type: "te
 }
 
 function NumberControl({ field, stored, def }: { field: Extract<Field, { type: "number" }>; stored: string; def: unknown }) {
-  const [draft, setDraft] = useDraft(stored, (v) => setVal(field.path, v === "" ? undefined : Number(v)), stored === "" && typeof def === "number" ? String(def) : stored);
+  // Out-of-range values would make the config invalid and crash the app: the store only ever sees a clamped number.
+  const clamp = (n: number) => Math.min(field.max ?? Infinity, Math.max(field.min ?? -Infinity, n));
+  const [draft, setDraft] = useDraft(stored, (v) => setVal(field.path, v.trim() === "" || !Number.isFinite(Number(v)) ? undefined : clamp(Number(v))), stored === "" && typeof def === "number" ? String(def) : stored);
+  const settle = () => draft.trim() !== "" && Number.isFinite(Number(draft)) && setDraft(String(clamp(Number(draft))));
   return (
     <Shell path={field.path} label={field.label} hint={field.hint} htmlFor={controlId(field.path)}>
-      <input id={controlId(field.path)} type="number" min={field.min} max={field.max} step={field.step ?? 1} value={draft} placeholder={def == null ? "default" : String(def)} onChange={(e) => setDraft(e.target.value)} />
+      <input id={controlId(field.path)} type="number" min={field.min} max={field.max} step={field.step ?? 1} value={draft} placeholder={def == null ? "default" : String(def)} onChange={(e) => setDraft(e.target.value)} onBlur={settle} />
     </Shell>
   );
 }

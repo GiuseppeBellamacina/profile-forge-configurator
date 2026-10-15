@@ -11,7 +11,7 @@ export async function loadDevicons(): Promise<Devicon[]> {
 export const deviconUrl = (d: Devicon) => `${DEVICON}/icons/${d.name}/${d.name}-${d.versions.svg.includes("original") ? "original" : d.versions.svg[0]}.svg`;
 const POPULAR = ["python", "javascript", "typescript", "react", "nodejs", "docker", "git", "linux", "cplusplus", "c", "rust", "go", "java", "pytorch", "tensorflow", "numpy", "pandas", "jupyter", "fastapi", "postgresql", "vscode", "html5", "css3", "bash", "github", "kubernetes", "amazonwebservices", "mongodb", "redis", "opencv"];
 
-const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+const norm = (s: string) => s.toLowerCase().replace(/\+/g, "plus").replace(/#/g, "sharp").replace(/[^a-z0-9]/g, ""); // C++ / C# are not "c"
 const stem = (s: string) => norm(s).replace(/\d+$/, ""); // python3 -> python
 const keys = (d: Devicon) => [d.name, ...(d.altnames ?? [])].map(norm);
 const bigrams = (s: string) => { const m = new Map<string, number>(); for (let i = 0; i < s.length - 1; i++) m.set(s.slice(i, i + 2), (m.get(s.slice(i, i + 2)) ?? 0) + 1); return m; };
@@ -23,7 +23,7 @@ export const similarity = (a: string, b: string) => {
   for (const [g, n] of x) hit += Math.min(n, y.get(g) ?? 0);
   return a.length < 2 || b.length < 2 ? 0 : (2 * hit) / (a.length + b.length - 2);
 };
-const base = (path: string) => (path.split("/").pop() ?? "").replace(/\.[^.]+$/, "");
+const base = (path: string) => (path.split("/").pop() ?? "").replace(/\.[^.]+$/, "").replace(/^white_bg_/, "").replace(/-(original|plain|line|wordmark).*$/, ""); // cplusplus-original.svg -> cplusplus
 
 /** The devicon an item of the stack stands for, by its name or file name: exact, without trailing version digits, or very similar (postgres ~ postgresql). */
 export function findDevicon(list: Devicon[], item: { name: string; image: string }): Devicon | undefined {

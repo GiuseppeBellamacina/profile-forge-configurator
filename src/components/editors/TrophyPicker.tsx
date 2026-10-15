@@ -95,9 +95,13 @@ export function TrophyPicker() {
   const titles: string[] = raw.trophies?.titles ?? [];
 
   const list = useMemo(() => {
-    const k = normalize(clone(raw));
-    k.trophies.extra = new Set(["issues", "reviews"]);
-    return tiles(summarize(profile, k).trophies);
+    try {
+      const k = normalize(clone(raw));
+      k.trophies.extra = new Set(["issues", "reviews"]);
+      return tiles(summarize(profile, k).trophies);
+    } catch {
+      return []; // an invalid config is reported by the preview; this must not unmount the app
+    }
   }, [raw, profile]);
   const key = JSON.stringify([raw.colors, raw.themes, raw.customThemes, raw.trophies?.parts, raw.trophies?.noBg, raw.trophies?.noFrame]);
   const cache = useMemo(() => new Map<string, string>(), [key, assets, profile]);
