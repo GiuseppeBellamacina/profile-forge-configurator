@@ -15,6 +15,10 @@ const withSamples = (raw: Record<string, any>) => {
   return out;
 };
 
+/** Options that drive an animation (avatar ring, snake, logo marquee, bars…). Changing one replays the card even in the still steps; colors, layout and text edits stay still. */
+const ANIMATED = ["header", "marquee", "heatmap", "techStack", "trophies", "stats", "streak", "languages", "card"];
+const touchesAnimated = (a: Record<string, any>, b: Record<string, any>) => ANIMATED.some((k) => JSON.stringify(a[k]) !== JSON.stringify(b[k]));
+
 export type Preview = { url: string; error: string; missing: string[]; busy: boolean; light: boolean; slots: string[]; slot: string; height: number; boxes: Box[] };
 const EMPTY: Preview = { url: "", error: "", missing: [], busy: true, light: false, slots: [], slot: "", height: 0, boxes: [] };
 
@@ -29,6 +33,10 @@ export function usePreview(): Preview {
   const samples = step === "layout";
   const [out, setOut] = useState<Preview>(EMPTY);
   const lastUrl = useRef("");
+  // this config came from an edit of an animated option: render it animated once
+  const track = useRef({ raw, anim: false });
+  if (track.current.raw !== raw) track.current = { raw, anim: touchesAnimated(track.current.raw, raw) };
+  const anim = track.current.anim;
 
   useEffect(() => {
     let stale = false;
@@ -36,7 +44,7 @@ export function usePreview(): Preview {
     const timer = setTimeout(async () => {
       try {
         const { svg, missing, light, slots, slot, height, boxes } = await renderCard(
-          still ? { ...(samples ? withSamples(raw) : raw), card: { ...raw.card, animations: false } } : raw,
+          still && !anim ? { ...(samples ? withSamples(raw) : raw), card: { ...raw.card, animations: false } } : samples ? withSamples(raw) : raw,
           assets,
           profile,
           wanted,
@@ -50,12 +58,12 @@ export function usePreview(): Preview {
       } catch (e: any) {
         if (!stale) setOut((o) => ({ ...o, error: e.message ?? String(e), busy: false }));
       }
-    }, still ? 30 : 140);
+    }, still && !anim ? 30 : 140);
     return () => {
       stale = true;
       clearTimeout(timer);
     };
-  }, [raw, assets, profile, wanted, still, samples]);
+  }, [raw, assets, profile, wanted, still, samples, anim]);
 
   return out;
 }

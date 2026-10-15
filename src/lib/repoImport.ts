@@ -2,7 +2,7 @@
 import type { Raw } from "../core";
 
 /** Safety limits for the images pulled into the preview (only the ones the config really uses). */
-export const LIMITS = { files: 100, fileBytes: 1_000_000, totalBytes: 8_000_000 };
+export const LIMITS = { files: 250, fileBytes: 1_000_000, totalBytes: 8_000_000 };
 
 export type Skipped = { path: string; reason: string };
 export type AssetMap = Record<string, { url: string }>;
