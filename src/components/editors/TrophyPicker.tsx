@@ -61,8 +61,8 @@ function TrophyTile({ t, on, cache, onClick }: { t: Tile; on: boolean; cache: Ma
 }
 
 /** One trophy in the order grid: drag it onto another cell to move it there. */
-function SortCell({ title, t, cut, cache, i, drag, over, setDrag, setOver, move }: {
-  title: string; t?: Tile; cut: boolean; cache: Map<string, string>; i: number; drag: number | null; over: number | null;
+function SortCell({ title, t, cut, lit, onStar, cache, i, drag, over, setDrag, setOver, move }: {
+  title: string; t?: Tile; cut: boolean; lit: boolean; onStar: () => void; cache: Map<string, string>; i: number; drag: number | null; over: number | null;
   setDrag: (n: number | null) => void; setOver: (n: number | null) => void; move: (from: number, to: number) => void;
 }) {
   const [box, url] = useThumb<HTMLDivElement>(title, cache);
@@ -79,6 +79,7 @@ function SortCell({ title, t, cut, cache, i, drag, over, setDrag, setOver, move 
     >
       {url && <img alt="" src={url} draggable={false} />}
       <span className="tnum">{i + 1}</span>
+      <button type="button" className={`tstar${lit ? " on" : ""}`} aria-pressed={lit} title={lit ? "Highlighted on the card (click to remove)" : "Highlight on the card"} onClick={onStar}>{lit ? "★" : "☆"}</button>
     </div>
   );
 }
@@ -123,6 +124,8 @@ export function TrophyPicker() {
   const saveBirthday = (m: string, d: string) => setVal("trophies.birthday", `${m}-${pad(Math.min(+d, DAYS[+m - 1]))}`);
   // what the card shows, in order: the chosen trophies, or every earned one while nothing is chosen
   const order = titles.length ? titles : list.filter((t) => t.earned && !t.optional).map((t) => t.title);
+  const lit: string[] = raw.trophies?.highlight ?? [];
+  const star = (title: string) => setVal("trophies.highlight", lit.some((x) => same(x, title)) ? lit.filter((x) => !same(x, title)) : [...lit, title]);
   const move = (from: number, to: number) => edit((r) => {
     const cur: string[] = [...order];
     if (from === to || to < 0 || to >= cur.length) return;
@@ -155,10 +158,10 @@ export function TrophyPicker() {
                 <b>Order on the card</b>
                 <div className="tsort" style={{ gap: `${gy}px ${gx}px`, padding: pd * 0.8, justifyContent: o.align === "left" ? "flex-start" : "center", ["--cols" as string]: cols, ["--gx" as string]: `${gx}px` }}>
                   {order.map((title, i) => (
-                    <SortCell key={title} title={title} t={list.find((t) => same(t.title, title))} cut={i >= shown} cache={cache} i={i} drag={drag} over={over} setDrag={setDrag} setOver={setOver} move={move} />
+                    <SortCell key={title} title={title} t={list.find((t) => same(t.title, title))} cut={i >= shown} lit={lit.some((x) => same(x, title))} onStar={() => star(title)} cache={cache} i={i} drag={drag} over={over} setDrag={setDrag} setOver={setOver} move={move} />
                   ))}
                 </div>
-                <span className="hint">Drag a trophy onto another place to move it. Same columns and rows as the card{o.rows > 0 && order.length > shown ? "; the faded ones are cut by the rows limit" : ""}.</span>
+                <span className="hint">Drag a trophy onto another place to move it, ☆ to make it glow. Same columns and rows as the card{o.rows > 0 && order.length > shown ? "; the faded ones are cut by the rows limit" : ""}.</span>
               </div>
             )}
             {birthdayOn && (

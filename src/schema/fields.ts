@@ -112,6 +112,7 @@ export const GROUPS: Group[] = [
   {
     id: "trophies", title: "Trophies", blurb: "The trophy case.", step: "sections",
     fields: [
+      { type: "select", path: "trophies.sort", label: "Order", options: ["default", "rank", "name"], hint: "default: the order you set in Choose trophies. rank: highest level first. name: A-Z" },
       { type: "text", path: "trophies.title", label: "Title" },
       { type: "list", path: "trophies.ranks", label: "Only these ranks", placeholder: "-E  (E D C B A S S+ SECRET)", hint: "“-” drops a rank" },
       { type: "list", path: "trophies.hideRanks", label: "Hide ranks" },
@@ -136,6 +137,17 @@ export const GROUPS: Group[] = [
     ],
   },
   {
+    id: "terminal", title: "Terminal", blurb: "A terminal whose commands type themselves.", step: "sections",
+    fields: [{ type: "text", path: "terminal.title", label: "Window title", placeholder: "<login>@github: ~" }],
+  },
+  {
+    id: "rhythm", title: "Rhythm", blurb: "When you code: per weekday and per month.", step: "sections",
+    fields: [
+      { type: "text", path: "rhythm.title", label: "Title" },
+      { type: "multi", path: "rhythm.show", label: "Show", options: ["weekdays", "months"] },
+    ],
+  },
+  {
     id: "heatmap", title: "Heatmap", blurb: "The contribution calendar.", step: "sections",
     fields: [
       { type: "select", path: "heatmap.mode", label: "Style", hint: "snake: an animated snake eats the contributions (use it instead of a separate snake image)", options: ["grid", "snake"] },
@@ -144,6 +156,8 @@ export const GROUPS: Group[] = [
         hint: "smart: quietest days first, then busier ones. busy: busiest first. nearest: always the closest day. sweep: column by column. rows: row by row. spiral: outside in.",
         options: ["smart", "busy", "nearest", "sweep", "rows", "spiral"],
       },
+      { type: "number", path: "heatmap.snakeLength", label: "Snake length", min: 3, max: 12, hint: "cells", when: { path: "heatmap.mode", equals: "snake" } },
+      { type: "select", path: "heatmap.snakeStyle", label: "Snake style", hint: "rainbow: every segment its own colour. glow: a soft halo around the body", options: ["classic", "rainbow", "glow"], when: { path: "heatmap.mode", equals: "snake" } },
       { type: "color", path: "colors.snakeColor", label: "Snake color", hint: "default: the theme ring color. For one theme only, use Look, Color overrides.", when: { path: "heatmap.mode", equals: "snake" } },
       { type: "number", path: "heatmap.weeks", label: "Weeks", min: 4, max: 53 },
       { type: "select", path: "heatmap.cell", label: "Cell shape", hint: "triangle tiles up and down; snowflake is brighter with more contributions; moon grows from an empty disc to a full moon; mixed is a stable random mix of square, round and triangle", options: ["square", "round", "triangle", "snowflake", "moon", "mixed"] },

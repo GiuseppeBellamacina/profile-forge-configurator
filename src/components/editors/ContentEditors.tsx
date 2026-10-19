@@ -23,6 +23,24 @@ export function AboutEditor() {
   );
 }
 
+// ── terminal ─────────────────────────────────────────────────────────────────
+export function TerminalEditor() {
+  const raw = useRaw();
+  const stored: string = (raw.terminal?.lines ?? []).join("\n");
+  const [draft, setDraft] = useState(stored);
+  useEffect(() => setDraft((d) => (d.trimEnd() === stored ? d : stored)), [stored]);
+  return (
+    <label className="field" id="field-terminal">
+      <span className="field-label">Terminal lines</span>
+      <textarea rows={6} value={draft} spellCheck={false} style={{ fontFamily: "ui-monospace, Consolas, monospace" }} placeholder={"$ whoami\nAda, AI engineer\n$ cat focus.txt\nLLM systems"} onChange={(e) => {
+        setDraft(e.target.value);
+        setVal("terminal.lines", e.target.value.split("\n").map((x) => x.trimEnd()).filter(Boolean));
+      }} />
+      <span className="hint">One line per row. Lines starting with "$ " are typed like commands, the others appear as their output. Add Terminal in Layout to show it.</span>
+    </label>
+  );
+}
+
 // ── flat lists (projects, links) ─────────────────────────────────────────────
 type Col = { key: string; label: string; wide?: boolean; list?: string; color?: boolean };
 

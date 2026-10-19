@@ -3,7 +3,7 @@ import { DEFAULTS } from "../../core";
 import { fieldsOf, groupsOf, type Group } from "../../schema/fields";
 import { isSet, useRaw } from "../../store/config";
 import { useUi } from "../../store/ui";
-import { AboutEditor, LinksEditor, StackEditor, WorkingEditor } from "../editors/ContentEditors";
+import { AboutEditor, LinksEditor, StackEditor, TerminalEditor, WorkingEditor } from "../editors/ContentEditors";
 import { DataBlock } from "../editors/DataBlock";
 import { ImportExport } from "../editors/ImportExport";
 import { FlagPicker } from "../editors/FlagPicker";
@@ -102,6 +102,7 @@ function Accordion({ group, first }: { group: Group; first: boolean }) {
         <FieldList fields={group.fields} />
         {group.id === "header" && raw.header?.avatar !== "hide" && <FrameGallery />}
         {group.id === "techStack" && <StackEditor />}
+        {group.id === "terminal" && <TerminalEditor />}
       </div>
     </details>
   );
@@ -125,6 +126,9 @@ export const ContentStep = () => (
     </Section>
     <Section title="Links">
       <LinksEditor />
+    </Section>
+    <Section title="Terminal">
+      <TerminalEditor />
     </Section>
     <Section title="Tech stack">
       <StackEditor />

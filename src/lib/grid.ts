@@ -98,5 +98,6 @@ export const unused = (items: Item[]) => SECTIONS.filter((s) => !items.some((i) 
 export const NAMES: Record<string, string> = {
   header: "Header", about: "About me", workingOn: "Working on", stats: "Stats", streak: "Streak",
   languages: "Languages", trophies: "Trophies", heatmap: "Heatmap", techStack: "Tech stack",
+  terminal: "Terminal", rhythm: "Rhythm",
 };
 export const sectionLabel = (id: string) => NAMES[id] ?? id;
