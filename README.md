@@ -4,6 +4,8 @@ The web configurator for [profile-forge](https://github.com/GiuseppeBellamacina/
 
 Design your card with a live preview, then publish everything to your profile repo in one click. React + TypeScript + Vite, built to a static site.
 
+![profile-forge configurator](assets/screenshot.png)
+
 - **Guided steps**: *Start* (preset, data, general) → *Look* (themes, colors) → *Layout* → *Details* (every section's options) → *Content* (about, projects, links, tech stack) → *Publish*. The preview stays visible; on a phone it is a bottom sheet.
 - **Live preview** with the real renderer (`profile-forge/src/render.js` is bundled into the page), dark/light slots, demo data or your own numbers.
 - **Theme gallery** with a preview of each of the 47 themes, custom themes, per-color overrides.
