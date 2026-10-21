@@ -27,6 +27,11 @@ export function Preview() {
   const zoom = useZoomPan(stage, card);
   // until the user takes over, keep the whole card in view while it changes size
   useEffect(() => { if (!zoom.touched.current) requestAnimationFrame(zoom.fit); }, [pv.url, pv.height, zoom.fit]);
+  // a new theme, slot or preset hands the view back: the next render is fitted to show the whole card
+  const refit = useUi((s) => s.refit);
+  const slot = useUi((s) => s.slot);
+  const themesKey = JSON.stringify(raw.themes);
+  useEffect(() => { zoom.touched.current = false; }, [themesKey, slot, refit]);
   const [copyLabel, setCopyLabel] = useState("Copy");
   const json = configJson(raw);
 

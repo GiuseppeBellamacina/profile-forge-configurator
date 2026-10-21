@@ -14,13 +14,14 @@ export type StepId = (typeof STEPS)[number]["id"];
 
 // ?step=look opens a step directly (handy for links and screenshots); otherwise the last one, kept across the sign-in redirect.
 const saved = new URLSearchParams(location.search).get("step") ?? session.get<string>("pf:tab");
-type Ui = { step: StepId; slot: string | null; focusPath: string | null; sheetOpen: boolean; query: string; boxes: Box[] };
+type Ui = { step: StepId; slot: string | null; focusPath: string | null; sheetOpen: boolean; query: string; boxes: Box[]; refit: number };
 export const uiStore = createStore<Ui>({
   step: STEPS.some((s) => s.id === saved) ? (saved as StepId) : "start",
   slot: null,
   focusPath: null,
   sheetOpen: false,
   query: "",
+  refit: 0, // bumped when a preset is loaded: the preview zooms to show the whole card again
   boxes: [], // where the sections landed in the last render (the grid editor needs their natural heights)
 });
 

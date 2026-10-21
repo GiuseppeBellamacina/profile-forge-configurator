@@ -22,5 +22,5 @@ await copy("docs/themes", "theme-previews");
 await copy("docs/presets", "preset-previews");
 
 const presets = (await readdir(join(coreDir, "presets"))).filter((f) => f.endsWith(".json")).map((f) => f.slice(0, -5)).sort();
-await writeFile(join(out, "manifest.json"), JSON.stringify({ presets }, null, 2));
+await writeFile(join(out, "manifest.json"), JSON.stringify({ presets, version: Date.now().toString(36) }, null, 2));
 console.log(`synced ${presets.length} presets from ${coreDir}`);
