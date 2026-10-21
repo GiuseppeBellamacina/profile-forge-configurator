@@ -160,7 +160,7 @@ export const GROUPS: Group[] = [
       { type: "select", path: "heatmap.snakeStyle", label: "Snake style", hint: "rainbow: every segment its own colour. glow: a soft halo around the body", options: ["classic", "rainbow", "glow"], when: { path: "heatmap.mode", equals: "snake" } },
       { type: "color", path: "colors.snakeColor", label: "Snake color", hint: "default: the theme ring color. For one theme only, use Look, Color overrides.", when: { path: "heatmap.mode", equals: "snake" } },
       { type: "number", path: "heatmap.weeks", label: "Weeks", min: 4, max: 53 },
-      { type: "select", path: "heatmap.cell", label: "Cell shape", hint: "triangle tiles up and down; snowflake is brighter with more contributions; moon grows from an empty disc to a full moon; mixed is a stable random mix of square, round and triangle", options: ["square", "round", "triangle", "snowflake", "moon", "mixed"] },
+      { type: "select", path: "heatmap.cell", label: "Cell shape", hint: "triangle tiles up and down; snowflake is brighter with more contributions; moon grows from an empty disc to a full moon; hexagon nests like a honeycomb; mixed is a stable random mix of square, round and triangle", options: ["square", "round", "triangle", "snowflake", "moon", "hexagon", "mixed"] },
       { type: "select", path: "heatmap.weekStart", label: "Week starts on", options: ["sun", "mon"] },
       { type: "bool", path: "heatmap.legend", label: "Legend" },
       { type: "bool", path: "heatmap.monthLabels", label: "Month labels" },
