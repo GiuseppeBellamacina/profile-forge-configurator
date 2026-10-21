@@ -25,8 +25,6 @@ export function Preview() {
   const stage = useRef<HTMLDivElement>(null);
   const card = useRef<HTMLDivElement>(null);
   const zoom = useZoomPan(stage, card);
-  // until the user takes over, keep the whole card in view while it changes size
-  useEffect(() => { if (!zoom.touched.current) requestAnimationFrame(zoom.fit); }, [pv.url, pv.height, zoom.fit]);
   // a new theme, slot or preset hands the view back: the next render is fitted to show the whole card
   const refit = useUi((s) => s.refit);
   const slot = useUi((s) => s.slot);
@@ -82,7 +80,8 @@ export function Preview() {
       <div ref={stage} className={`stage ${pv.light ? "light" : ""}`} {...zoom.handlers} onClick={() => matchMedia("(max-width: 980px)").matches && !open && uiStore.set({ sheetOpen: true })}>
         {pv.url && (
           <div ref={card} className="card-wrap" style={zoom.style}>
-            <img key={replay} src={pv.url} alt="Card preview" />
+            {/* fit once the new image is laid out: before onLoad the wrapper still has the previous card's size */}
+            <img key={replay} src={pv.url} alt="Card preview" onLoad={() => { if (!zoom.touched.current) zoom.fit(); }} />
             {step === "layout" && Array.isArray(raw.grid) && pv.boxes.length > 0 && <GridOverlay boxes={pv.boxes} height={pv.height} items={itemsOf(raw.grid)} />}
           </div>
         )}
