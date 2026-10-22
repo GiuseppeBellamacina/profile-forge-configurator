@@ -223,7 +223,7 @@ export function ColorWidget({ k, label, value, theme, onSet }: { k: string; labe
 const colorNames = COLOR_NAMES.filter((k) => k !== "bg_gradient");
 // the snake colour is only offered while the heatmap is a snake
 // the level colours have their own editor and the frame colour sits next to the frame option
-const OWN_EDITOR = new Set(["levelE", "levelD", "levelC", "levelB", "levelA", "levelS", "levelTop", "frameColor"]);
+const OWN_EDITOR = new Set(["levelE", "levelD", "levelC", "levelB", "levelA", "levelS", "levelTop", "levelX", "frameColor"]);
 const shownColors = (raw: Record<string, any>) => colorNames.filter((k) => !OWN_EDITOR.has(k) && (k !== "snakeColor" || raw.heatmap?.mode === "snake"));
 
 /** Color overrides for all slots, or for one slot only. */

@@ -4,7 +4,7 @@ import { setVal, useAssets, useRaw } from "../../store/config";
 import { useSession } from "../../store/session";
 import { later } from "./ThemeEditor";
 
-const FRAMES = ["ring", "none", "auto", "double", "dashed", "neon", "pixel", "glitch", "laurel", "flames", "sakura", "stars", "halo", "aurora"];
+const FRAMES = ["ring", "none", "auto", "double", "dashed", "neon", "pixel", "glitch", "laurel", "flames", "sakura", "stars", "halo", "aurora", "orbit", "prism"];
 
 /** The avatar of the user (with their level and colours) in every frame; click one to use it. Drawn when it scrolls into view. */
 function Tile({ frame, cache }: { frame: string; cache: Map<string, string> }) {

@@ -114,7 +114,7 @@ export const GROUPS: Group[] = [
     fields: [
       { type: "select", path: "trophies.sort", label: "Order", options: ["default", "rank", "name"], hint: "default: the order you set in Choose trophies. rank: highest level first. name: A-Z" },
       { type: "text", path: "trophies.title", label: "Title" },
-      { type: "list", path: "trophies.ranks", label: "Only these ranks", placeholder: "-E  (E D C B A S S+ SECRET)", hint: "“-” drops a rank" },
+      { type: "list", path: "trophies.ranks", label: "Only these ranks", placeholder: "-E  (E E+ D- … S+ SSS SECRET)", hint: "“-” drops a rank; a bare letter means its whole family (B = B- B B+)" },
       { type: "list", path: "trophies.hideRanks", label: "Hide ranks" },
       { type: "number", path: "trophies.columns", label: "Columns", min: -1, max: 12, hint: "0 = all in one row" },
       { type: "number", path: "trophies.rows", label: "Rows", min: 0, max: 10, hint: "0 = no limit" },

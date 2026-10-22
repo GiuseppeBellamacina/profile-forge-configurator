@@ -2,9 +2,9 @@ import { getPath } from "../../lib/path";
 import { setVal, themeSlots, useRaw } from "../../store/config";
 import { ColorWidget } from "./ThemeEditor";
 
-const LEVELS: [string, string][] = [["levelE", "E"], ["levelD", "D"], ["levelC", "C"], ["levelB", "B"], ["levelA", "A"], ["levelS", "S"], ["levelTop", "S+ (top 1%)"]];
+const LEVELS: [string, string][] = [["levelE", "E"], ["levelD", "D"], ["levelC", "C"], ["levelB", "B"], ["levelA", "A"], ["levelS", "S"], ["levelTop", "SSS"], ["levelX", "X (top 0.1%)"]];
 
-/** One colour per level; they colour the rank, the trophies and an automatic avatar frame. */
+/** One colour per letter ("+" is a little brighter, "-" a little duller); they colour the rank, the trophies and an automatic avatar frame. */
 export function LevelColors() {
   const raw = useRaw();
   const theme = Object.values(themeSlots(raw))[0] ?? "dark";
