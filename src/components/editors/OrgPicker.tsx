@@ -35,7 +35,8 @@ export function OrgPicker() {
   });
   const ord: string[] = o.order?.length ? o.order : select;
   const at = (login: string) => { const i = ord.findIndex((x) => same(x, login)); return i < 0 ? Infinity : i; };
-  const list = custom ? [...orgs].sort((a, b) => at(a.login) - at(b.login)) : orgs;
+  // the same order as the card (stats.js summarize): by stars, by your order, or by contributions
+  const list = [...orgs].sort((a, b) => (o.sort === "popularity" ? b.stars - a.stars : custom ? at(a.login) - at(b.login) || b.contributions - a.contributions : b.contributions - a.contributions));
   const shown = list.filter((x) => on(x.login)).map((x) => x.login);
   const move = (login: string, d: number) => edit((r) => {
     const cur = [...shown];
