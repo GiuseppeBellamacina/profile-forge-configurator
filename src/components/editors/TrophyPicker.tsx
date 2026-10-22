@@ -55,8 +55,12 @@ function useThumb<E extends HTMLElement>(title: string, cache: Map<string, strin
 function TrophyTile({ t, on, cache, onClick }: { t: Tile; on: boolean; cache: Map<string, string>; onClick: () => void }) {
   const [box, url] = useThumb<HTMLButtonElement>(t.title, cache);
   return (
-    <button ref={box} type="button" className={`tile fthumb-tile${t.earned ? "" : " dim"}`} aria-pressed={on} onClick={onClick} title={t.hint}>
-      <span className="fthumb">{url && <img alt="" src={url} />}</span>
+    <button ref={box} type="button" className={`tile fthumb-tile${t.earned ? "" : " dim"}${on ? "" : " hidden"}`} aria-pressed={on} onClick={onClick} title={`${on ? "On the card: click to hide. " : "Hidden: click to show. "}${t.hint}`}>
+      <span className="fthumb">
+        {url && <img alt="" src={url} />}
+        {/* three states: on the card now, allowed but not earned yet (it appears when you earn it), hidden */}
+        <span className={`tbadge ${!on ? "off" : t.earned ? "on" : "wait"}`}>{!on ? "Hidden" : t.earned ? "✓ On card" : "Not yet"}</span>
+      </span>
       <span className="meta"><b>{t.name}</b>{t.earned && !t.secret && <small>{t.rank}</small>}</span>
     </button>
   );
@@ -168,7 +172,7 @@ export function TrophyPicker() {
           <div className="dlg-head"><b>Choose trophies</b><button className="btn sm" onClick={() => ref.current?.close()}>Close</button></div>
           <div className="dlg-body">
             <span className="log">
-              Every trophy you earn is on the card, new ones too: click one to hide it (or show it again). In colour: trophies you have, with their level. Faded: not yet, hover one to see how to get it.
+              Every trophy you earn is on the card, new ones too. Click one to hide it or show it again. <span className="tbadge on inline">✓ On card</span> you have it and it is shown · <span className="tbadge wait inline">Not yet</span> not earned yet, it appears when you earn it (hover for how) · <span className="tbadge off inline">Hidden</span> never shown.
               {(titles.length > 0 || hidden.length > 0) && <> <button className="btn sm" onClick={() => edit((r) => { if (r.trophies) { delete r.trophies.titles; delete r.trophies.hideTitles; } })}>Show all</button></>}
             </span>
             {order.length > 1 && (

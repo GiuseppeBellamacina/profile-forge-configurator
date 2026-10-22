@@ -324,3 +324,25 @@ img.logo { background: none; box-shadow: none; display: block; border-radius: 8p
 .tcell .tnum { position: absolute; top: 3px; left: 5px; font-size: 10px; color: var(--muted); }
 .tcell .tstar { position: absolute; top: 1px; right: 2px; background: none; border: 0; padding: 2px 4px; font-size: 13px; line-height: 1; color: var(--muted); cursor: pointer; }
 .tcell .tstar.on { color: #ffd23f; }
+
+/* trophy and organization states */
+.tgallery .fthumb { position: relative; }
+.tbadge { position: absolute; top: 5px; right: 5px; font-size: 10px; font-weight: 600; line-height: 1; padding: 3px 6px; border-radius: 99px; white-space: nowrap; }
+.tbadge.inline { position: static; display: inline-block; vertical-align: 1px; }
+.tbadge.on { background: #1f6f3d; color: #d9ffe6; }
+.tbadge.wait { background: var(--surface-3); color: var(--muted); border: 1px solid var(--line-2); }
+.tbadge.off { background: #5b1e22; color: #ffc7cb; }
+.tgallery .tile[aria-pressed="true"] { border-color: var(--line); box-shadow: none; }
+.tgallery .tile.hidden .fthumb img { filter: grayscale(1); opacity: .22; }
+.tgallery .tile.hidden .meta b { text-decoration: line-through; color: var(--muted); }
+.orglist { display: grid; gap: 6px; }
+.orgrow { display: flex; align-items: center; gap: 8px; }
+.orgtag { position: relative; flex: 1; display: flex; align-items: center; gap: 10px; padding: 7px 96px 7px 8px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface); color: var(--text); cursor: pointer; text-align: left; }
+.orgtag:hover { border-color: var(--line-3); }
+.orgtag img, .orgtag .orglogo { width: 24px; height: 24px; border-radius: 6px; flex: none; }
+.orgtag .orglogo { display: grid; place-items: center; background: var(--surface-3); font-weight: 700; font-size: 12px; }
+.orgtag b { font-weight: 600; }
+.orgtag small { color: var(--muted); font-size: 11.5px; }
+.orgtag .tbadge { top: 50%; transform: translateY(-50%); right: 8px; }
+.orgrow.off .orgtag img, .orgrow.off .orgtag .orglogo { filter: grayscale(1); opacity: .35; }
+.orgrow.off .orgtag b { text-decoration: line-through; color: var(--muted); }
