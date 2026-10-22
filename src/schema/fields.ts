@@ -142,6 +142,16 @@ export const GROUPS: Group[] = [
     fields: [{ type: "text", path: "terminal.title", label: "Window title", placeholder: "<login>@github: ~" }],
   },
   {
+    id: "orgs", title: "Contributed to", blurb: "The organizations you contributed to.", step: "sections",
+    fields: [
+      { type: "text", path: "orgs.title", label: "Title" },
+      { type: "select", path: "orgs.sort", label: "Order", options: ["contributions", "popularity", "custom"], hint: "popularity: stars of the repos you contributed to. custom: your order, below" },
+      { type: "select", path: "orgs.mode", label: "Style", options: ["static", "scroll"], hint: "scroll: one row that keeps moving" },
+      { type: "select", path: "orgs.direction", label: "Direction", options: ["left", "right"], when: { path: "orgs.mode", equals: "scroll" } },
+      { type: "number", path: "orgs.speed", label: "Speed", min: 5, max: 200, hint: "pixels per second", when: { path: "orgs.mode", equals: "scroll" } },
+    ],
+  },
+  {
     id: "rhythm", title: "Rhythm", blurb: "When you code: per weekday and per month.", step: "sections",
     fields: [
       { type: "text", path: "rhythm.title", label: "Title" },

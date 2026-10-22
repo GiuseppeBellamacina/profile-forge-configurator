@@ -7,6 +7,7 @@ import { AboutEditor, LinksEditor, StackEditor, TerminalEditor, WorkingEditor } 
 import { DataBlock } from "../editors/DataBlock";
 import { ImportExport } from "../editors/ImportExport";
 import { FlagPicker } from "../editors/FlagPicker";
+import { OrgPicker } from "../editors/OrgPicker";
 import { TrophyPicker } from "../editors/TrophyPicker";
 import { FrameGallery } from "../editors/FrameGallery";
 import { ImportFromRepo } from "../editors/ImportFromRepo";
@@ -103,6 +104,7 @@ function Accordion({ group, first }: { group: Group; first: boolean }) {
         {group.id === "header" && raw.header?.avatar !== "hide" && <FrameGallery />}
         {group.id === "techStack" && <StackEditor />}
         {group.id === "terminal" && <TerminalEditor />}
+        {group.id === "orgs" && <OrgPicker />}
       </div>
     </details>
   );

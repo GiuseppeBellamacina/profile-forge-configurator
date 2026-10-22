@@ -8,7 +8,7 @@ type Row = string | string[];
 const NAMES: Record<string, string> = {
   header: "Header", about: "About me", workingOn: "Working on", stats: "Stats", streak: "Streak",
   languages: "Languages", trophies: "Trophies", heatmap: "Heatmap", techStack: "Tech stack",
-  terminal: "Terminal", rhythm: "Rhythm",
+  terminal: "Terminal", rhythm: "Rhythm", orgs: "Contributed to",
 };
 const label = (s: string) => NAMES[s] ?? s;
 // Any two sections can share a row at half width, except the header (which always spans the card).
