@@ -47,7 +47,7 @@ export const GROUPS: Group[] = [
       { type: "select", path: "header.frameAnimation", label: "Frame motion", options: ["default", "none", "spin", "pulse", "twinkle"], when: [{ path: "header.frame", not: "none" }, { path: "header.avatar", not: "hide" }] },
       { type: "color", path: "colors.frameColor", label: "Frame color", hint: "default: the color of your level", when: [{ path: "header.frame", not: "none" }, { path: "header.avatar", not: "hide" }] },
       { type: "select", path: "header.rankIcon", label: "Rank shows", options: ["level", "percentile", "github"] },
-      { type: "select", path: "header.rankEffect", label: "Rank effect", options: ["auto", "none", "halo", "shine", "flame", "rainbow"], hint: "auto: by level (S a halo, SSS light and sparkles, X a big flame); the others at any level" },
+      { type: "select", path: "header.rankEffect", label: "Rank effect", options: ["auto", "none", "halo", "shine", "embers", "rainbow"], hint: "auto: by level (S a halo, SSS light and sparkles, X glowing embers); the others at any level" },
       { type: "select", path: "header.rankStyle", label: "Rank shape", options: ["ring", "hexagon", "shield"] },
       { type: "number", path: "header.rankThickness", label: "Rank thickness", min: 4, max: 16 },
       { type: "multi", path: "hideSections", label: "Hide", hint: "to drop a whole section, just remove it in Layout", options: ["rank"] },
