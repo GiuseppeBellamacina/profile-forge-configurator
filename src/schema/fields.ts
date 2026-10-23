@@ -164,6 +164,7 @@ export const GROUPS: Group[] = [
       { type: "select", path: "heatmap.mode", label: "Style", hint: "snake: an animated snake eats the contributions. pacman: a whole automatic game of Pac-Man with the four ghosts on a playfield skinned by your heatmap (day shapes do not apply)", options: ["grid", "snake", "pacman"] },
       { type: "select", path: "heatmap.pacmanMaze", label: "Maze", hint: "data: your quiet days become the walls (it changes with your data). classic: a fixed arcade maze. open: no walls", options: ["data", "classic", "open"], when: { path: "heatmap.mode", equals: "pacman" } },
       { type: "number", path: "heatmap.pacmanLives", label: "Lives", min: 1, max: 5, when: { path: "heatmap.mode", equals: "pacman" } },
+      { type: "number", path: "heatmap.pacmanGames", label: "Games", min: 1, max: 3, when: { path: "heatmap.mode", equals: "pacman" } },
       { type: "color", path: "colors.pacmanColor", label: "Pac-Man color", hint: "default: yellow. For one theme only, use Look, Color overrides.", when: { path: "heatmap.mode", equals: "pacman" } },
       {
         type: "select", path: "heatmap.snakePath", label: "Snake route", when: { path: "heatmap.mode", equals: "snake" },
