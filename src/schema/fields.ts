@@ -161,7 +161,10 @@ export const GROUPS: Group[] = [
   {
     id: "heatmap", title: "Heatmap", blurb: "The contribution calendar.", step: "sections",
     fields: [
-      { type: "select", path: "heatmap.mode", label: "Style", hint: "snake: an animated snake eats the contributions (use it instead of a separate snake image)", options: ["grid", "snake"] },
+      { type: "select", path: "heatmap.mode", label: "Style", hint: "snake: an animated snake eats the contributions. pacman: a whole automatic game of Pac-Man with the four ghosts, played on your days", options: ["grid", "snake", "pacman"] },
+      { type: "select", path: "heatmap.pacmanMaze", label: "Maze", hint: "data: your quiet days become the walls (it changes with your data). classic: a fixed arcade maze. open: no walls", options: ["data", "classic", "open"], when: { path: "heatmap.mode", equals: "pacman" } },
+      { type: "number", path: "heatmap.pacmanLives", label: "Lives", min: 1, max: 5, when: { path: "heatmap.mode", equals: "pacman" } },
+      { type: "color", path: "colors.pacmanColor", label: "Pac-Man color", hint: "default: yellow. For one theme only, use Look, Color overrides.", when: { path: "heatmap.mode", equals: "pacman" } },
       {
         type: "select", path: "heatmap.snakePath", label: "Snake route", when: { path: "heatmap.mode", equals: "snake" },
         hint: "smart: quietest days first, then busier ones. busy: busiest first. nearest: always the closest day. sweep: column by column. rows: row by row. spiral: outside in.",
