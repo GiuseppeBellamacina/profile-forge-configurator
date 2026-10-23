@@ -14,10 +14,10 @@ export const AUTH_URL: string = ((import.meta.env.VITE_AUTH_URL as string | unde
 type Me = { login: string; avatar_url: string };
 type S = {
   token: string; priv: boolean; me: Me | null; via: "oauth" | null; authError: string;
-  profile: Raw; source: string; loadMsg: string; loading: boolean; fetched: { login: string; priv: boolean } | null;
+  profile: Raw; source: string; loadMsg: string; loading: boolean; progress: number; step: string; fetched: { login: string; priv: boolean } | null;
 };
 export const sessionStore = createStore<S>({
-  token: "", priv: false, me: null, via: null, authError: "", profile: demoProfile(), source: "demo data", loadMsg: "", loading: false, fetched: null,
+  token: "", priv: false, me: null, via: null, authError: "", profile: demoProfile(), source: "demo data", loadMsg: "", loading: false, progress: 0, step: "", fetched: null,
 });
 export const useSession = <T,>(select: (s: S) => T) => useStore(sessionStore, select);
 
@@ -63,17 +63,17 @@ export async function loadProfile(login: string, { force = false } = {}) {
     sessionStore.set({ profile: cached, fetched: { login, priv }, source: `@${login}`, loadMsg: `Showing @${login}.` });
     return;
   }
-  sessionStore.set({ loading: true, source: `loading @${login}…`, loadMsg: "Fetching your profile (a few seconds, only this once)…" });
+  sessionStore.set({ loading: true, progress: 0, step: "Starting…", source: `loading @${login}…`, loadMsg: "Fetching the profile: it can take a while on large accounts, only this once." });
   try {
     normalize(clone(raw)); // fail early on an invalid config
     // signed out: read-only public proxy on the worker
     const via = token ? {} : { endpoint: `${AUTH_URL}/api/graphql` };
-    const p = await fetchProfile({ login, token: token || "anon", includePrivate: priv, tz: raw.timezone ?? "UTC", startingYear: null, extras: true, ...via });
+    const p = await fetchProfile({ login, token: token || "anon", includePrivate: priv, tz: raw.timezone ?? "UTC", startingYear: null, extras: true, ...via, onProgress: (progress: number, step: string) => sessionStore.set({ progress, step }) });
     ss.set(key, p);
-    sessionStore.set({ profile: p, fetched: { login, priv }, source: `@${login}`, loadMsg: `Showing @${login}.`, loading: false });
+    sessionStore.set({ profile: p, fetched: { login, priv }, source: `@${login}`, loadMsg: `Showing @${login}.`, loading: false, progress: 1 });
   } catch (e: any) {
     const f = sessionStore.get().fetched;
-    sessionStore.set({ source: f ? `@${f.login}` : "demo data", loadMsg: `Could not load @${login}: ${e.message}`, loading: false });
+    sessionStore.set({ source: f ? `@${f.login}` : "demo data", loadMsg: `Could not load @${login}: ${e.message}`, loading: false, progress: 0 });
     throw e;
   }
 }

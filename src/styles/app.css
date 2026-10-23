@@ -346,3 +346,8 @@ img.logo { background: none; box-shadow: none; display: block; border-radius: 8p
 .orgtag .tbadge { top: 50%; transform: translateY(-50%); right: 8px; }
 .orgrow.off .orgtag img, .orgrow.off .orgtag .orglogo { filter: grayscale(1); opacity: .35; }
 .orgrow.off .orgtag b { text-decoration: line-through; color: var(--muted); }
+
+/* profile loading bar */
+.loadbar { display: grid; gap: 4px; }
+.loadbar .track { height: 6px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
+.loadbar .fill { height: 100%; border-radius: 99px; background: var(--text); transition: width .35s ease; }
