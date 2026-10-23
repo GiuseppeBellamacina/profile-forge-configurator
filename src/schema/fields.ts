@@ -161,7 +161,7 @@ export const GROUPS: Group[] = [
   {
     id: "heatmap", title: "Heatmap", blurb: "The contribution calendar.", step: "sections",
     fields: [
-      { type: "select", path: "heatmap.mode", label: "Style", hint: "snake: an animated snake eats the contributions. pacman: a whole automatic game of Pac-Man with the four ghosts, played on your days", options: ["grid", "snake", "pacman"] },
+      { type: "select", path: "heatmap.mode", label: "Style", hint: "snake: an animated snake eats the contributions. pacman: a whole automatic game of Pac-Man with the four ghosts on a playfield skinned by your heatmap (day shapes do not apply)", options: ["grid", "snake", "pacman"] },
       { type: "select", path: "heatmap.pacmanMaze", label: "Maze", hint: "data: your quiet days become the walls (it changes with your data). classic: a fixed arcade maze. open: no walls", options: ["data", "classic", "open"], when: { path: "heatmap.mode", equals: "pacman" } },
       { type: "number", path: "heatmap.pacmanLives", label: "Lives", min: 1, max: 5, when: { path: "heatmap.mode", equals: "pacman" } },
       { type: "color", path: "colors.pacmanColor", label: "Pac-Man color", hint: "default: yellow. For one theme only, use Look, Color overrides.", when: { path: "heatmap.mode", equals: "pacman" } },
@@ -174,7 +174,7 @@ export const GROUPS: Group[] = [
       { type: "select", path: "heatmap.snakeStyle", label: "Snake style", hint: "rainbow: every segment its own colour. glow: a soft halo around the body", options: ["classic", "rainbow", "glow"], when: { path: "heatmap.mode", equals: "snake" } },
       { type: "color", path: "colors.snakeColor", label: "Snake color", hint: "default: the theme ring color. For one theme only, use Look, Color overrides.", when: { path: "heatmap.mode", equals: "snake" } },
       { type: "number", path: "heatmap.weeks", label: "Weeks", min: 4, max: 53 },
-      { type: "select", path: "heatmap.cell", label: "Cell shape", hint: "triangle tiles up and down; snowflake is brighter with more contributions; moon grows from an empty disc to a full moon; hexagon nests like a honeycomb; mixed is a stable random mix of square, round and triangle", options: ["square", "round", "triangle", "snowflake", "moon", "hexagon", "mixed"] },
+      { type: "select", path: "heatmap.cell", label: "Cell shape", hint: "triangle tiles up and down; snowflake is brighter with more contributions; moon grows from an empty disc to a full moon; hexagon nests like a honeycomb; mixed is a stable random mix of square, round and triangle", options: ["square", "round", "triangle", "snowflake", "moon", "hexagon", "mixed"] , when: { path: "heatmap.mode", not: "pacman" } },
       { type: "select", path: "heatmap.weekStart", label: "Week starts on", options: ["sun", "mon"] },
       { type: "bool", path: "heatmap.legend", label: "Legend" },
       { type: "bool", path: "heatmap.monthLabels", label: "Month labels" },
