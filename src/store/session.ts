@@ -57,7 +57,7 @@ export async function loadProfile(login: string, { force = false } = {}) {
   if (!token && !AUTH_URL) throw new Error("Preview needs the sign-in backend, which isn’t configured on this site.");
   const raw = configStore.get().raw;
   const priv = !!token && granted && !!raw.includePrivate; // private data needs the user's own token with the "repo" grant
-  const key = `pf:profile:${login}:${priv}`;
+  const key = `pf:profile:v2:${login}:${priv}`; // v2: profiles cached before the organizations were fetched are dropped
   const cached = !force && ss.get<Raw>(key);
   if (cached) {
     sessionStore.set({ profile: cached, fetched: { login, priv }, source: `@${login}`, loadMsg: `Showing @${login}.` });
