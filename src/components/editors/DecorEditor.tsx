@@ -5,9 +5,11 @@ import { addAssets, edit, setVal, themeSlots, useAssets, useRaw } from "../../st
 import { Icon } from "../ui/Icon";
 import { ColorWidget } from "./ThemeEditor";
 
-type Piece = { motif?: string; image?: string; x?: number; y?: number; anchor?: string; size?: number; rotate?: number; opacity?: number; color?: string; color2?: string; layer?: string; flip?: boolean; motion?: string };
+type Piece = { motif?: string; image?: string; x?: number; y?: number; anchor?: string; size?: number; speed?: number; rotate?: number; opacity?: number; color?: string; color2?: string; layer?: string; flip?: boolean; motion?: string };
 
 const MAX = 12;
+/** Pieces that move by themselves, whose pace can be changed: the animated motifs and any svg of yours. */
+const animated = (p: Piece) => p.motif === "lightning" || /\.svg$/i.test(p.image ?? "");
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "art";
 
 /** A motif as a small picture, in two theme-ish colours, for the gallery and the list. */
@@ -92,6 +94,7 @@ export function DecorEditor() {
             <Slider label={p.anchor === "bottom" ? "Up" : "Down"} value={p.y ?? 20} min={-10} max={120} onChange={(v) => update(i, { y: v }, "y")} />
             <Slider label="Size" value={p.size ?? 20} min={4} max={100} onChange={(v) => update(i, { size: v }, "size")} />
             <Slider label="Turn" value={p.rotate ?? 0} min={-180} max={180} onChange={(v) => update(i, { rotate: v || undefined }, "rotate")} />
+            {animated(p) && <Slider label="Speed" value={p.speed ?? 1} min={0.25} max={4} step={0.25} onChange={(v) => update(i, { speed: v === 1 ? undefined : v }, "speed")} />}
             <Slider label="Opacity" value={p.opacity ?? 0.5} min={0} max={1} step={0.05} onChange={(v) => update(i, { opacity: v }, "opacity")} />
           </div>
           <div className="row">
@@ -116,10 +119,10 @@ export function DecorEditor() {
             </label>
             <label className="decor-pick"><input type="checkbox" checked={!!p.flip} onChange={(e) => update(i, { flip: e.target.checked || undefined })} /> Mirror</label>
           </div>
-          {p.motif && (
+          {(p.motif || /\.svg$/i.test(p.image ?? "")) && (
             <div className="row">
-              <ColorWidget k="ring_color" label="Main" value={p.color ?? ""} theme={first} onSet={(v) => update(i, { color: v }, "color")} />
-              <ColorWidget k="icon_color" label="Accent" value={p.color2 ?? ""} theme={first} onSet={(v) => update(i, { color2: v }, "color2")} />
+              <ColorWidget k="ring_color" label={p.motif ? "Main" : "Recolor"} value={p.color ?? ""} theme={first} onSet={(v) => update(i, { color: v }, "color")} />
+              {p.motif && <ColorWidget k="icon_color" label="Accent" value={p.color2 ?? ""} theme={first} onSet={(v) => update(i, { color2: v }, "color2")} />}
             </div>
           )}
         </div>
