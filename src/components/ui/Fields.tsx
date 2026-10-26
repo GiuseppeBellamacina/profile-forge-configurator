@@ -68,6 +68,14 @@ export function FieldView({ field }: { field: Field }) {
       return <ListControl field={field} stored={Array.isArray(own) ? own.join(", ") : ""} />;
     case "color":
       return <ColorControl field={field} raw={raw} />;
+    case "hex": {
+      const first = Object.values(themeSlots(raw))[0] ?? "dark";
+      return (
+        <Shell path={path} label={field.label} hint={field.hint}>
+          <ColorWidget k={field.like} label="" value={own ?? ""} theme={first} onSet={(v) => setVal(path, v ?? null)} />
+        </Shell>
+      );
+    }
     case "bool":
       return (
         <Shell path={path} label={field.label} hint={field.hint} inline onActivate={() => setVal(path, !cur)}>

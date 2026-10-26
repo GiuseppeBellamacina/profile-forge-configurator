@@ -9,7 +9,7 @@ const sample = (f: Field): unknown => {
     case "text": return f.path === "card.background.gradient" ? "35,aaaaaa,bbbbbb" : f.path === "timezone" ? "Europe/Rome" : "x";
     case "number": return f.min ?? 1;
     case "bool": return true;
-    case "color": return "ff8a3d";
+    case "color": case "hex": return "ff8a3d";
     case "select": return f.options.find((o) => o !== null) ?? null;
     case "multi": return [f.options[0]];
     case "list": return ["a"];

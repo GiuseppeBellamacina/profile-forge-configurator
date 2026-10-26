@@ -1,4 +1,4 @@
-import { normalize, render, stackItems, resolveTheme, sectionBoxes, summarize, type Box, type Raw } from "../core";
+import { imageRefs, normalize, render, stackItems, resolveTheme, sectionBoxes, summarize, type Box, type Raw } from "../core";
 import { dataUri, fonts } from "./assets";
 import { deviconUrl, findDevicon, loadDevicons } from "./devicon";
 import { b64 } from "./publish";
@@ -41,6 +41,11 @@ export async function renderCard(raw: Raw, assets: Record<string, { url: string 
       }),
     )
   ).filter(Boolean);
+
+  // the background image and the images of the decor, embedded like the flag
+  k.images = Object.fromEntries(
+    (await Promise.all(imageRefs(k).map(async (ref) => [ref, await dataUri(assets, ref).catch((e) => (console.warn("card image not loaded:", e.message), null))] as const))).filter(([, u]) => u),
+  );
 
   if (k.header.flag) k.flagData = await dataUri(assets, k.header.flag).catch((e) => (console.warn("flag not loaded:", e.message), null));
 

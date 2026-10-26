@@ -11,6 +11,7 @@ export type Field =
   | (Base & { type: "number"; min?: number; max?: number; step?: number })
   | (Base & { type: "bool" })
   | (Base & { type: "color" }) // a colour override: path is colors.<name>
+  | (Base & { type: "hex"; like: string }) // any other colour option (null = the theme's); `like` is the colour override whose theme colour it shows as placeholder
   | (Base & { type: "select"; options: (string | number | null)[] })
   | (Base & { type: "multi"; options: string[]; max?: number })
   | (Base & { type: "list"; placeholder?: string });
@@ -34,9 +35,19 @@ export const GROUPS: Group[] = [
       { type: "number", path: "card.radius", label: "Corner radius", min: 0, max: 60 },
       { type: "bool", path: "card.hideBorder", label: "Hide border" },
       { type: "bool", path: "card.animations", label: "Animations" },
-      { type: "select", path: "card.background.pattern", label: "Background pattern", options: ["none", "dots", "grid", "diagonal"] },
-      { type: "bool", path: "card.background.glow", label: "Accent glow" },
       { type: "text", path: "card.background.gradient", label: "Background gradient", hint: "angle,color1,color2,…", placeholder: "35,4158d0,c850c0,ffcc70" },
+      { type: "select", path: "card.background.pattern", label: "Background pattern", options: ["none", "dots", "grid", "diagonal", "halftone", "scanlines", "stripes", "hex", "circuit", "crosses"] },
+      { type: "hex", path: "card.background.patternColor", label: "Pattern color", like: "muted_color", when: { path: "card.background.pattern", not: "none" } },
+      { type: "number", path: "card.background.patternOpacity", label: "Pattern opacity", min: 0, max: 1, step: 0.05, hint: "empty: each pattern has its own", when: { path: "card.background.pattern", not: "none" } },
+      { type: "number", path: "card.background.patternSize", label: "Pattern size (%)", min: 25, max: 400, step: 5, when: { path: "card.background.pattern", not: "none" } },
+      { type: "bool", path: "card.background.glow", label: "Glow" },
+      { type: "hex", path: "card.background.glowColor", label: "Glow color", like: "ring_color", when: { path: "card.background.glow", equals: true } },
+      { type: "number", path: "card.background.glowX", label: "Glow position X (%)", min: 0, max: 100, step: 5, when: { path: "card.background.glow", equals: true } },
+      { type: "number", path: "card.background.glowY", label: "Glow position Y (%)", min: 0, max: 100, step: 5, when: { path: "card.background.glow", equals: true } },
+      { type: "number", path: "card.background.glowSize", label: "Glow size (%)", min: 10, max: 200, step: 5, when: { path: "card.background.glow", equals: true } },
+      { type: "number", path: "card.background.glowOpacity", label: "Glow strength", min: 0, max: 1, step: 0.02, when: { path: "card.background.glow", equals: true } },
+      { type: "select", path: "card.background.imageFit", label: "Image fit", options: ["cover", "contain"], when: { path: "card.background.image", not: null } },
+      { type: "number", path: "card.background.imageOpacity", label: "Image opacity", min: 0, max: 1, step: 0.05, when: { path: "card.background.image", not: null } },
     ],
   },
   {

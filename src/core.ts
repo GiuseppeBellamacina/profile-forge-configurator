@@ -3,6 +3,7 @@ import * as config from "@core/config.js";
 import * as github from "@core/github.js";
 import * as i18n from "@core/i18n.js";
 import * as icons from "@core/icons.js";
+import * as motifs from "@core/motifs.js";
 import * as renderer from "@core/render.js";
 import * as secrets from "@core/secrets.js";
 import * as stats from "@core/stats.js";
@@ -18,11 +19,15 @@ export const REMOVED_KEYS: Set<string> = config.REMOVED_KEYS;
 export const MIN_SPAN: Record<string, number> = config.MIN_SPAN;
 export const needsExtras: (k: Raw) => boolean = config.needsExtras;
 export const stackItems: <T extends { name: string }>(techStack: { items: T[] }[], o: Raw, rand?: () => number) => T[] = config.stackItems;
+export const imageRefs: (k: Raw) => string[] = config.imageRefs;
 export const setPath: (o: Raw, path: string, value: unknown) => Raw = config.setPath;
 
 export const LOCALES: string[] = i18n.LOCALES;
 export const ICONS: Record<string, string> = icons.ICONS;
 export const BRANDS: Record<string, string> = icons.BRANDS;
+/** The decorative motifs of the card: (main colour, accent colour) -> svg markup in a 100 x 100 box. */
+export const MOTIFS: Record<string, (a: string, b: string) => string> = motifs.MOTIFS;
+export const MOTIF_NAMES: string[] = motifs.MOTIF_NAMES;
 
 export const render: (data: Raw, opts: Raw) => string = renderer.render;
 export type Box = { id: string; x: number; y: number; w: number; h: number; minH: number };

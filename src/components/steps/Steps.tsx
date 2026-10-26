@@ -1,3 +1,4 @@
+import { BackgroundImage, DecorEditor } from "../editors/DecorEditor";
 import { useEffect, useState, type ReactNode } from "react";
 import { DEFAULTS } from "../../core";
 import { fieldsOf, groupsOf, type Group } from "../../schema/fields";
@@ -67,6 +68,10 @@ export const LookStep = () => (
     </Section>
     <Section title="Card">
       <FieldList fields={fieldsOf("card").fields} />
+      <BackgroundImage />
+    </Section>
+    <Section title="Art on the card">
+      <DecorEditor />
     </Section>
   </>
 );
