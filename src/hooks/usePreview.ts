@@ -29,8 +29,9 @@ export function usePreview(): Preview {
   const profile = useSession((s) => s.profile);
   const wanted = useUi((s) => s.slot);
   const step = useUi((s) => s.step);
-  const ghost = useUi((s) => s.dragArt);
+  const drag = useUi((s) => s.dragArt); // a piece of art is being dragged: drawn once without it, sections faded, no redraw while the mouse moves
   const still = ["look", "layout", "sections", "content"].includes(step); // while editing: no animation, near-instant updates
+  const dragged = drag === null ? raw : { ...raw, card: { ...raw.card, decor: (raw.card?.decor ?? []).filter((_: unknown, i: number) => i !== drag) } };
   const samples = step === "layout";
   const frozen = step === "look"; // in Look nothing moves, not even right after an edit of an animated option
   const [out, setOut] = useState<Preview>(EMPTY);
@@ -46,12 +47,12 @@ export function usePreview(): Preview {
     const timer = setTimeout(async () => {
       try {
         const { svg, missing, light, slots, slot, height, boxes } = await renderCard(
-          still && (!anim || frozen) ? { ...(samples ? withSamples(raw) : raw), card: { ...raw.card, animations: false } } : samples ? withSamples(raw) : raw,
+          still && (!anim || frozen) ? { ...(samples ? withSamples(dragged) : dragged), card: { ...dragged.card, animations: false } } : samples ? withSamples(dragged) : dragged,
           assets,
           profile,
           wanted,
           undefined,
-          ghost ? { ghost: true } : undefined,
+          drag !== null ? { ghost: true } : undefined,
         );
         if (stale) return;
         const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
@@ -67,7 +68,7 @@ export function usePreview(): Preview {
       stale = true;
       clearTimeout(timer);
     };
-  }, [raw, assets, profile, wanted, still, samples, anim, frozen, ghost]);
+  }, [raw, assets, profile, wanted, still, samples, anim, frozen, drag]);
 
   return out;
 }

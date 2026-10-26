@@ -363,7 +363,8 @@ img.logo { background: none; box-shadow: none; display: block; border-radius: 8p
 /* drag the art of the card on the preview (DecorOverlay) */
 .decor-overlay { position: absolute; inset: 0; pointer-events: none; }
 .dbox { position: absolute; transform: translate(-50%, -50%); border: 1px dashed transparent; border-radius: 4px; cursor: grab; pointer-events: auto; touch-action: none; }
-.dbox:hover, .dbox.moving { border-color: var(--text); background: rgba(255, 255, 255, 0.06); }
+.dbox:hover, .dbox.moving { border-color: var(--text); background: rgba(255, 255, 255, 0.04); }
+.dbox svg, .dbox img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .dbox.moving { cursor: grabbing; }
 .dbox .dname { position: absolute; left: 0; top: -18px; padding: 1px 6px; border-radius: 4px; background: var(--text); color: #000; font-size: 11px; white-space: nowrap; display: none; }
 .dbox:hover .dname, .dbox.moving .dname { display: block; }

@@ -34,6 +34,12 @@ export async function assetBytes(assets: Record<string, { url: string }>, path: 
   bytes.set(key, b);
   return b;
 }
+const uris = new Map<string, string>(); // the base64 of an icon is computed once, not at every render of the preview
 export async function dataUri(assets: Record<string, { url: string }>, path: string) {
-  return `data:${MIME[extOf(path)] ?? "image/png"};base64,${b64(await assetBytes(assets, path))}`;
+  const key = imgSrc(assets, path);
+  const hit = uris.get(key);
+  if (hit) return hit;
+  const uri = `data:${MIME[extOf(path)] ?? "image/png"};base64,${b64(await assetBytes(assets, path))}`;
+  uris.set(key, uri);
+  return uri;
 }
