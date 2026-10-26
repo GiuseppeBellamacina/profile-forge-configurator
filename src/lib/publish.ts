@@ -1,6 +1,8 @@
 // Everything needed to put the card on a user's GitHub: file generators + a small GitHub REST client.
 // No backend: the user's token stays in the page and only talks to api.github.com.
 
+import { relevant } from "./relevant";
+
 export const ACTION_REPO = "GiuseppeBellamacina/profile-forge";
 const API = "https://api.github.com";
 const enc = new TextEncoder();
@@ -57,14 +59,16 @@ jobs:
 `;
 }
 
+// only what applies: options the form hides (the snake options with Pac-Man...) are not written, see relevant()
 export const configJson = (raw: Raw) =>
-  JSON.stringify({ $schema: `https://raw.githubusercontent.com/${ACTION_REPO}/main/config.schema.json`, ...raw }, null, 2) + "\n";
+  JSON.stringify({ $schema: `https://raw.githubusercontent.com/${ACTION_REPO}/main/config.schema.json`, ...relevant(raw) }, null, 2) + "\n";
 
 export const MARK = ["<!-- profile-forge:start -->", "<!-- profile-forge:end -->"];
 
 /** The README block: the card (dark/light <picture>) plus one clickable button per link. */
 export function readmeBlock(raw: Raw) {
-  const slots = Object.keys(raw.themes && !Array.isArray(raw.themes) ? raw.themes : { dark: 1, light: 1 });
+  const themes = relevant(raw).themes; // one theme in every slot: one card, one image
+  const slots = Object.keys(themes && !Array.isArray(themes) ? themes : { dark: 1, light: 1 });
   const img = (s: string) => `assets/profile-forge-${s}.svg`;
   const pic = (file: (s: string) => string, alt: string, w = "") => {
     const has = (s: string) => slots.includes(s);

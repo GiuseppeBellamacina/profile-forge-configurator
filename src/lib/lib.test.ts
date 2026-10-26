@@ -44,6 +44,31 @@ describe("generated files", () => {
   it("config.json carries the schema url first", () => {
     expect(configJson({ locale: "it" }).split("\n")[1]).toContain("$schema");
   });
+  it("config.json leaves out the options that do not apply", () => {
+    const out = JSON.parse(configJson({
+      heatmap: { mode: "pacman", cell: "triangle", snakeStyle: "glow", snakeLength: 9, pacmanGames: 2 },
+      colors: { snakeColor: "ff0000", pacmanColor: "ffff00", panel_color: "0d0a15" },
+      colorsByTheme: { dark: { snakeColor: "00ff00" } },
+      card: { background: { glow: false, glowX: 10, pattern: "none", patternSize: 200 } },
+    }));
+    expect(out.heatmap).toEqual({ mode: "pacman", pacmanGames: 2 });
+    expect(out.colors).toEqual({ pacmanColor: "ffff00", panel_color: "0d0a15" });
+    expect(out.colorsByTheme).toBeUndefined();
+    expect(out.card).toEqual({ background: { glow: false } }); // glow itself is a real choice, its position and strength are not
+    const snake = JSON.parse(configJson({ heatmap: { mode: "snake", snakeStyle: "glow", pacmanGames: 3 }, colors: { snakeColor: "ff0000" } }));
+    expect(snake.heatmap).toEqual({ mode: "snake", snakeStyle: "glow" });
+    expect(snake.colors).toEqual({ snakeColor: "ff0000" });
+  });
+  it("one theme in both slots is one card, and the README shows a single image", () => {
+    const same = { themes: { dark: "shadow-monarch", light: "shadow-monarch" }, colorsByTheme: { light: { panel_color: "ffffff" } } };
+    const out = JSON.parse(configJson(same));
+    expect(out.themes).toEqual({ dark: "shadow-monarch" });
+    expect(out.colorsByTheme).toBeUndefined();
+    expect(readmeBlock(same)).toContain('<img src="assets/profile-forge-dark.svg"');
+    expect(readmeBlock(same)).not.toContain("<picture>");
+    expect(readmeBlock({ themes: { dark: "dark", light: "light" } })).toContain("<picture>");
+    expect(JSON.parse(configJson({ themes: { dark: "a", light: "b" } })).themes).toEqual({ dark: "a", light: "b" });
+  });
   it("slug", () => expect(slug("C++ / Go")).toBe("c-go"));
 });
 
