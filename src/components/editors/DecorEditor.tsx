@@ -5,7 +5,7 @@ import { addAssets, edit, setVal, themeSlots, useAssets, useRaw } from "../../st
 import { Icon } from "../ui/Icon";
 import { ColorWidget } from "./ThemeEditor";
 
-type Piece = { motif?: string; image?: string; x?: number; y?: number; size?: number; rotate?: number; opacity?: number; color?: string; color2?: string; layer?: string; flip?: boolean; motion?: string };
+type Piece = { motif?: string; image?: string; x?: number; y?: number; anchor?: string; size?: number; rotate?: number; opacity?: number; color?: string; color2?: string; layer?: string; flip?: boolean; motion?: string };
 
 const MAX = 12;
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "art";
@@ -26,7 +26,7 @@ function Slider({ label, value, min, max, step = 1, onChange }: { label: string;
 
 /**
  * The art on the card (`card.decor`): pick motifs from a library or upload your own image, then place, size, turn and fade each
- * piece. Positions are percents of the card, so a piece keeps its place when the card gets taller.
+ * piece. Positions are percents of the card width, from the top or the bottom, so a piece keeps its place when the card gets taller.
  */
 export function DecorEditor() {
   const raw = useRaw();
@@ -88,13 +88,19 @@ export function DecorEditor() {
             <button type="button" className="btn sm danger" title="Remove" aria-label="Remove" onClick={() => save(list.filter((_, j) => j !== i))}><Icon n="reset" /></button>
           </div>
           <div className="decor-grid">
-            <Slider label="Left" value={p.x ?? 50} min={-20} max={120} onChange={(v) => update(i, { x: v }, "x")} />
-            <Slider label="Top" value={p.y ?? 50} min={-20} max={120} onChange={(v) => update(i, { y: v }, "y")} />
+            <Slider label="Right" value={p.x ?? 50} min={-20} max={120} onChange={(v) => update(i, { x: v }, "x")} />
+            <Slider label={p.anchor === "bottom" ? "Up" : "Down"} value={p.y ?? 20} min={-10} max={120} onChange={(v) => update(i, { y: v }, "y")} />
             <Slider label="Size" value={p.size ?? 20} min={4} max={100} onChange={(v) => update(i, { size: v }, "size")} />
             <Slider label="Turn" value={p.rotate ?? 0} min={-180} max={180} onChange={(v) => update(i, { rotate: v || undefined }, "rotate")} />
             <Slider label="Opacity" value={p.opacity ?? 0.5} min={0} max={1} step={0.05} onChange={(v) => update(i, { opacity: v }, "opacity")} />
           </div>
           <div className="row">
+            <label className="decor-pick">Measured
+              <select value={p.anchor ?? "top"} onChange={(e) => update(i, { anchor: e.target.value === "top" ? undefined : e.target.value })}>
+                <option value="top">from the top</option>
+                <option value="bottom">from the bottom</option>
+              </select>
+            </label>
             <label className="decor-pick">Layer
               <select value={p.layer ?? "back"} onChange={(e) => update(i, { layer: e.target.value === "back" ? undefined : e.target.value })}>
                 <option value="back">behind the sections</option>
