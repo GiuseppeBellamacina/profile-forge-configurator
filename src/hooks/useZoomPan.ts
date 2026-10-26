@@ -47,8 +47,8 @@ export function useZoomPan(stage: RefObject<HTMLElement>, card: RefObject<HTMLEl
 
   const drag = useRef<{ x: number; y: number; id: number } | null>(null);
   const onPointerDown = useCallback((e: React.PointerEvent) => {
-    // widgets of the grid editor keep their own drag
-    if ((e.target as HTMLElement).closest(".gbox,.ghandle,.gvhandle,button,a,input,select,summary")) return;
+    // widgets of the grid editor and the art handles keep their own drag
+    if ((e.target as HTMLElement).closest(".gbox,.ghandle,.gvhandle,.dbox,button,a,input,select,summary")) return;
     touched.current = true;
     drag.current = { x: e.clientX, y: e.clientY, id: e.pointerId };
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
