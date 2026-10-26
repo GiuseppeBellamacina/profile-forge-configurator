@@ -7,6 +7,7 @@ import { useSession } from "../store/session";
 import { uiStore, useUi } from "../store/ui";
 import { itemsOf } from "../lib/grid";
 import { GridOverlay } from "./GridOverlay";
+import { DecorOverlay } from "./DecorOverlay";
 import { Icon } from "./ui/Icon";
 
 const copy = async (text: string, setLabel: (s: string) => void, idle: string) => {
@@ -82,6 +83,7 @@ export function Preview() {
           <div ref={card} className="card-wrap" style={zoom.style}>
             {/* fit once the new image is laid out: before onLoad the wrapper still has the previous card's size */}
             <img key={replay} src={pv.url} alt="Card preview" onLoad={() => { if (!zoom.touched.current) zoom.fit(); }} />
+            {step === "look" && Array.isArray(raw.card?.decor) && raw.card.decor.length > 0 && pv.height > 0 && <DecorOverlay pieces={raw.card.decor} height={pv.height} />}
             {step === "layout" && Array.isArray(raw.grid) && pv.boxes.length > 0 && <GridOverlay boxes={pv.boxes} height={pv.height} items={itemsOf(raw.grid)} />}
           </div>
         )}

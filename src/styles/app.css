@@ -359,3 +359,11 @@ img.logo { background: none; box-shadow: none; display: block; border-radius: 8p
 .decor-slider { display: grid; grid-template-columns: 52px 1fr 40px; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
 .decor-slider output { text-align: right; color: var(--text); font-variant-numeric: tabular-nums; }
 .decor-pick { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+
+/* drag the art of the card on the preview (DecorOverlay) */
+.decor-overlay { position: absolute; inset: 0; pointer-events: none; }
+.dbox { position: absolute; transform: translate(-50%, -50%); border: 1px dashed transparent; border-radius: 4px; cursor: grab; pointer-events: auto; touch-action: none; }
+.dbox:hover, .dbox.moving { border-color: var(--text); background: rgba(255, 255, 255, 0.06); }
+.dbox.moving { cursor: grabbing; }
+.dbox .dname { position: absolute; left: 0; top: -18px; padding: 1px 6px; border-radius: 4px; background: var(--text); color: #000; font-size: 11px; white-space: nowrap; display: none; }
+.dbox:hover .dname, .dbox.moving .dname { display: block; }

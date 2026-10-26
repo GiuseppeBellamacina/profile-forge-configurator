@@ -14,7 +14,7 @@ export type StepId = (typeof STEPS)[number]["id"];
 
 // ?step=look opens a step directly (handy for links and screenshots); otherwise the last one, kept across the sign-in redirect.
 const saved = new URLSearchParams(location.search).get("step") ?? session.get<string>("pf:tab");
-type Ui = { step: StepId; slot: string | null; focusPath: string | null; sheetOpen: boolean; query: string; boxes: Box[]; refit: number };
+type Ui = { step: StepId; slot: string | null; focusPath: string | null; sheetOpen: boolean; query: string; boxes: Box[]; refit: number; dragArt: boolean };
 export const uiStore = createStore<Ui>({
   step: STEPS.some((s) => s.id === saved) ? (saved as StepId) : "start",
   slot: null,
@@ -22,6 +22,7 @@ export const uiStore = createStore<Ui>({
   sheetOpen: false,
   query: "",
   refit: 0, // bumped when a preset is loaded: the preview zooms to show the whole card again
+  dragArt: false, // a piece of art is being dragged on the preview: the sections fade so it can be placed behind them
   boxes: [], // where the sections landed in the last render (the grid editor needs their natural heights)
 });
 

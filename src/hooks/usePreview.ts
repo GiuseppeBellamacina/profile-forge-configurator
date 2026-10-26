@@ -29,8 +29,10 @@ export function usePreview(): Preview {
   const profile = useSession((s) => s.profile);
   const wanted = useUi((s) => s.slot);
   const step = useUi((s) => s.step);
+  const ghost = useUi((s) => s.dragArt);
   const still = ["look", "layout", "sections", "content"].includes(step); // while editing: no animation, near-instant updates
   const samples = step === "layout";
+  const frozen = step === "look"; // in Look nothing moves, not even right after an edit of an animated option
   const [out, setOut] = useState<Preview>(EMPTY);
   const lastUrl = useRef("");
   // this config came from an edit of an animated option: render it animated once
@@ -44,10 +46,12 @@ export function usePreview(): Preview {
     const timer = setTimeout(async () => {
       try {
         const { svg, missing, light, slots, slot, height, boxes } = await renderCard(
-          still && !anim ? { ...(samples ? withSamples(raw) : raw), card: { ...raw.card, animations: false } } : samples ? withSamples(raw) : raw,
+          still && (!anim || frozen) ? { ...(samples ? withSamples(raw) : raw), card: { ...raw.card, animations: false } } : samples ? withSamples(raw) : raw,
           assets,
           profile,
           wanted,
+          undefined,
+          ghost ? { ghost: true } : undefined,
         );
         if (stale) return;
         const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
@@ -58,12 +62,12 @@ export function usePreview(): Preview {
       } catch (e: any) {
         if (!stale) setOut((o) => ({ ...o, error: e.message ?? String(e), busy: false }));
       }
-    }, still && !anim ? 30 : 140);
+    }, still && (!anim || frozen) ? 30 : 140);
     return () => {
       stale = true;
       clearTimeout(timer);
     };
-  }, [raw, assets, profile, wanted, still, samples, anim]);
+  }, [raw, assets, profile, wanted, still, samples, anim, frozen, ghost]);
 
   return out;
 }

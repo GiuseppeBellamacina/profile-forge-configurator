@@ -15,7 +15,7 @@ async function deviconData(it: { name: string; image: string }) {
 }
 
 /** The card as an SVG string for one theme slot, using the real renderer. Shared by the live preview and the theme thumbnails. */
-export async function renderCard(raw: Raw, assets: Record<string, { url: string }>, profile: Raw, wanted?: string | null, tweak?: (data: Raw) => void): Promise<Rendered> {
+export async function renderCard(raw: Raw, assets: Record<string, { url: string }>, profile: Raw, wanted?: string | null, tweak?: (data: Raw) => void, opts?: Raw): Promise<Rendered> {
   const k = normalize(clone(raw));
   const slots: string[] = k.slots.map(([s]: [string]) => s);
   const slot = slots.includes(wanted ?? "") ? (wanted as string) : slots[0];
@@ -50,7 +50,7 @@ export async function renderCard(raw: Raw, assets: Record<string, { url: string 
   if (k.header.flag) k.flagData = await dataUri(assets, k.header.flag).catch((e) => (console.warn("flag not loaded:", e.message), null));
 
   const colors = { ...k.colors, ...k.colorsByTheme[slot] };
-  const svg = render(data, { theme, k, colors, fontCss: await fonts() });
+  const svg = render(data, { theme, k, colors, fontCss: await fonts(), ...opts });
   const { height, boxes } = sectionBoxes(data, { theme, k, colors });
   return { svg, missing, light: resolveTheme(theme).base === "light", slots, slot, height, boxes };
 }

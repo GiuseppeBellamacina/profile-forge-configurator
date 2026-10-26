@@ -34,6 +34,8 @@ export const GROUPS: Group[] = [
     fields: [
       { type: "number", path: "card.radius", label: "Corner radius", min: 0, max: 60 },
       { type: "bool", path: "card.hideBorder", label: "Hide border" },
+      { type: "select", path: "card.panels", label: "Panel shape", options: ["rounded", "square", "notched"], hint: "notched: chamfered corners and an accent stroke, like a game HUD" },
+      { type: "select", path: "card.titles", label: "Panel titles", options: ["plain", "tag"], hint: "tag: a label in the accent colour with a slanted end" },
       { type: "bool", path: "card.animations", label: "Animations" },
       { type: "text", path: "card.background.gradient", label: "Background gradient", hint: "angle,color1,color2,…", placeholder: "35,4158d0,c850c0,ffcc70" },
       { type: "select", path: "card.background.pattern", label: "Background pattern", options: ["none", "dots", "grid", "diagonal", "halftone", "scanlines", "stripes", "hex", "circuit", "crosses"] },
