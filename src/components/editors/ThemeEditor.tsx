@@ -253,6 +253,11 @@ export function ColorsEditor() {
         <span className="field-label" title="angle,color1,color2,…">bg_gradient</span>
         <input type="text" placeholder="120,0f2027,203a43,2c5364" defaultValue={getPath(raw, `${base}.bg_gradient`) ?? ""} key={base} onChange={(e) => setVal(`${base}.bg_gradient`, e.target.value.trim() || undefined)} />
       </label>
+      {Object.keys(getPath(raw, base) ?? {}).length > 0 && (
+        <button type="button" className="btn sm" style={{ justifySelf: "start" }} onClick={() => edit((r) => { t === "all" ? delete r.colors : delete r.colorsByTheme?.[t]; if (r.colorsByTheme && !Object.keys(r.colorsByTheme).length) delete r.colorsByTheme; })}>
+          Clear every override ({Object.keys(getPath(raw, base)).length}), back to the theme as it is
+        </button>
+      )}
     </div>
   );
 }
