@@ -5,7 +5,7 @@ import { addAssets, edit, setVal, themeSlots, useAssets, useRaw } from "../../st
 import { Icon } from "../ui/Icon";
 import { ColorWidget } from "./ThemeEditor";
 
-type Piece = { motif?: string; image?: string; x?: number; y?: number; anchor?: string; size?: number; speed?: number; rotate?: number; opacity?: number; color?: string; color2?: string; layer?: string; flip?: boolean; motion?: string };
+type Piece = { motif?: string; image?: string; text?: string; x?: number; y?: number; anchor?: string; size?: number; speed?: number; rotate?: number; opacity?: number; color?: string; color2?: string; layer?: string; flip?: boolean; motion?: string };
 
 const MAX = 12;
 /** Pieces that move by themselves, whose pace can be changed: the animated motifs and any svg of yours. */
@@ -38,6 +38,8 @@ export function DecorEditor() {
   const dlg = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
   const file = useRef<HTMLInputElement>(null);
+  const [word, setWord] = useState("");
+  const addWord = () => { if (!word.trim() || list.length >= MAX) return; add({ text: word.trim(), x: 50, y: 20, size: 18, opacity: 1 }); setWord(""); };
   useEffect(() => { if (open) dlg.current?.showModal(); }, [open]);
 
   let accent = "#5b8cff", accent2 = "#9aa4b5";
@@ -76,6 +78,8 @@ export function DecorEditor() {
       <div className="row">
         <button type="button" className="btn primary" onClick={() => setOpen(true)} disabled={list.length >= MAX}>Add art</button>
         <button type="button" className="btn" onClick={() => file.current?.click()} disabled={list.length >= MAX}>Upload an image</button>
+        <input type="text" className="decor-word" maxLength={24} placeholder="A word: BOOM!" value={word} onChange={(e) => setWord(e.target.value)} onKeyDown={(e) => e.key === "Enter" && addWord()} />
+        <button type="button" className="btn" onClick={addWord} disabled={!word.trim() || list.length >= MAX}>Add the word</button>
         <input ref={file} type="file" accept="image/svg+xml,image/png,image/jpeg,image/webp,image/gif" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) upload(f); }} />
         <span className="log">{list.length ? `${list.length} of ${MAX} pieces` : "No art yet: pick a motif or upload your own image."}</span>
       </div>
@@ -83,8 +87,8 @@ export function DecorEditor() {
       {list.map((p, i) => (
         <div key={i} className="card-box decor-item">
           <div className="row">
-            <img className="decor-thumb" alt="" src={p.motif ? motifUrl(p.motif, p.color ? `#${p.color}` : accent2, p.color2 ? `#${p.color2}` : accent) : imgSrc(assets, p.image ?? "")} />
-            <b style={{ flex: 1 }}>{p.motif ?? p.image?.split("/").pop()}</b>
+            {p.text !== undefined ? <span className="decor-thumb decor-aa">Aa</span> : <img className="decor-thumb" alt="" src={p.motif ? motifUrl(p.motif, p.color ? `#${p.color}` : accent2, p.color2 ? `#${p.color2}` : accent) : imgSrc(assets, p.image ?? "")} />}
+            {p.text !== undefined ? <input type="text" style={{ flex: 1 }} maxLength={24} value={p.text} aria-label="The word" onChange={(e) => e.target.value && update(i, { text: e.target.value }, "text")} /> : <b style={{ flex: 1 }}>{p.motif ?? p.image?.split("/").pop()}</b>}
             <button type="button" className="btn sm" title="Move back" aria-label="Move back" disabled={i === 0} onClick={() => move(i, -1)}>↑</button>
             <button type="button" className="btn sm" title="Move forward" aria-label="Move forward" disabled={i === list.length - 1} onClick={() => move(i, 1)}>↓</button>
             <button type="button" className="btn sm danger" title="Remove" aria-label="Remove" onClick={() => save(list.filter((_, j) => j !== i))}><Icon n="reset" /></button>
@@ -119,10 +123,10 @@ export function DecorEditor() {
             </label>
             <label className="decor-pick"><input type="checkbox" checked={!!p.flip} onChange={(e) => update(i, { flip: e.target.checked || undefined })} /> Mirror</label>
           </div>
-          {(p.motif || /\.svg$/i.test(p.image ?? "")) && (
+          {(p.motif || p.text !== undefined || /\.svg$/i.test(p.image ?? "")) && (
             <div className="row">
-              <ColorWidget k="ring_color" label={p.motif ? "Main" : "Recolor"} value={p.color ?? ""} theme={first} onSet={(v) => update(i, { color: v }, "color")} />
-              {p.motif && <ColorWidget k="icon_color" label="Accent" value={p.color2 ?? ""} theme={first} onSet={(v) => update(i, { color2: v }, "color2")} />}
+              <ColorWidget k="ring_color" label={p.text !== undefined ? "Fill" : p.motif ? "Main" : "Recolor"} value={p.color ?? ""} theme={first} onSet={(v) => update(i, { color: v }, "color")} />
+              {(p.motif || p.text !== undefined) && <ColorWidget k="icon_color" label={p.text !== undefined ? "Outline" : "Accent"} value={p.color2 ?? ""} theme={first} onSet={(v) => update(i, { color2: v }, "color2")} />}
             </div>
           )}
         </div>

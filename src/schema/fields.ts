@@ -34,11 +34,11 @@ export const GROUPS: Group[] = [
     fields: [
       { type: "number", path: "card.radius", label: "Corner radius", min: 0, max: 60 },
       { type: "bool", path: "card.hideBorder", label: "Hide border" },
-      { type: "select", path: "card.panels", label: "Panel shape", options: ["rounded", "square", "notched"], hint: "notched: chamfered corners and an accent stroke, like a game HUD" },
+      { type: "select", path: "card.panels", label: "Panel shape", options: ["rounded", "square", "notched", "pop"], hint: "notched: chamfered corners, like a game HUD; pop: a thick outline and a hard shadow, like a comic panel" },
       { type: "select", path: "card.titles", label: "Panel titles", options: ["plain", "tag"], hint: "tag: a label in the accent colour with a slanted end" },
       { type: "bool", path: "card.animations", label: "Animations" },
       { type: "text", path: "card.background.gradient", label: "Background gradient", hint: "angle,color1,color2,…", placeholder: "35,4158d0,c850c0,ffcc70" },
-      { type: "select", path: "card.background.pattern", label: "Background pattern", options: ["none", "dots", "grid", "diagonal", "halftone", "scanlines", "stripes", "hex", "circuit", "crosses"] },
+      { type: "select", path: "card.background.pattern", label: "Background pattern", options: ["none", "dots", "grid", "diagonal", "halftone", "scanlines", "stripes", "hex", "circuit", "crosses", "rays"] },
       { type: "hex", path: "card.background.patternColor", label: "Pattern color", like: "muted_color", when: { path: "card.background.pattern", not: "none" } },
       { type: "number", path: "card.background.patternOpacity", label: "Pattern opacity", min: 0, max: 1, step: 0.05, hint: "empty: each pattern has its own", when: { path: "card.background.pattern", not: "none" } },
       { type: "number", path: "card.background.patternSize", label: "Pattern size (%)", min: 25, max: 400, step: 5, when: { path: "card.background.pattern", not: "none" } },
@@ -61,7 +61,7 @@ export const GROUPS: Group[] = [
       { type: "color", path: "colors.frameColor", label: "Frame color", hint: "default: the color of your level", when: [{ path: "header.frame", not: "none" }, { path: "header.avatar", not: "hide" }] },
       { type: "select", path: "header.rankIcon", label: "Rank shows", options: ["level", "percentile", "github"] },
       { type: "select", path: "header.rankEffect", label: "Rank effect", options: ["auto", "none", "halo", "shine", "embers", "rainbow"], hint: "auto: by level (S a halo, SSS light and sparkles, X glowing embers); the others at any level" },
-      { type: "select", path: "header.rankStyle", label: "Rank shape", options: ["ring", "hexagon", "shield"] },
+      { type: "select", path: "header.rankStyle", label: "Rank shape", options: ["ring", "hexagon", "shield", "burst"] },
       { type: "number", path: "header.rankThickness", label: "Rank thickness", min: 4, max: 16 },
       { type: "multi", path: "hideSections", label: "Hide", hint: "to drop a whole section, just remove it in Layout", options: ["rank"] },
       {

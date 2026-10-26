@@ -368,3 +368,5 @@ img.logo { background: none; box-shadow: none; display: block; border-radius: 8p
 .dbox.moving { cursor: grabbing; }
 .dbox .dname { position: absolute; left: 0; top: -18px; padding: 1px 6px; border-radius: 4px; background: var(--text); color: #000; font-size: 11px; white-space: nowrap; display: none; }
 .dbox:hover .dname, .dbox.moving .dname { display: block; }
+.decor-word { width: 150px; }
+.decor-aa { display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; }

@@ -5,7 +5,7 @@ import { edit, themeSlots, useAssets, useRaw } from "../store/config";
 import { uiStore } from "../store/ui";
 
 const CARD_W = 1000; // the card is always 1000 wide: x, y and size are percents of it
-type Piece = { motif?: string; image?: string; x?: number; y?: number; anchor?: string; size?: number; rotate?: number; opacity?: number; color?: string; color2?: string; flip?: boolean };
+type Piece = { motif?: string; image?: string; text?: string; x?: number; y?: number; anchor?: string; size?: number; rotate?: number; opacity?: number; color?: string; color2?: string; flip?: boolean };
 
 /**
  * Handles over the art of the card: drag one with the mouse to move it.
@@ -52,7 +52,7 @@ export function DecorOverlay({ pieces, height }: { pieces: Piece[]; height: numb
           <div
             key={i}
             className={`dbox${moving ? " moving" : ""}`}
-            title={p.motif ?? p.image?.split("/").pop()}
+            title={p.text ?? p.motif ?? p.image?.split("/").pop()}
             style={{ left: `${x}%`, top: `${(top / heightPct) * 100}%`, width: `${size}%`, height: `${(size / heightPct) * 100}%` }}
             onPointerDown={(e) => {
               e.preventDefault();
@@ -73,10 +73,12 @@ export function DecorOverlay({ pieces, height }: { pieces: Piece[]; height: numb
             }}
             onLostPointerCapture={() => moving && end()}
           >
-            {moving && (p.motif
+            {moving && (p.text !== undefined
+              ? <svg viewBox="0 0 100 100" style={look}><text x="50" y="68" textAnchor="middle" fontSize={Math.min(64, Math.round(165 / Math.max(3, p.text.length)))} fontWeight="800" fill={p.color ? `#${p.color}` : accent} stroke={p.color2 ? `#${p.color2}` : "#14141c"} strokeWidth="6" paintOrder="stroke">{p.text}</text></svg>
+              : p.motif
               ? <svg viewBox="0 0 100 100" style={look} dangerouslySetInnerHTML={{ __html: MOTIFS[p.motif](a, b) }} />
               : <img src={imgSrc(assets, p.image ?? "")} alt="" style={{ ...look, width: "100%", height: "100%", objectFit: "contain" }} />)}
-            <span className="dname">{p.motif ?? p.image?.split("/").pop()}</span>
+            <span className="dname">{p.text ?? p.motif ?? p.image?.split("/").pop()}</span>
           </div>
         );
       })}
