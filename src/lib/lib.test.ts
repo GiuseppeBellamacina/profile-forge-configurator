@@ -49,7 +49,7 @@ describe("generated files", () => {
       heatmap: { mode: "pacman", cell: "triangle", snakeStyle: "glow", snakeLength: 9, pacmanGames: 2 },
       colors: { snakeColor: "ff0000", pacmanColor: "ffff00", panel_color: "0d0a15" },
       colorsByTheme: { dark: { snakeColor: "00ff00" } },
-      card: { background: { glow: false, glowX: 10, pattern: "none", patternSize: 200 } },
+      card: { background: { glow: false, glowX: 10, patternSize: 200 } },
     }));
     expect(out.heatmap).toEqual({ mode: "pacman", pacmanGames: 2 });
     expect(out.colors).toEqual({ pacmanColor: "ffff00", panel_color: "0d0a15" });
