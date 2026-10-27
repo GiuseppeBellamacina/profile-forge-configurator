@@ -58,8 +58,10 @@ export default {
         headers: { Accept: "application/json", "Content-Type": "application/json", "User-Agent": "profile-forge-oauth" },
         body: JSON.stringify({ client_id: env.GITHUB_CLIENT_ID, client_secret: env.GITHUB_CLIENT_SECRET, code, redirect_uri: `${url.origin}/auth/callback` }),
       });
-      const j = await res.json().catch(() => ({}));
-      if (!j.access_token) return back(new URLSearchParams({ pf_error: j.error_description ?? j.error ?? "token exchange failed", state }));
+      const raw = await res.text();
+      const j = (() => { try { return JSON.parse(raw); } catch { return {}; } })();
+      // say what GitHub answered when it gave neither a token nor a reason (HTTP status and the start of the body), so a failure can be told apart
+      if (!j.access_token) return back(new URLSearchParams({ pf_error: j.error_description ?? j.error ?? `token exchange failed (GitHub answered HTTP ${res.status}: ${raw.replace(/\s+/g, " ").slice(0, 120) || "nothing"})`, state }));
       return back(new URLSearchParams({ pf_token: j.access_token, state }));
     }
 
